@@ -1,0 +1,3 @@
+examples/*.raw
+examples/*.rendered
+examples/*.html
