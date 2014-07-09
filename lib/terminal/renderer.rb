@@ -2,15 +2,11 @@ require 'escape_utils'
 
 module Terminal
   class Renderer
-    def self.render(string)
-      new.render(output)
-    end
-
     def render(output)
-      return "" if output.nil?
+      return "" if output.nil? || output.strip.length == 0
 
-      # Limit the entire size of the output to 4 meg
-      max_total_size = 4.megabytes
+      # Limit the entire size of the output to 4 meg (4 * megabyte * kilabyte)
+      max_total_size = 4 * 1024 * 1024
       if output.bytesize > max_total_size
         output = output.byteslice(0, max_total_size)
         output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed #{number_to_human_size(max_total_size)} limit for logs."
@@ -42,8 +38,6 @@ module Terminal
     # \e[0m reset color information
     # \e[?m use the ? color going forward
     def emulate_terminal_rendering(string)
-      return "" if string.blank?
-
       # Splits the output into intersting parts.
       parts = string.scan(/[\n\r\b]|\e\[[\d;]+m|\e|[^\n\r\b\e]+/)
 

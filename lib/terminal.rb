@@ -6,5 +6,7 @@ require "terminal/renderer"
 require "terminal/cli"
 
 module Terminal
-  # Your code goes here...
+  def self.render(output)
+    Terminal::Renderer.new.render(output)
+  end
 end

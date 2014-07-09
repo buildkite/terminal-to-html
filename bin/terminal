@@ -4,4 +4,21 @@ $:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
 
 require 'terminal'
 
-Terminal::CLI.run(ARGV)
+def help
+  puts <<-usage
+Usage:
+  $ cat output.text | terminal
+  $ terminal output.text
+
+Help:
+  $ terminal -h
+
+See https://buildboxhq.github.io/terminal for more information.
+  usage
+end
+
+if ($stdin.tty? && ARGV.empty?) || ARGV.delete('-h') || ARGV.delete('--help')
+  help
+else
+  puts Terminal.render(ARGF.read)
+end

@@ -1,15 +1,16 @@
 module Terminal
   class CLI
-    def self.run(*args)
-      new(args).run
+    def self.run(*args, file)
+      new(args, file).run
     end
 
-    def initialize(args)
+    def initialize(args, file)
       @args = args
+      @file = file
     end
 
     def run
-      puts @args
+      puts @file
     end
   end
 end
