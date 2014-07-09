@@ -1,5 +1,3 @@
-# Terminal
-
 ![logo](http://buildboxhq.github.io/terminal/images/logo.png)
 
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
