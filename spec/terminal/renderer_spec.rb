@@ -11,6 +11,14 @@ describe Terminal::Renderer do
     end
   end
 
+  describe "rendering of ascii.sh" do
+    it "returns the expected result" do
+      fixture = Fixture.for("ascii.sh")
+
+      expect(renderer.render(fixture.raw)).to eql(fixture.rendered)
+    end
+  end
+
   describe "#render" do
     let(:hello_output) { "he\e[81mllo" }
 
