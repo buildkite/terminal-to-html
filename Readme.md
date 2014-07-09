@@ -1,5 +1,7 @@
 # Terminal
 
+![logo](https://raw.githubusercontent.com/buildboxhq/terminal/master/docs/logo.png)
+
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
 
 Terminal takes any arbitrary crazy shell output (ASCII), and turns it into beautifully rendered HTML.
