@@ -9,6 +9,8 @@
 .c90 { color: #838887; }
 
 * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -22,12 +24,13 @@
 a {
   color: currentColor;
   text-decoration: none;
-}
-a:hover {
   border-bottom: 1px solid currentColor;
 }
 
-header img {
+header a {
+  border-bottom: none;
+}
+header a img {
   width: 100%;
 }
 
@@ -66,15 +69,15 @@ section {
 }
 .example .code.before::before, .example .code.after::before {
   display: block;
-  color: rgb(80,80,80);
+  color: rgb(120,120,120);
   font-size: 13px;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   margin-bottom: 1.5em;
 }
 .example .code.before::before {
-  content: 'Raw shell output';
+  content: 'Shell output';
 }
 .example .code.after::before {
   content: 'Rendered HTML';
@@ -91,10 +94,20 @@ section {
 
 @media only screen and (min-width: 50em) {
   .example {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
     flex-direction: row;
   }
   .example .code {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
     flex: 1;
   }
   .example .code.before {
@@ -118,19 +131,32 @@ footer {
   text-align: center;
 }
 
-footer p {
+footer a {
   display: inline-block;
+  border-bottom: none;
 }
 
-footer a {
+footer a, footer .bb, footer .heart {
+  -webkit-transition: color .2s;
+  transition: color .2s;
+}
+
+footer .bb {
   display: block;
   font-weight: bold;
   font-size: 32px;
-  -webkit-transition: color 0.1s;
-  transition: color 0.1s;
+  color: rgb(170,170,170);
 }
 
 footer a:hover {
+  color: rgb(130,130,130);
+}
+
+footer a:hover .heart {
+  color: red;
+}
+
+footer a:hover .bb {
   color: rgb(120,120,120);
   border-bottom: none;
 }
