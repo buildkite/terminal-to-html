@@ -26,7 +26,24 @@ Or install it yourself as:
 Terminal.render("...")
 ```
 
-### Using with the Buildbox API and the command line
+### Command Line
+
+Terminal ships with a command line utility. For example, you can pipe `rspec` output to it:
+
+```bash
+rspec --color --tty | terminal
+```
+
+Or use output saved earlier:
+
+```bash
+rspec --tty --color > output.txt
+terminal output.txt
+```
+
+With `rspec`, you'll need to use the `--tty` and `--color` options to force it to output colors.
+
+### With the Buildbox API
 
 First install [jq](http://stedolan.github.io/jq/), if you have [Homebrew](http://brew.sh/) installed, you can just `brew install jq`.
 
@@ -36,6 +53,8 @@ Then, you can:
 $JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]"
 echo $(curl $JOB_LOG_URL -s | jq '.content') | terminal
 ```
+
+For more information on the Buildbox Builds API, see: https://buildbox.io/docs/api/builds
 
 ## Contributing
 
