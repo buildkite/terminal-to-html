@@ -13,6 +13,9 @@ Usage:
 Help:
   $ terminal -h
 
+Preview in the browser:
+  $ terminal --preview
+
 See https://buildboxhq.github.io/terminal for more information.
   usage
 end
