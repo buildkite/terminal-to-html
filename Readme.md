@@ -54,6 +54,8 @@ and when the render has finished, it will open in your web browser with a before
 rspec --color --tty | terminal --preview
 ```
 
+![logo](http://buildboxhq.github.io/terminal/images/preview.png)
+
 ### With the Buildbox API
 
 First install [jq](http://stedolan.github.io/jq/), if you have [Homebrew](http://brew.sh/) installed, you can just `brew install jq`.
