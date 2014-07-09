@@ -25,6 +25,15 @@ footer {
   font-weight: bold;
   font-size: 25px;
   text-decoration: none;
+
+  -webkit-transition-property: color;
+  -webkit-transition-duration: 0.1s;
+  transition-property: color;
+  transition-duration: 0.1s;
+}
+
+.footer-logo a:hover {
+  color: #858585;
 }
 
 .code {
