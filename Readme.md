@@ -1,6 +1,6 @@
 # Terminal
 
-![logo](https://raw.githubusercontent.com/buildboxhq/terminal/master/docs/logo.png)
+![logo](http://buildboxhq.github.io/terminal/images/logo.png)
 
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
 
