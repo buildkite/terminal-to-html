@@ -17,8 +17,23 @@ See https://buildboxhq.github.io/terminal for more information.
   usage
 end
 
+preview = ARGV.delete('--preview')
+
 if ($stdin.tty? && ARGV.empty?) || ARGV.delete('-h') || ARGV.delete('--help')
   help
 else
-  puts Terminal.render(ARGF.read)
+  raw = ARGF.read
+  rendered = Terminal.render(raw)
+
+  if preview
+    require 'tempfile'
+
+    tempfile = Tempfile.new([ 'preview', '.html' ])
+    tempfile.write(Terminal::Preview.new(raw, rendered).render)
+    tempfile.close
+
+    exec %{open "#{tempfile.path}"}
+  else
+    puts rendered
+  end
 end
