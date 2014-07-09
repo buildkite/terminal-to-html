@@ -60,6 +60,10 @@ footer {
   line-height: 23px;
 }
 
+.example .before {
+  display: none;
+}
+
 /* yellow */
 .c33 {
   color: #c6c502;

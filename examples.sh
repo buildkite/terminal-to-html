@@ -15,7 +15,8 @@ function buildbox-run {
   buildbox-exit-if-failed $?
 }
 
-buildbox-run "curl -o /tmp/buildbox-agent.tar.gz https://github.com/buildboxhq/buildbox-agent/releases/download/v0.1-alpha/buildbox-agent-darwin-386.tar.gz"
+echo -e "$BUILDBOX_PROMPT curl -o /tmp/file.txt https://example.com/file.txt"
+curl -o /tmp/buildbox-agent.tar.gz https://github.com/buildboxhq/buildbox-agent/releases/download/v0.1-alpha/buildbox-agent-darwin-386.tar.gz
 
 echo '---'
 

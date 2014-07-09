@@ -1,4 +1,6 @@
 require 'pty'
+require 'rubygems'
+require 'terminal'
 
 output = ""
 read_io, write_io, pid = nil
@@ -33,7 +35,8 @@ read_io.close
 Process.waitpid(pid)
 
 examples = output.split("---").map do |example|
-  %{<div class="code"><pre>#{example}</pre></div>}
+  rendered = Terminal.render(example.chomp.strip)
+  %{<div class="code example"><pre class="before">#{example}</pre><pre class="after">#{rendered}</pre></div>}
 end.join("\n")
 
 template = File.read("template.html")

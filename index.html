@@ -14,12 +14,15 @@
       <div class="code large"><pre>Terminal takes any arbitrary crazy shell output (ASCII), and
 turns it into beautifully rendered HTML.</pre></div>
 
-      <div class="code"><pre>[90m$[0m curl -o /tmp/buildbox-agent.tar.gz https://github.com/buildboxhq/buildbox-agent/releases/download/v0.1-alpha/buildbox-agent-darwin-386.tar.gz
+      <div class="code example"><pre class="before">[90m$[0m curl -o /tmp/file.txt https://example.com/file.txt
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0100   360  100   360    0     0    186      0  0:00:01  0:00:01 --:--:--   186
-</pre></div>
-<div class="code"><pre>
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0100   360  100   360    0     0    143      0  0:00:02  0:00:02 --:--:--   143
+</pre><pre class="after"><span class='c90'>$</span> curl -o &#47;tmp&#47;file.txt https:&#47;&#47;example.com&#47;file.txt
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   360  100   360    0     0    143      0  0:00:02  0:00:02 --:--:--   143</pre></div>
+<div class="code example"><pre class="before">
 [90m$[0m rspec specs.rb
 [32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31mF[0m
 
@@ -34,13 +37,32 @@ Failures:
      [31m  (compared using eql?)[0m
      [36m# ./specs.rb:18:in `block (2 levels) in <top (required)>'[0m
 
-Finished in 0.00963 seconds (files took 0.16422 seconds to load)
+Finished in 0.00153 seconds (files took 0.15272 seconds to load)
 [31m6 examples, 1 failure[0m
 
 Failed examples:
 
 [31mrspec ./specs.rb:17[0m [36m# this test should fail[0m
-</pre></div>
+</pre><pre class="after"><span class='c90'>$</span> rspec specs.rb
+<span class='c32'>.</span><span class='c32'>.</span><span class='c32'>.</span><span class='c32'>.</span><span class='c32'>.</span><span class='c31'>F</span>
+&nbsp;
+Failures:
+&nbsp;
+  1) this test should fail
+     <span class='c31'>Failure&#47;Error: expect(false).to eql(true)</span>
+     <span class='c31'>  </span>
+     <span class='c31'>  expected: true</span>
+     <span class='c31'>       got: false</span>
+     <span class='c31'>  </span>
+     <span class='c31'>  (compared using eql?)</span>
+     <span class='c36'># .&#47;specs.rb:18:in `block (2 levels) in &lt;top (required)&gt;&#39;</span>
+&nbsp;
+Finished in 0.00153 seconds (files took 0.15272 seconds to load)
+<span class='c31'>6 examples, 1 failure</span>
+&nbsp;
+Failed examples:
+&nbsp;
+<span class='c31'>rspec .&#47;specs.rb:17</span> <span class='c36'># this test should fail</span></pre></div>
 
       <div class="code large"><pre><span class="c90"># Get started</span>
 $ gem install terminal</pre></div>
