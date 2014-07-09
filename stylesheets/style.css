@@ -46,6 +46,12 @@ section {
   padding: 30px;
 }
 
+@media only screen and (max-width: 30em) {
+  .code {
+    font-size: 15px;
+  }
+}
+
 .code p {
   margin: 0;
 }
@@ -61,6 +67,12 @@ section {
 .intro {
   font-size: 28px;
   line-height: 1.6;
+}
+
+@media only screen and (max-width: 30em) {
+  .intro {
+    font-size: 18px;
+  }
 }
 
 .example .code {
