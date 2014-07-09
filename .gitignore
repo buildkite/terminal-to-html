@@ -22,3 +22,4 @@ tmp
 mkmf.log
 examples/*.raw
 examples/*.rendered
+examples/*.html

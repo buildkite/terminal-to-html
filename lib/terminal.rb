@@ -4,6 +4,7 @@ require "terminal/color"
 require "terminal/reset"
 require "terminal/renderer"
 require "terminal/cli"
+require "terminal/preview"
 
 module Terminal
   def self.render(output)

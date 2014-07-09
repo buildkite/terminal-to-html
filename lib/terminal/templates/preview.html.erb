@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    .code {
+      background: #171717;
+      border-radius: 5px;
+      color: white;
+      padding: 30px;
+      margin-bottom: 15px;
+      word-break: break-word;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+
+    .code pre {
+      margin: 0;
+      padding: 0;
+      font-family: Monaco, courier;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    /* yellow */
+    .c33 {
+      color: #c6c502;
+    }
+
+    /* green */
+    .c32 {
+      color: #00bd02;
+    }
+
+    /* intense green */
+    .c1 {
+      color: #5ef765;
+    }
+
+    /* red */
+    .c31 {
+      color: #e10c02;
+    }
+
+    /* blue */
+    .c34 {
+      color: #8db7e0;
+    }
+
+    /* magent */
+    .c35 {
+      color: #ceacde;
+    }
+
+    /* cyan */
+    .c36 {
+      color: #00cdd9;
+    }
+
+    /* black (but we can't use black, so a diff color) */
+    .c30 {
+      color: #666;
+    }
+
+    /* grey */
+    .c90 {
+      color: #838887;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .previews {
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .preview-left, .preview-right {
+      width: 50%;
+      float: left;
+    }
+
+    .preview-left .code {
+      margin-right: 10px;
+    }
+
+    .preview-right .code {
+      margin-left: 10px;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="previews">
+      <div class="preview-left"><div class="code"><pre><%= raw %></pre></div></div>
+      <div class="preview-right"><div class="code"><pre><%= rendered %></pre></div></div>
+    </div>
+  </body>
+</html>

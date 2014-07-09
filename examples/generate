@@ -36,7 +36,9 @@ end
 read_io.close
 Process.waitpid(pid)
 
-output = output.chomp.strip
+raw = output.chomp.strip
+rendered = Terminal.render(output)
 
-File.open("#{file}.raw", "w") { |file| file.write(output) }
-File.open("#{file}.rendered", "w") { |file| file.write(Terminal.render(output)) }
+File.open("#{file}.raw", "w") { |file| file.write(raw) }
+File.open("#{file}.rendered", "w") { |file| file.write(rendered) }
+File.open("#{file}.html", "w") { |file| file.write(Terminal::Preview.new(raw, rendered).render) }
