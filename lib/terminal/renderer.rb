@@ -66,16 +66,19 @@ module Terminal
         when "\b"
           pointer = cursor-1
 
-          # Seek backwards until something that isn't a color is reached.
+          # Seek backwards until something that isn't a color is reached. When we
+          # reach it (probably a string) remove the last character of it.
           # Colors aren't affected by \b
-          while pointer > 0
+          while pointer >= 0
             char_at_pointer = line[pointer]
-            break unless char_at_pointer.kind_of?(Terminal::Color)
+
+            unless char_at_pointer.kind_of?(Terminal::Node)
+              line[pointer] = char_at_pointer[0..-2]
+              break
+            end
 
             pointer -= 1
           end
-
-          cursor -= (cursor - pointer)
         when /\A\e\[(.*)m\z/
           color_code = $1.to_s
 

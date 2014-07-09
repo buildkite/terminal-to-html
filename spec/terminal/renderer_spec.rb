@@ -26,10 +26,10 @@ describe Terminal::Renderer do
       expect(renderer.render(raw)).to eql("he<span class='c81'>llo</span>")
     end
 
-    it "backspaces colors" do
-      raw = "he\e[81m\e[90m\bllo"
+    it "skips over colors when backspacing" do
+      raw = "he\e[32m\e[33m\bllo"
 
-      expect(renderer.render(raw)).to eql("hello")
+      expect(renderer.render(raw)).to eql("h<span class='c32'><span class='c33'>llo</span></span>")
     end
 
     it "starts overwriting characters when you \\r midway through somehing" do
