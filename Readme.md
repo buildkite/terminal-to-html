@@ -8,15 +8,21 @@ Terminal takes any arbitrary crazy shell output (ASCII), and turns it into beaut
 
 Add this line to your application's Gemfile:
 
-    gem 'terminal'
+```ruby
+gem 'terminal'
+```
 
 And then execute:
 
-    $ bundle
+```bash
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install terminal
+```bash
+gem install terminal
+```
 
 ## Usage
 
