@@ -39,7 +39,7 @@ module Terminal
     # \e[?m use the ? color going forward
     def emulate_terminal_rendering(string)
       # Splits the output into intersting parts.
-      parts = string.scan(/[\n\r\b]|\e\[[\d;]+m|\e|[^\n\r\b\e]+/)
+      parts = string.scan(/[\n\r\b]|\e\[[\d;]+m|\e|./)
 
       lines = []
 
