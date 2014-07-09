@@ -36,7 +36,14 @@ Process.waitpid(pid)
 
 examples = output.split("---").map do |example|
   rendered = Terminal.render(example.chomp.strip)
-  %{<div class="code example"><pre class="before">#{example}</pre><pre class="after">#{rendered}</pre></div>}
+  %(<section class="example">
+      <div class="code before">
+        <pre>#{example.strip}</pre>
+      </div>
+      <div class="code after">
+        <pre>#{rendered.strip}</pre>
+      </div>
+    </section>)
 end.join("\n")
 
 template = File.read("template.html")

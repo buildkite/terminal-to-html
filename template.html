@@ -1,24 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <title>Terminal - Renders ASCII as HTM</title>
-  <link href="stylesheets/style.css" media="all" rel="stylesheet" type="text/css" />
+  <meta charset='utf-8'>
+  <meta content='width=device-width, initial-scale=1.0' name='viewport'>
+  <title>Terminal - Renders shell output as HTML</title>
+  <link href="stylesheets/style.css" media="all" rel="stylesheet" type="text/css">
+  <script src="javascript/prefixfree.min.js"></script>
 </head>
   <body>
+    <header>
+      <h1><img alt="Terminal" src="images/logo.svg"></h2>
+    </header>
+
+    <section class="code intro">
+      <p>A Ruby library for converting arbitrary shell output (with&nbsp;<a href="http://en.wikipedia.org/wiki/ANSI_escape_code"><span class="c33">A</span><span class="c36">N</span><span class="c1">S</span><span class="c31">I</span></a>) into beautifully rendered&nbsp;HTML.</p>
+    </section>
+
+    <!-- EXAMPLES HERE -->
+
+    <section class="code getting-started"><pre><span class="c90"># Install the gem</span>
+$ gem install terminal
+$ terminal -h
+
+<span class="c90"># Read the documentation</span>
+$ open "<a href="https://github.com/buildboxhq/terminal">https://github.com/buildboxhq/terminal</a>"
+</pre></section>
+
+    <footer>
+      <p>Made with &#x2764; by <a href="https://buildbox.io">Buildbox</a></p>
+    </footer>
+
     <a href="https://github.com/buildboxhq/terminal"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
-
-    <div class="container">
-      <img class="main-logo" alt="logo" src="images/logo.png" />
-
-      <div class="code large"><pre>Terminal takes any arbitrary crazy shell output (ASCII), and
-turns it into beautifully rendered HTML.</pre></div>
-
-      <!-- EXAMPLES HERE -->
-
-      <div class="code large"><pre><span class="c90"># Get started</span>
-$ gem install terminal</pre></div>
-
-      <footer><div class="footer-love">Made with love by</div><div class="footer-logo"><a href="https://buildbox.io">Buildbox</a></div></footer>
-    </div>
   </body>
 </html>
