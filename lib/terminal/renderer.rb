@@ -76,36 +76,22 @@ module Terminal
           end
 
           cursor -= (cursor - pointer)
-        when "\e"
-          # Seek the next few characters to tell if theres a color present
-          seeked = string[index..(index + 10)]
+        when /\A\e\[(.*)m\z/
+          color_code = $1.to_s
 
-          # Does the next lot of characters look like a color code?
-          matched = seeked.to_s.match(/\A\e\[(.*)m\z/)
+          # Determine what sort of color code it is.
+          if color_code == "0"
+            line[cursor] = Terminal::Reset.new(colors_opened)
 
-          # If it does, skip over the characters that are the color,
-          # and track it at a single color object in the line. We do this
-          # so when we \b after a color, we skip back across the whole color
-          # not just the last character in the color sequence.
-          if matched
-            color_code = matched[1].to_s
+            colors_opened = 0
+          else
+            line[cursor] = Terminal::Color.new(color_code)
 
-            # Determine what sort of color code it is.
-            if color_code == "0"
-              line[cursor] = Terminal::Reset.new(colors_opened)
-
-              colors_opened = 0
-            else
-              line[cursor] = Terminal::Color.new(color_code)
-
-              colors_opened += 1
-            end
-
-            index += 3 + color_code.length
-            cursor += 1
-
-            next
+            colors_opened += 1
           end
+
+          index += char.length
+          cursor += 1
         else
           line[cursor] = char
           cursor += 1
@@ -118,14 +104,14 @@ module Terminal
         index += 1
       end
 
+      # Be sure to reset any unclosed colors on the last line
+      if colors_opened > 0
+        line << Terminal::Reset.new(colors_opened)
+      end
+
       # Add back in the last line if the end of the output
       # didn't end with a \n
       lines << line if line.any?
-
-      # Be sure to reset any unclosed colors.
-      if colors_opened > 0
-        lines << [ Terminal::Reset.new(colors_opened) ]
-      end
 
       # Join all the strings back together again
       lines = lines.map do |parts|

@@ -20,10 +20,8 @@ describe Terminal::Renderer do
   end
 
   describe "#render" do
-    let(:hello_output) { "he\e[81mllo" }
-
     it "closes colors that get opened" do
-      raw = "he\e[81mllo"
+      raw = "he\033[81mllo"
 
       expect(renderer.render(raw)).to eql("he<span class='c81'>llo</span>")
     end
