@@ -1,0 +1,91 @@
+.main-logo {
+  margin-bottom: 13px;
+}
+
+.container {
+  width: 620px;
+  margin: 0 auto;
+  padding: 75px 15px;
+}
+
+footer {
+  padding-top: 15px;
+  color: #dfdfdf;
+  text-align: center;
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+}
+
+.footer-love {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.footer-logo a {
+  color: #dfdfdf;
+  font-weight: bold;
+  font-size: 25px;
+  text-decoration: none;
+}
+
+.code {
+  background: #171717;
+  border-radius: 5px;
+  color: white;
+  padding: 30px;
+  margin-bottom: 15px;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.code pre {
+  margin: 0;
+  padding: 0;
+  font-family: Monaco, courier;
+  font-size: 15px;
+}
+
+/* yellow */
+.c33 {
+  color: #c6c502;
+}
+
+/* green */
+.c32 {
+  color: #00bd02;
+}
+
+/* intense green */
+.c1 {
+  color: #5ef765;
+}
+
+/* red */
+.c31 {
+  color: #e10c02;
+}
+
+/* blue */
+.c34 {
+  color: #8db7e0;
+}
+
+/* magent */
+.c35 {
+  color: #ceacde;
+}
+
+/* cyan */
+.c36 {
+  color: #00cdd9;
+}
+
+/* black (but we can't use black, so a diff color) */
+.c30 {
+  color: #666;
+}
+
+/* grey */
+.c90 {
+  color: #838887;
+}
