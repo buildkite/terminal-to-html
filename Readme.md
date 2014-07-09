@@ -60,6 +60,21 @@ echo $(curl $JOB_LOG_URL -s | jq '.content') | terminal
 
 For more information on the Buildbox Builds API, see: https://buildbox.io/docs/api/builds
 
+## Generating Fixtures
+
+To generate a fixture, first create a test case inside the `examples` folder. See the `curl.sh`
+file as an example. You can then generate a `.raw` and `.rendered` file by running:
+
+```bash
+./generate curl.sh
+```
+
+You should then move the `raw` and `rendered` files to the `fixtures` folder.
+
+```bash
+mv examples/*{raw,rendered} spec/fixtures
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/terminal/fork )

@@ -1,0 +1,4 @@
+<span class='c90'>$</span> curl -o &#47;tmp&#47;file.txt https:&#47;&#47;example.com&#47;file.txt
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   364  100   364    0     0    153      0  0:00:02  0:00:02 --:--:--   153
