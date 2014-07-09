@@ -1,6 +1,8 @@
 # Terminal
 
-TODO: Write a gem description
+[![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
+
+Terminal takes any arbitrary crazy shell output (ASCII), and turns it into beautifully rendered HTML.
 
 ## Installation
 
@@ -29,7 +31,8 @@ First install [jq](http://stedolan.github.io/jq/), if you have [Homebrew](http:/
 Then, you can:
 
 ```bash
-echo $(curl "https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]" -s | jq '.content') | terminal
+$JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]"
+echo $(curl $JOB_LOG_URL -s | jq '.content') | terminal
 ```
 
 ## Contributing
