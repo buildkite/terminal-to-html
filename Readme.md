@@ -47,6 +47,13 @@ terminal output.txt
 
 With `rspec`, you'll need to use the `--tty` and `--color` options to force it to output colors.
 
+We also provide a utility to preview the rendered version in a web browser. Simply append `--preview` to the command,
+and when the render has finished, it will open in your web browser with a before/after show.
+
+```bash
+rspec --color --tty | terminal --preview
+```
+
 ### With the Buildbox API
 
 First install [jq](http://stedolan.github.io/jq/), if you have [Homebrew](http://brew.sh/) installed, you can just `brew install jq`.
