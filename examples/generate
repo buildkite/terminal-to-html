@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'pty'
+$:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
+
+require 'terminal'
+
+output = ""
+read_io, write_io, pid = nil
+
+file = ARGV[0]
+
+read_io, write_io, pid = PTY.spawn("./#{file}")
+
+write_io.close
+
+loop do
+  fds, = IO.select([read_io], nil, nil, 5)
+  if fds
+    # should have some data to read
+    begin
+      chunk = read_io.read_nonblock(10240)
+      if block_given?
+        yield chunk
+      end
+      output += chunk
+    rescue Errno::EAGAIN, Errno::EWOULDBLOCK
+      # do select again
+    rescue EOFError, Errno::EIO # EOFError from OSX, EIO is raised by ubuntu
+      break
+    end
+  end
+  # if fds are empty, timeout expired - run another iteration
+end
+
+read_io.close
+Process.waitpid(pid)
+
+output = output.chomp.strip
+
+File.open("#{file}.raw", "w") { |file| file.write(output) }
+File.open("#{file}.rendered", "w") { |file| file.write(Terminal.render(output)) }
