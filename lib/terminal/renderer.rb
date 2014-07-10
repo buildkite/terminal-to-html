@@ -9,7 +9,7 @@ module Terminal
       max_total_size = 4 * 1024 * 1024
       if output.bytesize > max_total_size
         output = output.byteslice(0, max_total_size)
-        output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed #{number_to_human_size(max_total_size)} limit for logs."
+        output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed 4 megabyte limit for logs."
       end
 
       # Limit each line to (x) chars

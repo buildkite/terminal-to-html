@@ -20,6 +20,12 @@ describe Terminal::Renderer do
   end
 
   describe "#render" do
+    it "chops off logs longer than 4 megabytes" do
+      long_string = "x" * 4.5 * 1024 * 1024
+
+      expect(renderer.render(long_string)).to end_with("Warning: Terminal has chopped the rest of this line off as it&#39;s over the allowed 50000 characters per line limit.")
+    end
+
     it "closes colors that get opened" do
       raw = "he\033[81mllo"
 
