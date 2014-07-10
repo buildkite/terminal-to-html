@@ -11,9 +11,9 @@ describe Terminal::Renderer do
     end
   end
 
-  describe "rendering of ascii.sh" do
+  describe "rendering of homer.sh" do
     it "returns the expected result" do
-      fixture = Fixture.for("ascii.sh")
+      fixture = Fixture.for("homer.sh")
 
       expect(renderer.render(fixture.raw)).to eql(fixture.rendered)
     end
