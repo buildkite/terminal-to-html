@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
 
-Terminal takes any arbitrary crazy shell output (ASCII), and turns it into beautifully rendered HTML.
+Terminal is a Ruby library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://www.termsys.demon.co.uk/vtansi.htm for more information about ANSI Terminal Control Escape Sequences.
 
 ## Installation
 
