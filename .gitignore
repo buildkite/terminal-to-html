@@ -22,4 +22,3 @@ mkmf.log
 examples/*.raw
 examples/*.rendered
 examples/*.html
-examples/private
