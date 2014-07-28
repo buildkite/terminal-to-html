@@ -27,13 +27,13 @@ describe Terminal::Renderer do
     it "closes colors that get opened" do
       raw = "he\033[81mllo"
 
-      expect(render(raw)).to eql("<div class='term-l'>he<span class='term-c81'>llo</span></div>")
+      expect(render(raw)).to eql("<div class='term-l'>he<span class='term-fg81'>llo</span></div>")
     end
 
     it "skips over colors when backspacing" do
       raw = "he\e[32m\e[33m\bllo"
 
-      expect(render(raw)).to eql("<div class='term-l'>h<span class='term-c32'><span class='term-c33'>llo</span></span></div>")
+      expect(render(raw)).to eql("<div class='term-l'>h<span class='term-fg32'><span class='term-fg33'>llo</span></span></div>")
     end
 
     it "starts overwriting characters when you \\r midway through somehing" do
@@ -45,7 +45,7 @@ describe Terminal::Renderer do
     it "colors across multiple lines" do
       raw = "\e[81mhello\n\nfriend\e[0m"
 
-      expect(render(raw)).to eql("<div class='term-l'><span class='term-c81'>hello</span></div><div class='term-l'><span class='term-c81'></span></div><div class='term-l'><span class='term-c81'>friend</span></div>")
+      expect(render(raw)).to eql("<div class='term-l'><span class='term-fg81'>hello</span></div><div class='term-l'><span class='term-fg81'></span></div><div class='term-l'><span class='term-fg81'>friend</span></div>")
     end
 
     it "allows you to control the cursor forwards" do
