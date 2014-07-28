@@ -49,5 +49,29 @@ describe Terminal::Renderer do
 
       expect(renderer.render(raw)).to eql("<span class='c81'>hello\n&nbsp;\nfriend</span>")
     end
+
+    it "ignores \\e1[K" do
+      raw = "hello friend\e[K!"
+
+      expect(renderer.render(raw)).to eql("hello friend!")
+    end
+
+    it "ignores \\e1[0K" do
+      raw = "hello friend\e[0K!"
+
+      expect(renderer.render(raw)).to eql("hello friend!")
+    end
+
+    it "allows erasing the current line up to a point" do
+      raw = "hello friend\e[1K!"
+
+      expect(renderer.render(raw)).to eql("            !")
+    end
+
+    it "allows clearing of the current line" do
+      raw = "hello friend\e[2K!"
+
+      expect(renderer.render(raw)).to eql("            !")
+    end
   end
 end

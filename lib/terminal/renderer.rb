@@ -2,6 +2,35 @@ require 'escape_utils'
 
 module Terminal
   class Renderer
+    # If the string (which is a regex) matches, it'll split on that space, so we
+    # end up with an array of special characters and normal characters, i.e:
+    # [ '\n', '\r', 'a', 'b', '\e123m' ]
+    SPLIT_BY_CHARACTERS = [
+      # \n moves the cursor to a new line
+      # \r moves the cursor to the begining of the line
+      # \b moves the cursor back one
+      '[\n\r\b]',
+
+      # [K Erases from the current cursor position to the end of the current line.
+      '\e\[0?K',
+
+      # [1K Erases from the current cursor position to the start of the current line.
+      # [2K Erases the entire current line.
+      '\e\[[1-2]K',
+
+      # \e[0m reset color information
+      # \e[?m use the ? color going forward
+      '\e\[[\d;]+m',
+
+      # Random escpae sequences
+      '\e',
+
+      # Every other character
+      '.'
+    ]
+
+    SPLIT_BY_CHARACTERS_REGEX = Regexp.new(SPLIT_BY_CHARACTERS.join("|"))
+
     def render(output)
       return "" if output.nil? || output.strip.length == 0
 
@@ -32,14 +61,9 @@ module Terminal
 
     private
 
-    # \n moves the cursor to a new line
-    # \r moves the cursor to the begining of the line
-    # \b moves the cursor back one
-    # \e[0m reset color information
-    # \e[?m use the ? color going forward
     def emulate_terminal_rendering(string)
       # Splits the output into intersting parts.
-      parts = string.scan(/[\n\r\b]|\e\[[\d;]+m|\e|./)
+      parts = string.scan(SPLIT_BY_CHARACTERS_REGEX)
 
       lines = []
 
@@ -58,11 +82,22 @@ module Terminal
       parts.each do |char|
         case char
         when "\n"
+          # Starts writing from a new line
           lines << line
           line = []
           cursor = 0
         when "\r"
+          # Returns the writing cursor back to the begining of the line
           cursor = 0
+        when "\e[K", "\e[0K"
+          # erases everything after the cursor
+          line = line.fill(" ", cursor..line.length)
+        when "\e[1K"
+          # erases everything before the cursor
+          line = line.fill(" ", 0..cursor)
+        when "\e[2K"
+          # erase entire line
+          line = Array.new(line.length, " ")
         when "\b"
           pointer = cursor-1
 
