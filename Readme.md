@@ -63,7 +63,7 @@ First install [jq](http://stedolan.github.io/jq/), if you have [Homebrew](http:/
 Then, you can:
 
 ```bash
-$JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]"
+export JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]"
 echo $(curl $JOB_LOG_URL -s | jq '.content') | terminal
 ```
 
