@@ -1,4 +1,4 @@
-![logo](http://buildboxhq.github.io/terminal/images/logo.svg)
+![logo](http://buildbox.github.io/terminal/images/logo.svg)
 
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
 
@@ -54,7 +54,7 @@ and when the render has finished, it will open in your web browser with a before
 rspec --color --tty | terminal --preview
 ```
 
-![logo](http://buildboxhq.github.io/terminal/images/preview.png)
+![logo](http://buildbox.github.io/terminal/images/preview.png)
 
 ### With the Buildbox API
 
