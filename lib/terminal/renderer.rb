@@ -204,7 +204,7 @@ module Terminal
             # Figure out what class name to use. Supports xterm256 colors
             # indexes.
             class_name = if codes[0] == "38" && codes[1] == "5"
-                           "term-fg#{codes[2]}"
+                           "term-fgx-#{codes[2]}"
                          elsif codes[0] == "48" && codes[1] == "5"
                            raise 'yolo'
                            "term-bg#{codes[2]}"
