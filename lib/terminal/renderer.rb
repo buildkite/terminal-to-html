@@ -192,14 +192,22 @@ module Terminal
           code = $1.to_s
 
           if code == "0"
-            opened_spans.shift
-            buffer << "</span>"
+            # Only close a span if one has been opened. So if you have a string lin
+            # hello\e[0mthere it doens't just put a close span in there for no reason.
+            if opened_spans.length > 0
+              opened_spans.shift
+              buffer << "</span>"
+            end
           else
             codes = code.split(";")
 
-            # Figure out what class name to use
+            # Figure out what class name to use. Supports xterm256 colors
+            # indexes.
             class_name = if codes[0] == "38" && codes[1] == "5"
                            "term-fg#{codes[2]}"
+                         elsif codes[0] == "48" && codes[1] == "5"
+                           raise 'yolo'
+                           "term-bg#{codes[2]}"
                          elsif codes.length == 1
                            "term-fg#{codes.last}"
                          else

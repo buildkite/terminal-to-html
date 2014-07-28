@@ -121,6 +121,12 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("<div class='term-l'>            !</div>")
     end
 
+    it "doesn't close spans if no colors have been opened" do
+      raw = "hello \e[0mfriend"
+
+      expect(render(raw)).to eql("<div class='term-l'>hello friend</div>")
+    end
+
     it "escapes HTML"
     it "escapes HTML in color codes"
   end
