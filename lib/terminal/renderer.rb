@@ -11,6 +11,10 @@ module Terminal
       # \b moves the cursor back one
       '[\n\r\b]',
 
+      # \e[0m reset color information
+      # \e[?m use the ? color going forward
+      '\e\[[\d;]+m',
+
       # [K Erases from the current cursor position to the end of the current line.
       '\e\[0?K',
 
@@ -33,10 +37,6 @@ module Terminal
       # \e[?D move the cursor back ? many characters
       '\e\[[\d;]*D',
 
-      # \e[0m reset color information
-      # \e[?m use the ? color going forward
-      '\e\[[\d;]+m',
-
       # Random escpae sequences
       '\e',
 
@@ -45,7 +45,7 @@ module Terminal
     ]
 
     SPLIT_BY_CHARACTERS_REGEX = Regexp.new(SPLIT_BY_CHARACTERS.join("|"))
-
+    COLOR_REGEX = /\e\[.+m/
     MEGABYTES = 1024 * 1024
 
     def initialize(output)
@@ -89,36 +89,29 @@ module Terminal
       terminal_output = EscapeUtils.escape_html(terminal_output)
 
       # Now convert the colors to HTML
-      colorize!(terminal_output)
-
-      # Replace empty lines with a non breaking space.
-      terminal_output.gsub(/$^/, "&nbsp;")
+      convert_to_html(terminal_output)
     end
 
     private
+
+    def force_encoding!(string)
+      string.force_encoding('UTF-8')
+
+      if string.valid_encoding?
+        string
+      else
+        string.force_encoding('ASCII-8BIT').encode!('UTF-8', invalid: :replace, undef: :replace)
+      end
+    end
 
     def emulate_terminal_rendering(string)
       # Splits the output into intersting parts.
       parts = string.scan(SPLIT_BY_CHARACTERS_REGEX)
 
-      colors_opened = 0
-
       # The when cases are ordered by most likely, the lest checks it has to go through
       # before matching, the faster the render will be. Colors are usually most likey, so that's first.
-      parts.each_with_index do |char, index|
+      parts.each do |char|
         case char
-        when /\A\e\[(.*)m\z/
-          code = $1.to_s
-          escape = if code == "0"
-                     # Only remove a color if we're > 1
-                     colors_opened -= 1 if colors_opened > 0
-                     Terminal::Reset.new
-                   else
-                     colors_opened += 1
-                     Terminal::Color.new(code)
-                   end
-
-          @screen << escape
         when "\n"
           @screen.x = 0
           @screen.y += 1
@@ -127,21 +120,15 @@ module Terminal
         when "\r"
           @screen.x = 0
         when "\b"
-          # Seek backwards until something that isn't a color is reached. When
-          # we reach it (probably a string) remove the last character of it.
-          # Colors aren't affected by \b
+          # Colors are skipped when backspacing
           line = @screen[@screen.y]
-          pointer = @screen.x - 1
+          pointer = @screen.x
 
-          while pointer >= 0
-            char_at_pointer = line[pointer]
-
-            unless char_at_pointer.kind_of?(Terminal::Node)
+          while c = line[pointer -= 1]
+            if not c =~ COLOR_REGEX # color
               line[pointer] = ""
               break
             end
-
-            pointer -= 1
           end
         when "\e[G", "\e[0G", "\e[g"
           # TODO: I have no idea how these characters are supposed to work,
@@ -169,35 +156,70 @@ module Terminal
         end
       end
 
-      colors_opened.times do
-        @screen << Terminal::Reset.new
-      end
-
       @screen.to_s
     end
 
-    def colorize!(string)
-      string.gsub!(/\e\[([0-9;]+)m/) do |match|
-        color_codes = $1.split(';')
+    def convert_to_html(string)
+      buffer = [ "<div class='term-l'>" ]
 
-        if color_codes == [ "0" ]
-          "</span>"
+      # An array of open colors. As colors get opened, they get
+      # added to this list, and as they're reset (\e[0m) they are
+      # removed.
+      opened_colors = []
+
+      # Split the string into colors, new lines and the rest
+      chunks = string.scan(/\e\[[\d;]+m|\n|[^\n\e]+/)
+
+      # Iterate over the chunks, and turn them into HTML
+      chunks.each do |chunk|
+        case chunk
+        when "\n"
+          # Close any open colors
+          opened_colors.length.times do
+            buffer << "</span>"
+          end
+
+          # End the line and start a new one
+          buffer << "</div><div class='term-l'>"
+
+          # If there were open colors started on the previous line,
+          # open them up again here.
+          opened_colors.each do |classes|
+            buffer << "<span class='#{classes}'>"
+          end
+        when /\e\[(.*)m/
+          # Extract the color codes
+          code = $1.to_s
+
+          if code == "0"
+            opened_colors.shift
+            buffer << "</span>"
+          else
+            # There could be multiple colors defined
+            classes = code.split(";").map { |code| "term-c#{code}" }.join(" ")
+
+            # Add these colors to the list of opened ones
+            opened_colors << classes
+
+            # Open a span that is the color
+            buffer << "<span class='#{classes}'>"
+          end
         else
-          classes = color_codes.map { |code| "c#{code}" }
-
-          "<span class='#{classes.join(" ")}'>"
+          # If it's not a new color, or a new line, then add the chunk
+          # to the buffer.
+          buffer << chunk
         end
       end
-    end
 
-    def force_encoding!(string)
-      string.force_encoding('UTF-8')
-
-      if string.valid_encoding?
-        string
-      else
-        string.force_encoding('ASCII-8BIT').encode!('UTF-8', invalid: :replace, undef: :replace)
+      # If there were any open colors left over, close them
+      opened_colors.length.times do
+        buffer << "</span>"
       end
+
+      # End off the final line
+      buffer << "</div>"
+
+      buffer.join("")
     end
   end
 end

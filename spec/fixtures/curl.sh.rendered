@@ -1,4 +1,1 @@
-<span class='c90'>$</span> curl -o &#47;tmp&#47;file.txt https:&#47;&#47;example.com&#47;file.txt
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   364  100   364    0     0    153      0  0:00:02  0:00:02 --:--:--   153
+<div class='term-l'><span class='term-c90'>$</span> curl -o &#47;tmp&#47;file.txt https:&#47;&#47;example.com&#47;file.txt</div><div class='term-l'>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class='term-l'>                                 Dload  Upload   Total   Spent    Left  Speed</div><div class='term-l'>100   170  100   170    0     0     95      0  0:00:01  0:00:01 --:--:--    95</div>
