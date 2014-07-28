@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+$:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
+
+require 'terminal'
+require 'benchmark'
+require 'timeout'
+
+Benchmark.bm(30) do |bm|
+  Dir.glob("spec/fixtures/*.raw").each do |file|
+    output = File.read(file)
+    basename = File.basename(file)
+
+    bm.report basename do
+      Timeout.timeout(5) do
+        Terminal.render(output)
+      end
+    end
+  end
+end
