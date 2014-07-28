@@ -162,10 +162,10 @@ module Terminal
     def convert_to_html(string)
       buffer = [ "<div class='term-l'>" ]
 
-      # An array of open colors. As colors get opened, they get
+      # An array of open spans. As spans get opened, they get
       # added to this list, and as they're reset (\e[0m) they are
       # removed.
-      opened_colors = []
+      opened_spans = []
 
       # Split the string into colors, new lines and the rest
       chunks = string.scan(/\e\[[\d;]+m|\n|[^\n\e]+/)
@@ -174,35 +174,45 @@ module Terminal
       chunks.each do |chunk|
         case chunk
         when "\n"
-          # Close any open colors
-          opened_colors.length.times do
+          # Close any open spans
+          opened_spans.length.times do
             buffer << "</span>"
           end
 
           # End the line and start a new one
           buffer << "</div><div class='term-l'>"
 
-          # If there were open colors started on the previous line,
-          # open them up again here.
-          opened_colors.each do |classes|
-            buffer << "<span class='#{classes}'>"
+          # If there were open spans on the previous line, open them up again
+          # here.
+          opened_spans.each do |span|
+            buffer << span
           end
         when /\e\[(.*)m/
           # Extract the color codes
           code = $1.to_s
 
           if code == "0"
-            opened_colors.shift
+            opened_spans.shift
             buffer << "</span>"
           else
-            # There could be multiple colors defined
-            classes = code.split(";").map { |code| "term-c#{code}" }.join(" ")
+            codes = code.split(";")
 
-            # Add these colors to the list of opened ones
-            opened_colors << classes
+            # Figure out what class name to use
+            class_name = if codes[0] == "38" && codes[1] == "5"
+                           "term-fg#{codes[2]}"
+                         elsif codes.length == 1
+                           "term-fg#{codes.last}"
+                         else
+                           "term-esc-unknown"
+                         end
+
+            span = "<span class='#{class_name}'>"
+
+            # Add this span to the list of opened ones
+            opened_spans << span
 
             # Open a span that is the color
-            buffer << "<span class='#{classes}'>"
+            buffer << span
           end
         else
           # If it's not a new color, or a new line, then add the chunk
@@ -211,8 +221,8 @@ module Terminal
         end
       end
 
-      # If there were any open colors left over, close them
-      opened_colors.length.times do
+      # If there were any open spans left over, close them
+      opened_spans.length.times do
         buffer << "</span>"
       end
 
