@@ -72,25 +72,16 @@
 
     body {
       margin: 0;
-      padding: 0;
-    }
-
-    .previews {
-      overflow: hidden;
       padding: 20px;
     }
 
-    .preview-left, .preview-right {
-      width: 50%;
-      float: left;
+    .controls {
+      margin-bottom: 5px;
     }
 
-    .preview-left .code {
-      margin-right: 10px;
-    }
-
-    .preview-right .code {
-      margin-left: 10px;
+    a {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
     }
 
     .raw {
@@ -98,11 +89,25 @@
       white-space: pre;
     }
     </style>
+    <script>
+      function toggle(element) {
+        element.style.display = element.style.display === 'none' ? '' : 'none'
+      }
+
+      function switchViews() {
+        toggle(document.getElementById('rendered'));
+        toggle(document.getElementById('raw'));
+      }
+    </script>
   </head>
   <body>
-    <div class="previews">
-      <div class="preview-left"><div class="code raw"><%= raw %></div></div>
-      <div class="preview-right"><div class="code"><%= rendered %></div></div>
+    <div id="rendered" class="preview">
+      <div class="controls"><a href="#" onclick="switchViews(); return false">Show Raw Output</a></div>
+      <div class="code"><%= rendered %></div>
+    </div>
+    <div id="raw" class="preview" style="display: none">
+      <div class="controls"><a href="#" onclick="switchViews(); return false">Show Rendered Output</a></div>
+      <div class="code raw"><%= raw %></div>
     </div>
   </body>
 </html>
