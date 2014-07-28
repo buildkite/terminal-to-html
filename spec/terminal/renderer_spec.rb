@@ -127,6 +127,12 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("<div class='term-l'>hello friend</div>")
     end
 
+    it "\\e[K correctly clears all previous parts of the string" do
+      raw = "remote: Compressing objects:   0% (1/3342)\e[K\rremote: Compressing objects:   1% (34/3342)"
+
+      expect(render(raw)).to eql("<div class='term-l'>remote: Compressing objects:   1% (34&#47;3342)</div>")
+    end
+
     it "escapes HTML"
     it "escapes HTML in color codes"
   end

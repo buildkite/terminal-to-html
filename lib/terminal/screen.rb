@@ -66,15 +66,16 @@ module Terminal
       @y = value > 0 ? value : 0
     end
 
-    def clear(y, x_start = nil, x_end = nil)
-      if x_start.nil? && x_end.nil?
-        @screen[y] = Array.new(@screen[y].length, EMPTY)
-      else
-        line = @screen[y]
-        x_start = 0 if x_start == START_OF_LINE
-        x_end = line.length if x_end == END_OF_LINE
+    def clear(y, x_start, x_end)
+      line = @screen[y]
 
-        line.fill(EMPTY, x_start, x_end)
+      x_start = 0 if x_start == START_OF_LINE
+      x_end = line.length if x_end == END_OF_LINE
+
+      if x_start == START_OF_LINE && x_end == END_OF_LINE
+        @screen[y] = []
+      else
+        line.fill(EMPTY, x_start..x_end)
       end
     end
 

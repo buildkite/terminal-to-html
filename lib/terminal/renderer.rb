@@ -142,7 +142,7 @@ module Terminal
           # clear everything before the current x co-ordinate
           @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
         when "\e[2K"
-          @screen.clear(@screen.y)
+          @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
         when /\e\[(\d+)?A/
           @screen.up($1)
         when /\e\[(\d+)?B/
@@ -199,22 +199,7 @@ module Terminal
               buffer << "</span>"
             end
           else
-            codes = code.split(";")
-
-            # Figure out what class name to use. Supports xterm256 colors
-            # indexes.
-            class_name = if codes[0] == "38" && codes[1] == "5"
-                           "term-fgx-#{codes[2]}"
-                         elsif codes[0] == "48" && codes[1] == "5"
-                           raise 'yolo'
-                           "term-bg#{codes[2]}"
-                         elsif codes.length == 1
-                           "term-fg#{codes.last}"
-                         else
-                           "term-esc-unknown"
-                         end
-
-            span = "<span class='#{class_name}'>"
+            span = "<span class='#{color_class_name_from_code(code)}'>"
 
             # Add this span to the list of opened ones
             opened_spans << span
@@ -238,6 +223,23 @@ module Terminal
       buffer << "</div>"
 
       buffer.join("")
+    end
+
+    # Figure out what class name to use. Supports xterm256 colors
+    # indexes.
+    def color_class_name_from_code(code)
+      codes = code.split(";")
+
+      if codes[0] == "38" && codes[1] == "5"
+        "term-fgx-#{codes[2]}"
+      elsif codes[0] == "48" && codes[1] == "5"
+        raise 'yolo'
+        "term-bg#{codes[2]}"
+      elsif codes.length == 1
+        "term-fg#{codes.last}"
+      else
+        "term-esc-unknown"
+      end
     end
   end
 end
