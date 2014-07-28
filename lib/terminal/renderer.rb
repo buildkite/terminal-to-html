@@ -21,6 +21,15 @@ module Terminal
       # [2K Erases the entire current line.
       '\e\[[1-2]K',
 
+      # \e[?D move the cursor up ? many characters
+      '\e\[[\d;]+A',
+
+      # \e[?D move the cursor down ? many characters
+      '\e\[[\d;]+B',
+
+      # \e[?D move the cursor forward ? many characters
+      '\e\[[\d;]+C',
+
       # \e[?D move the cursor back ? many characters
       '\e\[[\d;]+D',
 
@@ -125,6 +134,22 @@ module Terminal
 
             pointer -= 1
           end
+        when /\e\[(\d+)A/
+          up = $1.to_i
+
+          # TODO
+        when /\e\[(\d+)B/
+          down = $1.to_i
+
+          # TODO
+        when /\e\[(\d+)C/
+          forwards = $1.to_i
+          new_position = cursor + forwards
+
+          # fill in the jumped spaces with a blank character
+          line = line.fill(" ", line.length..(new_position - 1))
+
+          cursor = new_position
         when /\e\[(\d+)D/
           backwards = $1.to_i
 

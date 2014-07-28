@@ -50,10 +50,52 @@ describe Terminal::Renderer do
       expect(renderer.render(raw)).to eql("<span class='c81'>hello\n&nbsp;\nfriend</span>")
     end
 
+    it "allows you to control the cursor forwards" do
+      raw = "this is \e[4Cpoop and stuff"
+
+      expect(renderer.render(raw)).to eql("this is     poop and stuff")
+    end
+
+    it "adds empty space if you forward further than the string length" do
+      raw = "this is great \e[4C"
+
+      expect(renderer.render(raw)).to eql("this is great     ")
+    end
+
     it "allows you to control the cursor backwards" do
       raw = "this is good\e[4Dpoop and stuff"
 
       expect(renderer.render(raw)).to eql("this is poop and stuff")
+    end
+
+    it "allows you to control the cursor upwards" do
+      raw = "1234\n56\e[1A78\e[B"
+
+      expect(renderer.render(raw)).to eql("1278\n56")
+    end
+
+    it "chops off anything past the cursor" do
+      # writes a grid of:
+      # 1234
+      # 5678
+      # then goes up a row (defaults to 1 when no number is used). when the
+      # render finishes, everything after the cursor is dropped
+      raw = "1234\n5678\e[A"
+
+      expect(renderer.render(raw)).to eql("1234")
+    end
+
+    it "allows you to control the cursor downwards" do
+      # creates a grid of:
+      # aaaa
+      # bbbb
+      # cccc
+      # Then goes up 2 rows, down 1 row, jumps to the begining
+      # of the line, rewrites it to 1234, then jumps back down
+      # to the end of the grid.
+      raw = "aaaa\nbbbb\ncccc\e[2A\e[1B\r1234\e[1B"
+
+      expect(renderer.render(raw)).to eql("aaaa\n1234\ncccc")
     end
 
     it "doesn't blow up if you go back too many characters" do

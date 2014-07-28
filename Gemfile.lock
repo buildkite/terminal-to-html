@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    terminal (0.1.1)
+    terminal (0.2)
       escape_utils (~> 1.0)
 
 GEM
