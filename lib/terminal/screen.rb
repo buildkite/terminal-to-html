@@ -70,7 +70,7 @@ module Terminal
       line = @screen[y]
 
       x_start = 0 if x_start == START_OF_LINE
-      x_end = line.length if x_end == END_OF_LINE
+      x_end = line.length - 1 if x_end == END_OF_LINE
 
       if x_start == START_OF_LINE && x_end == END_OF_LINE
         @screen[y] = []
@@ -113,9 +113,7 @@ module Terminal
     end
 
     def to_s
-      @screen.to_a.map do |chars|
-        chars.map(&:to_s).join("")
-      end.join("\n")
+      @screen.to_a.map { |chars| chars.join("") }.join("\n")
     end
   end
 end

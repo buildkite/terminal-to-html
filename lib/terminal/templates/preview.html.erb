@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <style>
     .code {
       background: #171717;
       border-radius: 5px;
       color: white;
-      margin-bottom: 15px;
       word-break: break-word;
       overflow-wrap: break-word;
       font-family: Monaco, courier;
       font-size: 12px;
       line-height: 20px;
-      padding: 15px 0;
+      padding: 14px 18px;
+      white-space: pre-wrap;
+    }
+
+    /* if JS has been applied to the code block, then each line becomes
+       a <div class="term-l"/> with it's own padding */
+    .code-js {
+      padding: 0;
     }
 
     .term-l {
@@ -291,9 +298,8 @@
       font-size: 13px;
     }
 
-    .raw {
-      padding: 15px;
-      white-space: pre;
+    .code {
+      margin-bottom: 15px;
     }
     </style>
     <script>

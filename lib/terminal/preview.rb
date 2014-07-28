@@ -2,7 +2,25 @@ require 'erb'
 
 module Terminal
   class Preview
-    class Binding < Struct.new(:raw, :rendered)
+    class Binding
+      def initialize(raw, rendered)
+        @raw = raw
+        @rendered = rendered
+      end
+
+      def raw
+        # Call out special escape characters to make debugging easier
+        @raw.
+          gsub("\n", "\\n\n").
+          gsub("\r", "\\r").
+          gsub("\b", "\\b").
+          gsub(/\e/, "\\\\e")
+      end
+
+      def rendered
+        @rendered
+      end
+
       def get_binding
         binding
       end

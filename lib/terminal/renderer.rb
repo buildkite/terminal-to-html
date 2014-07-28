@@ -160,7 +160,7 @@ module Terminal
     end
 
     def convert_to_html(string)
-      buffer = [ "<div class='term-l'>" ]
+      buffer = []
 
       # An array of open spans. As spans get opened, they get
       # added to this list, and as they're reset (\e[0m) they are
@@ -179,8 +179,8 @@ module Terminal
             buffer << "</span>"
           end
 
-          # End the line and start a new one
-          buffer << "</div><div class='term-l'>"
+          # Add a new line
+          buffer << "\n"
 
           # If there were open spans on the previous line, open them up again
           # here.
@@ -201,11 +201,14 @@ module Terminal
           else
             span = "<span class='#{color_class_name_from_code(code)}'>"
 
-            # Add this span to the list of opened ones
-            opened_spans << span
+            # If the last open span, is the same as the current one, skip it. Fixes defining multiple
+            # colors like this: <span class="red"><span class="red">
+            if not opened_spans.last == span
+              opened_spans << span
 
-            # Open a span that is the color
-            buffer << span
+              # Open a span that is the color
+              buffer << span
+            end
           end
         else
           # If it's not a new color, or a new line, then add the chunk
@@ -219,10 +222,8 @@ module Terminal
         buffer << "</span>"
       end
 
-      # End off the final line
-      buffer << "</div>"
-
-      buffer.join("")
+      # Join and replace empty lines with a non breaking space.
+      buffer.join("").gsub(/$^/, "&nbsp;")
     end
 
     # Figure out what class name to use. Supports xterm256 colors
