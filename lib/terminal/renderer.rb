@@ -14,9 +14,15 @@ module Terminal
       # [K Erases from the current cursor position to the end of the current line.
       '\e\[0?K',
 
+      # Clears tab at the current position
+      '\e\[0?[Gg]',
+
       # [1K Erases from the current cursor position to the start of the current line.
       # [2K Erases the entire current line.
       '\e\[[1-2]K',
+
+      # \e[?D move the cursor back ? many characters
+      '\e\[[\d;]+D',
 
       # \e[0m reset color information
       # \e[?m use the ? color going forward
@@ -89,6 +95,11 @@ module Terminal
         when "\r"
           # Returns the writing cursor back to the begining of the line
           cursor = 0
+        when "\e[G", "\e[0G", "\e[g"
+          # TODO: I have no idea how these characters are supposed to work,
+          # but this seems to be produce nicer results that what currently
+          # gets rendered.
+          cursor = 0
         when "\e[K", "\e[0K"
           # erases everything after the cursor
           line = line.fill(" ", cursor..line.length)
@@ -114,6 +125,13 @@ module Terminal
 
             pointer -= 1
           end
+        when /\e\[(\d+)D/
+          backwards = $1.to_i
+
+          new_position = cursor - backwards
+          new_position = 0 if new_position < 0
+
+          cursor = new_position
         when /\A\e\[(.*)m\z/
           color_code = $1.to_s
 

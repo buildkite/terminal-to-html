@@ -50,6 +50,18 @@ describe Terminal::Renderer do
       expect(renderer.render(raw)).to eql("<span class='c81'>hello\n&nbsp;\nfriend</span>")
     end
 
+    it "allows you to control the cursor backwards" do
+      raw = "this is good\e[4Dpoop and stuff"
+
+      expect(renderer.render(raw)).to eql("this is poop and stuff")
+    end
+
+    it "doesn't blow up if you go back too many characters" do
+      raw = "this is good\e[100Dpoop and stuff"
+
+      expect(renderer.render(raw)).to eql("poop and stuff")
+    end
+
     it "ignores \\e1[K" do
       raw = "hello friend\e[K!"
 
@@ -60,6 +72,12 @@ describe Terminal::Renderer do
       raw = "hello friend\e[0K!"
 
       expect(renderer.render(raw)).to eql("hello friend!")
+    end
+
+    it "handles \\e[0G ghetto style" do
+      raw = "hello friend\e[Ggoodbye buddy!"
+
+      expect(renderer.render(raw)).to eql("goodbye buddy!")
     end
 
     it "allows erasing the current line up to a point" do
