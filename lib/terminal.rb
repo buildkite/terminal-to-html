@@ -9,6 +9,6 @@ require "terminal/preview"
 
 module Terminal
   def self.render(output)
-    Terminal::Renderer.new.render(output)
+    Terminal::Renderer.new(output).render
   end
 end

@@ -46,7 +46,14 @@ module Terminal
 
     SPLIT_BY_CHARACTERS_REGEX = Regexp.new(SPLIT_BY_CHARACTERS.join("|"))
 
-    def render(output)
+    def initialize(output)
+      @output = output
+      @screen = Screen.new
+    end
+
+    def render
+      output = @output
+
       return "" if output.nil? || output.strip.length == 0
 
       # Limit the entire size of the output to 4 meg (4 * megabyte * kilabyte)
