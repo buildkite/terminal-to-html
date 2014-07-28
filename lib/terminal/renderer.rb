@@ -22,16 +22,16 @@ module Terminal
       '\e\[[1-2]K',
 
       # \e[?D move the cursor up ? many characters
-      '\e\[[\d;]+A',
+      '\e\[[\d;]*A',
 
       # \e[?D move the cursor down ? many characters
-      '\e\[[\d;]+B',
+      '\e\[[\d;]*B',
 
       # \e[?D move the cursor forward ? many characters
-      '\e\[[\d;]+C',
+      '\e\[[\d;]*C',
 
       # \e[?D move the cursor back ? many characters
-      '\e\[[\d;]+D',
+      '\e\[[\d;]*D',
 
       # \e[0m reset color information
       # \e[?m use the ? color going forward
@@ -46,24 +46,29 @@ module Terminal
 
     SPLIT_BY_CHARACTERS_REGEX = Regexp.new(SPLIT_BY_CHARACTERS.join("|"))
 
+    MEGABYTES = 1024 * 1024
+
     def initialize(output)
       @output = output
       @screen = Screen.new
     end
 
     def render
-      output = @output
+      return "" if @output.nil? || @output.strip.length == 0
 
-      return "" if output.nil? || output.strip.length == 0
+      # First duplicate the string, because we're going to be editing and chopping it
+      # up directly.
+      output = @output.dup
 
-      # Limit the entire size of the output to 4 meg (4 * megabyte * kilabyte)
-      max_total_size = 4 * 1024 * 1024
+      # Limit the entire size of the output to 4 meg
+      max_total_size = 4 * MEGABYTES
       if output.bytesize > max_total_size
         output = output.byteslice(0, max_total_size)
         output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed 4 megabyte limit for logs."
       end
 
       # Limit each line to (x) chars
+      # TODO: Move this to the screen
       max_line_length = 50_000
       output = output.split("\n").map do |line|
         if line.length > max_line_length
@@ -74,11 +79,20 @@ module Terminal
         end
       end.join("\n")
 
-      # Now do the terminal rendering
-      output = emulate_terminal_rendering(sanitize(output))
+      # Force encoding on the output first
+      force_encoding!(output)
+
+      # Now do the terminal rendering (handles all the special characters)
+      terminal_output = emulate_terminal_rendering(output)
+
+      # Escape any HTML
+      terminal_output = EscapeUtils.escape_html(terminal_output)
+
+      # Now convert the colors to HTML
+      colorize!(terminal_output)
 
       # Replace empty lines with a non breaking space.
-      output.gsub(/$^/, "&nbsp;")
+      terminal_output.gsub(/$^/, "&nbsp;")
     end
 
     private
@@ -87,132 +101,83 @@ module Terminal
       # Splits the output into intersting parts.
       parts = string.scan(SPLIT_BY_CHARACTERS_REGEX)
 
-      lines = []
-
-      index = 0
-      length = string.length
-
-      line = []
-      cursor = 0
-
-      # Every time a color is found, we increment this
-      # counter, every time it resets, we decrement.
-      # We do this so we close all the open spans at the
-      # end of the output.
       colors_opened = 0
 
-      parts.each do |char|
+      # The when cases are ordered by most likely, the lest checks it has to go through
+      # before matching, the faster the render will be. Colors are usually most likey, so that's first.
+      parts.each_with_index do |char, index|
         case char
-        when "\n"
-          # Starts writing from a new line
-          lines << line
-          line = []
-          cursor = 0
-        when "\r"
-          # Returns the writing cursor back to the begining of the line
-          cursor = 0
-        when "\e[G", "\e[0G", "\e[g"
-          # TODO: I have no idea how these characters are supposed to work,
-          # but this seems to be produce nicer results that what currently
-          # gets rendered.
-          cursor = 0
-        when "\e[K", "\e[0K"
-          # erases everything after the cursor
-          line = line.fill(" ", cursor..line.length)
-        when "\e[1K"
-          # erases everything before the cursor
-          line = line.fill(" ", 0..cursor)
-        when "\e[2K"
-          # erase entire line
-          line = Array.new(line.length, " ")
-        when "\b"
-          pointer = cursor-1
+        when /\A\e\[(.*)m\z/
+          code = $1.to_s
+          escape = if code == "0"
+                     # Only remove a color if we're > 1
+                     colors_opened -= 1 if colors_opened > 0
+                     Terminal::Reset.new
+                   else
+                     colors_opened += 1
+                     Terminal::Color.new(code)
+                   end
 
-          # Seek backwards until something that isn't a color is reached. When we
-          # reach it (probably a string) remove the last character of it.
+          @screen << escape
+        when "\n"
+          @screen.x = 0
+          @screen.y += 1
+        when "\r"
+          @screen.x = 0
+        when "\r"
+          @screen.x = 0
+        when "\b"
+          # Seek backwards until something that isn't a color is reached. When
+          # we reach it (probably a string) remove the last character of it.
           # Colors aren't affected by \b
+          line = @screen[@screen.y]
+          pointer = @screen.x - 1
+
           while pointer >= 0
             char_at_pointer = line[pointer]
 
             unless char_at_pointer.kind_of?(Terminal::Node)
-              line[pointer] = char_at_pointer[0..-2]
+              line[pointer] = ""
               break
             end
 
             pointer -= 1
           end
-        when /\e\[(\d+)A/
-          up = $1.to_i
-
-          # TODO
-        when /\e\[(\d+)B/
-          down = $1.to_i
-
-          # TODO
-        when /\e\[(\d+)C/
-          forwards = $1.to_i
-          new_position = cursor + forwards
-
-          # fill in the jumped spaces with a blank character
-          line = line.fill(" ", line.length..(new_position - 1))
-
-          cursor = new_position
-        when /\e\[(\d+)D/
-          backwards = $1.to_i
-
-          new_position = cursor - backwards
-          new_position = 0 if new_position < 0
-
-          cursor = new_position
-        when /\A\e\[(.*)m\z/
-          color_code = $1.to_s
-
-          # Determine what sort of color code it is.
-          if color_code == "0"
-            line[cursor] = Terminal::Reset.new(colors_opened)
-
-            colors_opened = 0
-          else
-            line[cursor] = Terminal::Color.new(color_code)
-
-            colors_opened += 1
-          end
-
-          index += char.length
-          cursor += 1
+        when "\e[G", "\e[0G", "\e[g"
+          # TODO: I have no idea how these characters are supposed to work,
+          # but this seems to be produce nicer results that what currently
+          # gets rendered.
+          @screen.x = 0
+        when "\e[K", "\e[0K"
+          # clear everything after the current x co-ordinate
+          @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
+        when "\e[1K"
+          # clear everything before the current x co-ordinate
+          @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
+        when "\e[2K"
+          @screen.clear(@screen.y)
+        when /\e\[(\d+)?A/
+          @screen.up($1)
+        when /\e\[(\d+)?B/
+          @screen.down($1)
+        when /\e\[(\d+)?C/
+          @screen.foward($1)
+        when /\e\[(\d+)?D/
+          @screen.backward($1)
         else
-          line[cursor] = char
-          cursor += 1
+          @screen << char
         end
-
-        # The cursor can't go back furthur than 0, so if you \b at the begining
-        # of a line, nothing happens.
-        cursor = 0 if cursor < 0
-
-        index += 1
       end
 
-      # Be sure to reset any unclosed colors on the last line
-      if colors_opened > 0
-        line << Terminal::Reset.new(colors_opened)
+      colors_opened.times do
+        @screen << Terminal::Reset.new
       end
 
-      # Add back in the last line if the end of the output
-      # didn't end with a \n
-      lines << line if line.any?
+      @screen.to_s
+    end
 
-      # Join all the strings back together again
-      lines = lines.map do |parts|
-        completed_line = parts.map(&:to_s).join("")
-      end.join("\n")
-
-      # Now escape all the things
-      lines = EscapeUtils.escape_html(lines)
-
-      matches = []
-
-      # Now we can easily gsub colors like a baws
-      lines.gsub!(/\e\[([0-9;]+)m/) do |match|
+    def colorize!(string)
+      string.gsub!(/\e\[([0-9;]+)m/) do |match|
         color_codes = $1.split(';')
 
         if color_codes == [ "0" ]
@@ -223,20 +188,15 @@ module Terminal
           "<span class='#{classes.join(" ")}'>"
         end
       end
-
-      lines
     end
 
-    def sanitize(string)
-      string = string.dup.force_encoding('UTF-8')
+    def force_encoding!(string)
+      string.force_encoding('UTF-8')
+
       if string.valid_encoding?
         string
       else
-        string.
-          force_encoding('ASCII-8BIT').
-          encode!('UTF-8',
-                  invalid: :replace,
-                  undef:   :replace)
+        string.force_encoding('ASCII-8BIT').encode!('UTF-8', invalid: :replace, undef: :replace)
       end
     end
   end

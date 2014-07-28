@@ -7,9 +7,5 @@ module Terminal
     def to_s
       "\e[#{@code}m"
     end
-
-    def to_debug
-      "[node:#{@code}]"
-    end
   end
 end

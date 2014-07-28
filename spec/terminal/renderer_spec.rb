@@ -49,15 +49,15 @@ describe Terminal::Renderer do
     end
 
     it "allows you to control the cursor forwards" do
-      raw = "this is \e[4Cpoop and stuff"
+      raw = "this is\e[4Cpoop and stuff"
 
-      expect(render(raw)).to eql("this is     poop and stuff")
+      expect(render(raw)).to eql("this is    poop and stuff")
     end
 
-    it "adds empty space if you forward further than the string length" do
-      raw = "this is great \e[4C"
+    it "doesn't allow you to jump down lines if the line doesn't exist" do
+      raw = "this is great \e[1Bhello"
 
-      expect(render(raw)).to eql("this is great     ")
+      expect(render(raw)).to eql("this is great hello")
     end
 
     it "allows you to control the cursor backwards" do
@@ -70,17 +70,6 @@ describe Terminal::Renderer do
       raw = "1234\n56\e[1A78\e[B"
 
       expect(render(raw)).to eql("1278\n56")
-    end
-
-    it "chops off anything past the cursor" do
-      # writes a grid of:
-      # 1234
-      # 5678
-      # then goes up a row (defaults to 1 when no number is used). when the
-      # render finishes, everything after the cursor is dropped
-      raw = "1234\n5678\e[A"
-
-      expect(render(raw)).to eql("1234")
     end
 
     it "allows you to control the cursor downwards" do
@@ -102,16 +91,16 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("poop and stuff")
     end
 
-    it "ignores \\e1[K" do
-      raw = "hello friend\e[K!"
+    it "\\e[1K clears everything before it" do
+      raw = "hello\e[1Kfriend!"
 
-      expect(render(raw)).to eql("hello friend!")
+      expect(render(raw)).to eql("     friend!")
     end
 
-    it "ignores \\e1[0K" do
-      raw = "hello friend\e[0K!"
+    it "clears everything after the \\e[0K" do
+      raw = "hello\nfriend!\e[A\r\e[0K"
 
-      expect(render(raw)).to eql("hello friend!")
+      expect(render(raw)).to eql("     \nfriend!")
     end
 
     it "handles \\e[0G ghetto style" do

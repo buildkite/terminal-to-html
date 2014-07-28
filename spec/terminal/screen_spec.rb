@@ -33,6 +33,15 @@ describe Terminal::Screen do
       expect(screen.to_a).to eql([[], [], [" ", "a", "b"]])
     end
 
+    it "makes going foward steps easy" do
+      screen.x = 3
+      screen.write('a')
+      screen.x = 7
+      screen.write('b')
+
+      expect(screen.to_a).to eql([[" ", " ", " ", "a", " ", " ", " ", "b"]])
+    end
+
     it "sets the x to be 0 if you go into the negatives" do
       screen.x = -1
 
@@ -43,6 +52,23 @@ describe Terminal::Screen do
       screen.y = -1
 
       expect(screen.y).to eql(0)
+    end
+
+    it "gives you a shortcut function to add to the current line" do
+      screen << 'h'
+      screen << 'i'
+
+      expect(screen.to_a).to eql([["h", "i"]])
+    end
+
+    it "can convert the screen to a string" do
+      screen << 'h'
+      screen << 'i'
+      screen.x = 0
+      screen.y += 1
+      screen << 'there'
+
+      expect(screen.to_s).to eql("hi\nthere")
     end
   end
 end
