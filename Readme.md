@@ -64,7 +64,7 @@ Then, you can:
 
 ```bash
 export JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]"
-echo $(curl $JOB_LOG_URL -s | jq '.content' | sed -e 's/^"//'  -e 's/"$//') | terminal
+curl $JOB_LOG_URL -s | jq '.content' -r | terminal
 ```
 
 For more information on the Buildbox Builds API, see: https://buildbox.io/docs/api/builds
