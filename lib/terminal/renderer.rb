@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'escape_utils'
 require 'emoji'
 
@@ -172,6 +174,10 @@ module Terminal
       end
     end
 
+    # The Emoji API will be transitioning to a nil-based find API, at the
+    # moment it raies exceptions for Emojis that can't be found:
+    # https://github.com/github/gemoji/commit/b1736a387c7c1c2af300506fea5603e2e1fb89d8
+    # Will support both for now.
     def emoji_image_from_unicode(unicode)
       emoji = Emoji.find_by_unicode(unicode)
 
@@ -183,6 +189,8 @@ module Terminal
       else
         unicode
       end
+    rescue
+      unicode
     end
   end
 end
