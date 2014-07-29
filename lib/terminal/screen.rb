@@ -1,20 +1,29 @@
-# A screen with x/y co-ordinates.
+# A fake terminal screen. Usage is like this:
 #
 # screen = Screen.new
 # screen.x = 10
 # screen.y = 10
+# screen.write('h')
 #
-# Will essentially create a 10 x 10 matrix with empty characters.
+# Will essentially create a 10 x 10 grid with empty characters, and at the
+# 10,10 spot element, there will be a 'h'. Co-ordinates start at 0,0
 #
-# screen.x = 5
-# screen.y = 5
-# screen.write 'y'
+# It also supports writing colors. So if you were to change the color like so:
 #
-# Will write the 'y' character to the 5,5 slot.
+# screen.color("42")
 #
-# screen.to_a returns an array of the screen.
+# Ever new character that you write, will be stored with that color
+# information.
 #
-# Co-ordinates start at 0,0
+# When turned into a string, the screen class creates ANSI escape characters,
+# that the renderer class gsubs out.
+#
+# \e[fg32;bg42;
+# \e[fgi91;;
+# \e[fgx102;bgx102;
+# \e[0m
+#
+# Are some of the examples of the escape sequences that this will render.
 
 module Terminal
   class Screen
@@ -23,6 +32,14 @@ module Terminal
         blob == value
       end
 
+      # Every node has a style, a foreground style, and a background
+      # style. This method returns what essentially becomes the escape
+      # sequence:
+      #
+      # \e[fg;bg;
+      #
+      # As the screen is turned into a string, the style is used to compare
+      # whether or not a new escape sequence is required.
       def style
         if fg || bg
           "#{fg};#{bg};"
@@ -176,19 +193,41 @@ module Terminal
       @screen.to_a.map { |chars| chars.map(&:to_s) }
     end
 
-    # Renders each node to a string, inserting and cleaning up color escape
-    # sequences where neccessary.
+    # Renders each node to a string. This looks at each node, and then inserts
+    # escape characters that will be gsubed into <span> elements.
+    #
+    # ANSI codes generally span across lines. So if you \e[12m\n\nhello, the hello will
+    # inhert the styles of \e[12m. This doesn't work so great in HTML, especially if you
+    # wrap divs around each line, so this method also copies any styles that are left open
+    # at the end of a line, to the begining of new lines, so you end up with something like this:
+    #
+    # \e[12m\n\e[12m\n\e[12mhello
+    #
+    # It also attempts to only insert escapes that are required. Given the following:
+    #
+    # \e[12mh\e[12me\e[12ml\e[12ml\e[12mo\e[0m
+    #
+    # A general purpose ANSI renderer will convert it to:
+    #
+    # <span class="c12">h<span class="c12">e<span class="c12">l<span class="c12">l<span class="c12">o</span></span></span></span>
+    #
+    # But ours is smart, and tries to do stuff like this:
+    #
+    # <span class="c12">hello</span>
     def to_s
       last_line_index = @screen.length - 1
       buffer = []
 
       @screen.each_with_index do |line, line_index|
         previous = nil
+
+        # Keep track of every open style we have, so we know
+        # that we need to close any open ones at the end.
         open_styles = 0
 
         line.each do |node|
           # If there is no previous node, and the current node has a color
-          # (think first node in a line) then add the escape character.
+          # (first node in a line) then add the escape character.
           if !previous && node.style
             buffer << "\e[#{node.style}m"
 
@@ -198,8 +237,8 @@ module Terminal
           # If we have a previous node, and the last node's style doesn't
           # match this nodes, then we start a new escape character.
           elsif previous && previous.style != node.style
-            # If this style is different to the last style, and this style is nil, that means
-            # the styling has stopped.
+            # If the new node has no style, that means that all the styles
+            # have been closed.
             if !node.style
               # Add our reset escape character
               buffer << "\e[0m"
