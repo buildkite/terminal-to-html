@@ -42,12 +42,12 @@ gem "terminal"
 Then in your `app/assets/application.css` file, add `terminal.css`
 
 ```css
-//= require "terminal"
+/* require "terminal" */
 ```
 
 Now in your views:
 
-```erb
+```html
 <div class="code"><%= Terminal.render(output)</div>
 ```
 
