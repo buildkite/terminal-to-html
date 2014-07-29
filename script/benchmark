@@ -3,10 +3,10 @@
 $:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
 
 require 'terminal'
-require 'benchmark'
+require 'benchmark/ips'
 require 'timeout'
 
-Benchmark.bm(30) do |bm|
+Benchmark.ips do |bm|
   Dir.glob("spec/fixtures/*.raw").each do |file|
     output = File.read(file)
     basename = File.basename(file)
