@@ -53,7 +53,7 @@ Now in your views:
 
 ### Emojis :+1:
 
-Terminal converts unicode to proper `<img>` emoji tags. We use the ![gemoji](https://github.com/github/gemoji)
+Terminal converts unicode to proper `<img>` emoji tags. We use the [gemoji](https://github.com/github/gemoji)
 to do this. The path to the assets can be customized by passing the `:emoji_asset_path` option to `Terminal.render`
 
 ```ruby
