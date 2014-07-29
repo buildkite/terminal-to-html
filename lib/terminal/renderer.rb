@@ -145,21 +145,5 @@ module Terminal
       # Replace empty lines with a non breaking space.
       string.gsub(/$^/, "&nbsp;")
     end
-
-    # Figure out what class name to use. Supports xterm256 colors
-    # indexes.
-    def color_class_name_from_code(code)
-      codes = code.split(";")
-
-      if codes[0] == "38" && codes[1] == "5"
-        "term-fgx#{codes[2]}"
-      elsif codes[0] == "48" && codes[1] == "5"
-        "term-bgx#{codes[2]}"
-      elsif codes.length == 1
-        "term-fg#{codes.last}"
-      else
-        "term-unknown"
-      end
-    end
   end
 end
