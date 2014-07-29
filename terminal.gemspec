@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Terminal::VERSION
   spec.authors       = ["Keith Pitt"]
   spec.email         = ["me@keithpitt.com"]
-  spec.summary       = %q{Renders ASCII as HTML}
-  spec.description   = %q{Renders ASCII as HTML}
-  spec.homepage      = "https://github.com/buildboxhq/terminal"
+  spec.summary       = %q{Converts ANSI to HTML}
+  spec.description   = %q{Converts ANSI to HTML}
+  spec.homepage      = "https://github.com/buildbox/terminal"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
+  spec.add_development_dependency "benchmark-ips"
 end
