@@ -48,7 +48,7 @@ Then in your `app/assets/application.css` file:
 Now in your views:
 
 ```
-<div class="code"><%= Terminal.render(output)</div>
+<div class="code"><%= Terminal.render(output) %></div>
 ```
 
 ### Emojis :+1:
@@ -84,7 +84,7 @@ and when the render has finished, it will open in your web browser with a before
 rspec --color --tty | terminal --preview
 ```
 
-![logo](http://buildbox.github.io/terminal/images/preview.png)
+![preview mode](http://buildbox.github.io/terminal/images/preview.png)
 
 ### With the Buildbox API
 
