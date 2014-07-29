@@ -67,5 +67,11 @@ describe Terminal::Screen do
 
       expect(screen.to_s).to eql("hi\nthere")
     end
+
+    it "does nothing if trying to clear a line that doesn't exist" do
+      screen.clear(12, Terminal::Screen::START_OF_LINE, Terminal::Screen::END_OF_LINE)
+
+      expect(screen.to_s).to eql("")
+    end
   end
 end
