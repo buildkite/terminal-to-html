@@ -109,6 +109,17 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("goodbye buddy!")
     end
 
+    # When you use \0g, if a character has already been written to the screen
+    # in a color, then it should stay that way after writing new characters. This
+    # test fails because the last . looses it's color, even though it's already
+    # been written.
+    it "preserves characters already written in a certain color" do
+      pending
+      raw = "  \e[90m․\e[0m\e[90m․\e[0m\e[0G\e[90m․\e[0m\e[90m․\e[0m"
+
+      expect(render(raw)).to eql("<span class='term-fg90'>․</span><span class='term-fg90'>․</span><span class='term-fg90'>․</span>")
+    end
+
     it "preserves opening colors when using \\e[0G" do
       raw = "\e[33mhello\e[0m\e[33m\e[44m\e[0Ggoodbye"
 
