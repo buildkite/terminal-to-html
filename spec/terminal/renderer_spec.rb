@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'spec_helper'
 
 describe Terminal::Renderer do
@@ -191,6 +193,12 @@ describe Terminal::Renderer do
       raw = "hi amazing \e[12 nom nom nom friends"
 
       expect(render(raw)).to eql("hi amazing \e[12 nom nom nom friends")
+    end
+
+    it "renders unicode emoji" do
+      raw = "this is great 👍"
+
+      expect(render(raw)).to eql(%{this is great <img alt=":+1:" title=":+1:" src="/assets/emojis/unicode/1f44d.png" class="emoji" width="20" height="20" />})
     end
   end
 

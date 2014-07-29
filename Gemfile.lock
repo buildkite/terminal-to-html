@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    terminal (0.2)
+    terminal (0.3.beta1)
       escape_utils (~> 1.0)
+      gemoji (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -10,6 +11,7 @@ GEM
     benchmark-ips (2.0.0)
     diff-lcs (1.2.5)
     escape_utils (1.0.1)
+    gemoji (2.0.0)
     hirb (0.7.2)
     method_profiler (2.0.1)
       hirb (>= 0.6.0)

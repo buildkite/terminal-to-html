@@ -6,7 +6,7 @@ require "terminal/preview"
 require "terminal/engine" if defined?(Rails)
 
 module Terminal
-  def self.render(output)
-    Terminal::Renderer.new(output).render
+  def self.render(output, options = {})
+    Terminal::Renderer.new(output, options).render
   end
 end

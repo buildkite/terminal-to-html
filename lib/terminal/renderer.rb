@@ -1,12 +1,18 @@
 require 'escape_utils'
+require 'emoji'
 
 module Terminal
   class Renderer
+    EMOJI_UNICODE_REGEXP = /[\u{1f600}-\u{1f64f}]|[\u{2702}-\u{27b0}]|[\u{1f680}-\u{1f6ff}]|[\u{24C2}-\u{1F251}]|[\u{1f300}-\u{1f5ff}]/
     ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd"
     MEGABYTES = 1024 * 1024
 
-    def initialize(output)
+    def initialize(output, options = {})
       @output = output
+
+      @options = options
+      @options[:emoji_asset_path] ||= "/assets/emojis"
+
       @screen = Screen.new
     end
 
@@ -49,7 +55,10 @@ module Terminal
       output = escape_html(output)
 
       # Now convert the colors to HTML
-      convert_to_html(output)
+      output = convert_to_html(output)
+
+      # And emojify
+      replace_unicode_with_emoji(output)
     end
 
     private
@@ -155,6 +164,25 @@ module Terminal
     # [ '\n', '\r', 'a', 'b', '\e123m' ]
     def split_by_escape_character(string)
       string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
+    end
+
+    def replace_unicode_with_emoji(string)
+      string.gsub(EMOJI_UNICODE_REGEXP) do |match|
+        emoji_image_from_unicode(match)
+      end
+    end
+
+    def emoji_image_from_unicode(unicode)
+      emoji = Emoji.find_by_unicode(unicode)
+
+      if emoji
+        name = ":#{emoji.name}:"
+        path = File.join(@options[:emoji_asset_path], emoji.image_filename)
+
+        %(<img alt="#{name}" title="#{name}" src="#{path}" class="emoji" width="20" height="20" />)
+      else
+        unicode
+      end
     end
   end
 end
