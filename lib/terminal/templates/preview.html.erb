@@ -4,20 +4,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link href="<%= asset_path("stylesheets/terminal.css") %>" media="screen" rel="stylesheet" />
     <style>
-      .code {
-        background: #171717;
-        border-radius: 5px;
-        color: white;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        font-family: Monaco, courier;
-        font-size: 12px;
-        line-height: 20px;
-        padding: 14px 18px;
-        white-space: pre-wrap;
-        margin-bottom: 15px;
-      }
-
       body {
         margin: 0;
         padding: 20px;
@@ -46,11 +32,11 @@
   <body>
     <div id="rendered" class="preview">
       <div class="controls"><a href="#" onclick="switchViews(); return false">Show Raw Output</a></div>
-      <div class="code"><%= rendered %></div>
+      <div class="term-container"><%= rendered %></div>
     </div>
     <div id="raw" class="preview" style="display: none">
       <div class="controls"><a href="#" onclick="switchViews(); return false">Show Rendered Output</a></div>
-      <div class="code raw"><%= raw %></div>
+      <div class="term-container raw"><%= raw %></div>
     </div>
   </body>
 </html>

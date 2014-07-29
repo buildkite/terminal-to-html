@@ -48,7 +48,7 @@ Then in your `app/assets/application.css` file:
 Now in your views:
 
 ```
-<div class="code"><%= Terminal.render(output) %></div>
+<div class="term-container"><%= Terminal.render(output) %></div>
 ```
 
 ### Emojis :+1:

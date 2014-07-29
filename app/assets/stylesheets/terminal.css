@@ -1,3 +1,16 @@
+.term-container {
+  background: #171717;
+  border-radius: 5px;
+  color: white;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  font-family: Monaco, courier;
+  font-size: 12px;
+  line-height: 20px;
+  padding: 14px 18px;
+  white-space: pre-wrap;
+}
+
 .term-fg30 { color: #666; } /* black (but we can't use black, so a diff color) */
 .term-fg31 { color: #e10c02; } /* red */
 .term-fg32 { color: #00bd02; } /* green */
