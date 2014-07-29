@@ -3,9 +3,14 @@ require 'erb'
 module Terminal
   class Preview
     class Binding
-      def initialize(raw, rendered)
+      def initialize(asset_path, raw, rendered)
+        @asset_path = asset_path
         @raw = raw
         @rendered = rendered
+      end
+
+      def asset_path(path)
+        File.join(@asset_path, path)
       end
 
       def raw
@@ -34,15 +39,23 @@ module Terminal
     def render
       template = File.read(template_path)
       renderer = ERB.new(template)
-      binding = Binding.new(@raw, @rendered)
+      binding = Binding.new(assets_path, @raw, @rendered)
 
       renderer.result(binding.get_binding)
     end
 
     private
 
+    def root_path
+      File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
+    end
+
+    def assets_path
+      File.join(root_path, 'app/assets')
+    end
+
     def template_path
-      File.join(File.expand_path(File.dirname(__FILE__)), 'templates/preview.html.erb')
+      File.join(root_path, 'lib/terminal/templates/preview.html.erb')
     end
   end
 end
