@@ -36,6 +36,12 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("h<span class='term-fg32'><span class='term-fg33'>llo</span></span>")
     end
 
+    it "treats \\e[39m a reset" do
+      raw = "\e[32mhi\e[39m there"
+
+      expect(render(raw)).to eql("<span class='term-fg32'>hi</span> there")
+    end
+
     it "starts overwriting characters when you \\r midway through somehing" do
       raw = "hello\rb"
 

@@ -217,7 +217,9 @@ module Terminal
           # Extract the color codes
           code = $1.to_s
 
-          if code == "0"
+          # 0 means reset all color information, 39 means (use default color)
+          # which is essentially the same as a reset.
+          if code == "0" || code == "39"
             # Only close a span if one has been opened. So if you have a string lin
             # hello\e[0mthere it doens't just put a close span in there for no reason.
             if opened_spans.length > 0
