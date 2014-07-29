@@ -88,7 +88,7 @@ rspec --color --tty | terminal --preview
 
 ### With the Buildbox API
 
-After fetching the job log URL via the [Buildbox Builds API](https://buildbox.io/docs/api/builds), you can pipe it directly into terminal by adding `.txt` and your API key:
+You can curl a job's log directly into terminal using job log URL from the [Builds API](https://buildbox.io/docs/api/builds), and adding `.txt` and your API key:
 
 ```bash
 JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log.txt?api_key=[api-key]"
