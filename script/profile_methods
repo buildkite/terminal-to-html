@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+$:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
+
+require 'terminal'
+require 'method_profiler'
+
+screen_profiler = MethodProfiler.observe(Terminal::Screen)
+render_profiler = MethodProfiler.observe(Terminal::Renderer)
+iterations = 10
+
+Dir.glob("spec/fixtures/*.raw").each do |file|
+  output = File.read(file)
+  basename = File.basename(file)
+
+  puts "Rendering `#{basename}` #{iterations} times..."
+  iterations.times { Terminal.render(output) }
+end
+
+puts screen_profiler.report
+puts render_profiler.report
