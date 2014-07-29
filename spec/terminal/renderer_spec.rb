@@ -51,7 +51,7 @@ describe Terminal::Renderer do
     it "colors across multiple lines" do
       raw = "\e[81mhello\n\nfriend\e[0m"
 
-      expect(render(raw)).to eql("<span class='term-fg81'>hello</span>\n<span class='term-fg81'></span>\n<span class='term-fg81'>friend</span>")
+      expect(render(raw)).to eql("<span class='term-fg81'>hello</span>\n&nbsp;\n<span class='term-fg81'>friend</span>")
     end
 
     it "allows you to control the cursor forwards" do
@@ -121,6 +121,12 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("<span class='term-fg90'>․․․․</span>")
     end
 
+    it "replaces empty lines with non-breaking spaces" do
+      raw = "hello\n\nfriend"
+
+      expect(render(raw)).to eql("hello\n&nbsp;\nfriend")
+    end
+
     it "preserves opening colors when using \\e[0G" do
       raw = "\e[33mhello\e[0m\e[33m\e[44m\e[0Ggoodbye"
 
@@ -166,7 +172,7 @@ describe Terminal::Renderer do
     it "escapes HTML in color codes" do
       raw = "hello \e[\"hellomfriend"
 
-      expect(render(raw)).to eql("hello [&quot;hellomfriend")
+      expect(render(raw)).to eql("hello \e[&quot;hellomfriend")
     end
   end
 

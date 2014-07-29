@@ -137,28 +137,51 @@ module Terminal
     # sequences where neccessary.
     def to_s
       last_line_index = @screen.length - 1
-
       buffer = []
-      previous = nil
 
       @screen.each_with_index do |line, line_index|
+        previous = nil
+        open_fgs = 0
+
         line.each do |node|
+          # If there is no previous node, and the current node has a color
+          # (think first node in a line) then add the escape character.
           if !previous && node.fg
             buffer << "\e[#{node.fg}m"
-          elsif previous
-            if previous.fg != node.fg
-              if node.fg
-                buffer << "\e[#{node.fg}m"
-              else
-                buffer << "\e[0m"
-              end
+
+            # Increment the open style counter
+            open_fgs += 1
+
+          # If we have a previous node, and the last node's fg style doesn't
+          # match this nodes, then we start a new escape character.
+          elsif previous && previous.fg != node.fg
+            # If this fg is different to the last fg, and this fg is nil, that means
+            # the styling has stopped.
+            if !node.fg
+              # Add our reset escape character
+              buffer << "\e[0m"
+
+              # Decrement the open style counter
+              open_fgs -= 1
+            else
+              buffer << "\e[#{node.fg}m"
+
+            # Increment the open style counter
+              open_fgs += 1
             end
           end
 
+          # Add the nodes blob to te buffer
           buffer << node.blob
+
+          # Set this node as being the previous node
           previous = node
         end
 
+        # Be sure to close off any open fg's for this line
+        open_fgs.times { buffer << "\e[0m" }
+
+        # Add a new line as long as this line isn't the last
         buffer << "\n" if line_index != last_line_index
       end
 

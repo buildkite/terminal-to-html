@@ -150,72 +150,16 @@ module Terminal
     end
 
     def convert_to_html(string)
-      buffer = []
-
-      # An array of open spans. As spans get opened, they get
-      # added to this list, and as they're reset (\e[0m) they are
-      # removed.
-      opened_spans = []
-
-      # Split the string into colors, new lines and the rest
-      chunks = string.scan(/\e\[[\d;]+m|\n|[^\n\e]+/)
-
-      # Iterate over the chunks, and turn them into HTML
-      chunks.each do |chunk|
-        case chunk
-        when "\n"
-          # Close any open spans
-          opened_spans.length.times do
-            buffer << "</span>"
-          end
-
-          # Add a new line
-          buffer << "\n"
-
-          # If there were open spans on the previous line, open them up again
-          # here.
-          opened_spans.each do |span|
-            buffer << span
-          end
-        when /\e\[(.*)m/
-          # Extract the color codes
-          code = $1.to_s
-
-          # 0 means reset all color information, 39 means (use default color)
-          # which is essentially the same as a reset.
-          if code == "0" || code == "39"
-            # Only close a span if one has been opened. So if you have a string lin
-            # hello\e[0mthere it doens't just put a close span in there for no reason.
-            if opened_spans.length > 0
-              opened_spans.shift
-              buffer << "</span>"
-            end
-          else
-            span = "<span class='#{color_class_name_from_code(code)}'>"
-
-            # If the last open span, is the same as the current one, skip it. Fixes defining multiple
-            # colors like this: <span class="red"><span class="red">
-            if not opened_spans.last == span
-              opened_spans << span
-
-              # Open a span that is the color
-              buffer << span
-            end
-          end
+      string = string.gsub(/\e\[([0-9;]+)m/) do |match, x|
+        if $1 == "0"
+          "</span>"
         else
-          # If it's not a new color, or a new line, then add the chunk
-          # to the buffer.
-          buffer << chunk
+          "<span class='#{color_class_name_from_code($1)}'>"
         end
       end
 
-      # If there were any open spans left over, close them
-      opened_spans.length.times do
-        buffer << "</span>"
-      end
-
-      # Join and replace empty lines with a non breaking space.
-      buffer.join("").gsub(/$^/, "&nbsp;")
+      # Replace empty lines with a non breaking space.
+      string.gsub(/$^/, "&nbsp;")
     end
 
     # Figure out what class name to use. Supports xterm256 colors
@@ -224,14 +168,13 @@ module Terminal
       codes = code.split(";")
 
       if codes[0] == "38" && codes[1] == "5"
-        "term-fgx-#{codes[2]}"
+        "term-fgx#{codes[2]}"
       elsif codes[0] == "48" && codes[1] == "5"
-        raise 'yolo'
-        "term-bg#{codes[2]}"
+        "term-bgx#{codes[2]}"
       elsif codes.length == 1
         "term-fg#{codes.last}"
       else
-        "term-esc-unknown"
+        "term-unknown"
       end
     end
   end
