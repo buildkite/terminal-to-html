@@ -5,22 +5,19 @@ describe Terminal::Screen do
 
   describe "#write" do
     it "writes to a given x/y co-ordinate" do
-      screen.x = 3
-      screen.y = 3
-      screen.write('h')
+      screen.x = 0
+      screen.y = 0
+      screen.write('a')
 
-      expect(screen.to_a).to eql([[], [], [], [" ", " ", " ", "h"]])
-    end
+      screen.x = 1
+      screen.y = 1
+      screen.write('b')
 
-    it "allows you to write to a co-ordinate via the method" do
-      screen.write('a', 0, 0)
-      screen.write('b', 1, 1)
-      screen.write('c', 2, 2)
+      screen.x = 2
+      screen.y = 2
+      screen.write('c')
 
       expect(screen.to_a).to eql([["a"], [" ", "b"], [" ", " ", "c"]])
-
-      expect(screen.x).to eql(0)
-      expect(screen.y).to eql(0)
     end
 
     it "makes going back steps easy" do

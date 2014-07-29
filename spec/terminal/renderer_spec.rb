@@ -33,7 +33,7 @@ describe Terminal::Renderer do
     it "skips over colors when backspacing" do
       raw = "he\e[32m\e[33m\bllo"
 
-      expect(render(raw)).to eql("h<span class='term-fg32'><span class='term-fg33'>llo</span></span>")
+      expect(render(raw)).to eql("h<span class='term-fg33'>llo</span>")
     end
 
     it "treats \\e[39m a reset" do
@@ -115,21 +115,16 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("goodbye buddy!")
     end
 
-    # When you use \0g, if a character has already been written to the screen
-    # in a color, then it should stay that way after writing new characters. This
-    # test fails because the last . looses it's color, even though it's already
-    # been written.
     it "preserves characters already written in a certain color" do
-      pending
       raw = "  \e[90m․\e[0m\e[90m․\e[0m\e[0G\e[90m․\e[0m\e[90m․\e[0m"
 
-      expect(render(raw)).to eql("<span class='term-fg90'>․</span><span class='term-fg90'>․</span><span class='term-fg90'>․</span>")
+      expect(render(raw)).to eql("<span class='term-fg90'>․․․․</span>")
     end
 
     it "preserves opening colors when using \\e[0G" do
       raw = "\e[33mhello\e[0m\e[33m\e[44m\e[0Ggoodbye"
 
-      expect(render(raw)).to eql("<span class='term-fg33'><span class='term-fg44'>goodbye</span></span>")
+      expect(render(raw)).to eql("<span class='term-fg44'>goodbye</span>")
     end
 
     it "allows erasing the current line up to a point" do

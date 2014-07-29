@@ -83,13 +83,13 @@ module Terminal
       force_encoding!(output)
 
       # Now do the terminal rendering (handles all the special characters)
-      terminal_output = emulate_terminal_rendering(output)
+      output = emulate_terminal_rendering(output)
 
       # Escape any HTML
-      terminal_output = EscapeUtils.escape_html(terminal_output)
+      output = EscapeUtils.escape_html(output)
 
       # Now convert the colors to HTML
-      convert_to_html(terminal_output)
+      convert_to_html(output)
     end
 
     private
@@ -119,48 +119,12 @@ module Terminal
           @screen.x = 0
         when "\r"
           @screen.x = 0
+        when /\e\[(.*)m/
+          @screen.fg($1.to_s)
         when "\b"
-          # Colors are skipped when backspacing
-          line = @screen[@screen.y]
-          pointer = @screen.x
-
-          while c = line[pointer -= 1]
-            if not c =~ COLOR_REGEX
-              line[pointer] = ""
-              break
-            end
-          end
+          @screen.x -= 1
         when "\e[G", "\e[0G", "\e[g"
-          # TODO: I have no idea how these characters are supposed to work,
-          # but after expermenting in console, I discovered that:
-          #
-          # \e[33mhello\e[0m\e[33m\e[44m\e[0Ggoodbye
-          #
-          # Preserves any open colors (33m and 44m) and starts writing text
-          # as those colors.
-          line = @screen[@screen.y]
-
-          # Calculate open colors
-          open_colors = []
-          line.each do |c|
-            if c =~ COLOR_REGEX
-              # Remove the last color if it's a reset
-              if c == "\e[0m"
-                open_colors.shift
-              else
-                open_colors << c
-              end
-            end
-          end
-
-          # Start writing from the first character
           @screen.x = 0
-
-          # Preserve the open colors by adding them to the begining
-          # of the line.
-          open_colors.each do |color|
-            @screen << color
-          end
         when "\e[K", "\e[0K"
           # clear everything after the current x co-ordinate
           @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)

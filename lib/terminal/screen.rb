@@ -18,9 +18,19 @@
 
 module Terminal
   class Screen
-    EMPTY = " "
+    class Node < Struct.new(:blob, :fg, :bg)
+      def ==(value)
+        blob == value
+      end
+
+      def to_s
+        blob
+      end
+    end
+
     END_OF_LINE = :end_of_line
     START_OF_LINE = :start_of_line
+    EMPTY = Node.new(" ")
 
     attr_reader :x, :y
 
@@ -28,34 +38,31 @@ module Terminal
       @x = 0
       @y = 0
       @screen = []
+      @fg = nil
     end
 
-    def write(character, x = @x, y = @y)
+    def write(character)
       # Expand the screen if we need to
-      ((y + 1) - @screen.length).times do
+      ((@y + 1) - @screen.length).times do
         @screen << []
       end
 
-      line = @screen[y]
+      line = @screen[@y]
       line_length = line.length
 
       # Write empty slots until we reach the line
-      (x - line_length).times do |i|
+      (@x - line_length).times do |i|
         line[line_length + i] = EMPTY
       end
 
       # Write the character to the slot
-      line[x] = character
+      line[@x] = Node.new(character, @fg, @bg)
     end
 
     def <<(character)
       write(character)
       @x += 1
       character
-    end
-
-    def [](y)
-      @screen[y]
     end
 
     def x=(value)
@@ -77,6 +84,20 @@ module Terminal
       else
         line.fill(EMPTY, x_start..x_end)
       end
+    end
+
+    # Changes the current foreground color that all new characters
+    # will be written with.
+    def fg(color)
+      if color == "0" # reset all styles
+        @fg = nil
+      elsif color == "39" # reset text style
+        @fg = nil
+      else
+        @fg = color
+      end
+
+      color
     end
 
     def up(value = nil)
@@ -109,11 +130,39 @@ module Terminal
     end
 
     def to_a
-      @screen
+      @screen.to_a.map { |chars| chars.map(&:to_s) }
     end
 
+    # Renders each node to a string, inserting and cleaning up color escape
+    # sequences where neccessary.
     def to_s
-      @screen.to_a.map { |chars| chars.join("") }.join("\n")
+      last_line_index = @screen.length - 1
+
+      buffer = []
+      previous = nil
+
+      @screen.each_with_index do |line, line_index|
+        line.each do |node|
+          if !previous && node.fg
+            buffer << "\e[#{node.fg}m"
+          elsif previous
+            if previous.fg != node.fg
+              if node.fg
+                buffer << "\e[#{node.fg}m"
+              else
+                buffer << "\e[0m"
+              end
+            end
+          end
+
+          buffer << node.blob
+          previous = node
+        end
+
+        buffer << "\n" if line_index != last_line_index
+      end
+
+      buffer.join("")
     end
   end
 end
