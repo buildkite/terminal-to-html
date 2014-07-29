@@ -5,10 +5,10 @@
 .term-fg34 { color: #8db7e0; } /* blue */
 .term-fg35 { color: #ceacde; } /* magenta */
 .term-fg36 { color: #00cdd9; } /* cyan */
-.term-fg90 { color: #838887; } /* grey */
 
 /* high intense colors */
 .term-fgi1 { color: #5ef765; }
+.term-fgi90 { color: #838887; } /* grey */
 
 /* background colors */
 .term-bg42 { background: #99ff5f; }
