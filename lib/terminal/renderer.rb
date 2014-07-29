@@ -2,50 +2,7 @@ require 'escape_utils'
 
 module Terminal
   class Renderer
-    # If the string (which is a regex) matches, it'll split on that space, so we
-    # end up with an array of special characters and normal characters, i.e:
-    # [ '\n', '\r', 'a', 'b', '\e123m' ]
-    SPLIT_BY_CHARACTERS = [
-      # \n moves the cursor to a new line
-      # \r moves the cursor to the begining of the line
-      # \b moves the cursor back one
-      '[\n\r\b]',
-
-      # \e[0m reset color information
-      # \e[?m use the ? color going forward
-      '\e\[[\d;]+m',
-
-      # [K Erases from the current cursor position to the end of the current line.
-      '\e\[0?K',
-
-      # Clears tab at the current position
-      '\e\[0?[Gg]',
-
-      # [1K Erases from the current cursor position to the start of the current line.
-      # [2K Erases the entire current line.
-      '\e\[[1-2]K',
-
-      # \e[?D move the cursor up ? many characters
-      '\e\[[\d;]*A',
-
-      # \e[?D move the cursor down ? many characters
-      '\e\[[\d;]*B',
-
-      # \e[?D move the cursor forward ? many characters
-      '\e\[[\d;]*C',
-
-      # \e[?D move the cursor back ? many characters
-      '\e\[[\d;]*D',
-
-      # Random escpae sequences
-      '\e',
-
-      # Every other character
-      '.'
-    ]
-
-    SPLIT_BY_CHARACTERS_REGEX = Regexp.new(SPLIT_BY_CHARACTERS.join("|"))
-    COLOR_REGEX = /\e\[.+m/
+    ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd"
     MEGABYTES = 1024 * 1024
 
     def initialize(output)
@@ -105,56 +62,83 @@ module Terminal
     end
 
     def emulate_terminal_rendering(string)
-      # Splits the output into intersting parts.
-      parts = string.scan(SPLIT_BY_CHARACTERS_REGEX)
+      # Scan the string to create an array of interesting things, for example
+      # it would look like this:
+      # [ '\n', '\r', 'a', 'b', '\e123m' ]
+      parts = string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
 
-      # The when cases are ordered by most likely, the lest checks it has to go through
-      # before matching, the faster the render will be. Colors are usually most likey, so that's first.
+      # The when cases are ordered by most likely, the lest checks it has to go
+      # through before matching, the faster the render will be. Colors are
+      # usually most likey, so that's first.
       parts.each do |char|
-        case char
-        when "\n"
-          @screen.x = 0
-          @screen.y += 1
-        when "\r"
-          @screen.x = 0
-        when "\r"
-          @screen.x = 0
-        when /\e\[(.*)m/
-          @screen.fg($1.to_s)
-        when "\b"
-          @screen.x -= 1
-        when "\e[G", "\e[0G", "\e[g"
-          @screen.x = 0
-        when "\e[K", "\e[0K"
-          # clear everything after the current x co-ordinate
-          @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
-        when "\e[1K"
-          # clear everything before the current x co-ordinate
-          @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
-        when "\e[2K"
-          @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
-        when /\e\[(\d+)?A/
-          @screen.up($1)
-        when /\e\[(\d+)?B/
-          @screen.down($1)
-        when /\e\[(\d+)?C/
-          @screen.foward($1)
-        when /\e\[(\d+)?D/
-          @screen.backward($1)
+        # Hackers way of not having to run a regex over every
+        # character.
+        if char.length == 1
+          case char
+          when "\n"
+            @screen.x = 0
+            @screen.y += 1
+          when "\r"
+            @screen.x = 0
+          when "\r"
+            @screen.x = 0
+          when "\b"
+            @screen.x -= 1
+          else
+            @screen << char
+          end
         else
-          @screen << char
+          handle_escape_code(char)
         end
       end
 
       @screen.to_s
     end
 
+    def handle_escape_code(sequence)
+      # Escapes have the following: \e [ (instruction) (code)
+      parts = sequence.match(/\e\[([\d;]+)?([#{ESCAPE_CONTROL_CHARACTERS}])/)
+
+      instruction = parts[1].to_s
+      code = parts[2].to_s
+
+      case code
+      when ""
+        # no-op - an empty \e
+      when "m"
+        @screen.fg(instruction)
+      when "G", "g"
+        @screen.x = 0
+      when "K", "k"
+        case instruction
+        when nil, "0"
+          # clear everything after the current x co-ordinate
+          @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
+        when "1"
+          # clear everything before the current x co-ordinate
+          @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
+        when "2"
+          @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
+        end
+      when "A"
+        @screen.up(instruction)
+      when "B"
+        @screen.down(instruction)
+      when "C"
+        @screen.foward(instruction)
+      when "D"
+        @screen.backward(instruction)
+      end
+    end
+
     def convert_to_html(string)
-      string = string.gsub(/\e\[([0-9;]+)m/) do |match, x|
+      string = string.gsub(/\e\[((?:xfg|fg)?\d+)m/) do |match, x|
         if $1 == "0"
-          "</span>"
+          %{</span>}
         else
-          "<span class='#{color_class_name_from_code($1)}'>"
+          # the colors have already been sorted into xterm or regular colors
+          # by the screen.
+          %{<span class='term-#{$1}'>}
         end
       end
 

@@ -89,29 +89,49 @@ module Terminal
     # Changes the current foreground color that all new characters
     # will be written with.
     def fg(color)
-      if color == "0" # reset all styles
-        @fg = nil
-      elsif color == "39" # reset text style
-        @fg = nil
-      else
-        @fg = color
+      codes = color.to_s.split(";")
+      base = codes[0]
+
+      # fg x-term color
+      if base == "38" && codes[1] == "5"
+        return @fg = "fgx#{codes[2]}"
       end
 
-      color
+      # bg x-term color
+      if base == "48" && codes[1] == "5"
+        return @bg = "fgx#{codes[2]}"
+      end
+
+      # reset all styles
+      if base == "0"
+        @fg = nil
+        @bg = nil
+        return base
+      end
+
+      if base == "39" # reset fg only
+        @fg = nil
+        return base
+      end
+
+      if base == "99" # reset bg only
+        @fg = nil
+        return base
+      end
+
+      if color.to_i > 0 # quick validation to make sure it's a number
+        return @fg = "fg#{base}"
+      end
+
+      false
     end
 
     def up(value = nil)
-      self.y -= value.nil? ? 1 : value.to_i
+      self.y -= parse_integer(value)
     end
 
     def down(value = nil)
-      increment = if value.nil?
-                    1
-                  else
-                    value.to_i
-                  end
-
-      new_y = @y + increment
+      new_y = @y + parse_integer(value)
 
       # Only jump down if the line exists
       if @screen[new_y]
@@ -122,11 +142,11 @@ module Terminal
     end
 
     def backward(value = nil)
-      self.x -= value.nil? ? 1 : value.to_i
+      self.x -= parse_integer(value)
     end
 
     def foward(value = nil)
-      self.x += value.nil? ? 1 : value.to_i
+      self.x += parse_integer(value)
     end
 
     def to_a
@@ -166,7 +186,7 @@ module Terminal
             else
               buffer << "\e[#{node.fg}m"
 
-            # Increment the open style counter
+              # Increment the open style counter
               open_fgs += 1
             end
           end
@@ -186,6 +206,12 @@ module Terminal
       end
 
       buffer.join("")
+    end
+
+    private
+
+    def parse_integer(value)
+      value.nil? || value == "" ? 1 : value.to_i
     end
   end
 end
