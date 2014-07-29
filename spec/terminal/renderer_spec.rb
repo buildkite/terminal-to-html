@@ -25,9 +25,9 @@ describe Terminal::Renderer do
     end
 
     it "closes colors that get opened" do
-      raw = "he\033[81mllo"
+      raw = "he\033[32mllo"
 
-      expect(render(raw)).to eql("he<span class='term-fg81'>llo</span>")
+      expect(render(raw)).to eql("he<span class='term-fg32'>llo</span>")
     end
 
     it "skips over colors when backspacing" do
@@ -49,9 +49,9 @@ describe Terminal::Renderer do
     end
 
     it "colors across multiple lines" do
-      raw = "\e[81mhello\n\nfriend\e[0m"
+      raw = "\e[32mhello\n\nfriend\e[0m"
 
-      expect(render(raw)).to eql("<span class='term-fg81'>hello</span>\n&nbsp;\n<span class='term-fg81'>friend</span>")
+      expect(render(raw)).to eql("<span class='term-fg32'>hello</span>\n&nbsp;\n<span class='term-fg32'>friend</span>")
     end
 
     it "allows you to control the cursor forwards" do
@@ -118,7 +118,7 @@ describe Terminal::Renderer do
     it "preserves characters already written in a certain color" do
       raw = "  \e[90m․\e[0m\e[90m․\e[0m\e[0G\e[90m․\e[0m\e[90m․\e[0m"
 
-      expect(render(raw)).to eql("<span class='term-fg90'>․․․․</span>")
+      expect(render(raw)).to eql("<span class='term-fgi90'>․․․․</span>")
     end
 
     it "replaces empty lines with non-breaking spaces" do
@@ -130,7 +130,7 @@ describe Terminal::Renderer do
     it "preserves opening colors when using \\e[0G" do
       raw = "\e[33mhello\e[0m\e[33m\e[44m\e[0Ggoodbye"
 
-      expect(render(raw)).to eql("<span class='term-fg44'>goodbye</span>")
+      expect(render(raw)).to eql("<span class='term-fg33 term-bg44'>goodbye</span>")
     end
 
     it "allows erasing the current line up to a point" do
@@ -160,7 +160,7 @@ describe Terminal::Renderer do
     it "collapses many spans of the same color into 1" do
       raw = "\e[90m․\e[90m․\e[90m․\e[90m․\n\e[90m․\e[90m․\e[90m․\e[90m․"
 
-      expect(render(raw)).to eql("<span class='term-fg90'>․․․․</span>\n<span class='term-fg90'>․․․․</span>")
+      expect(render(raw)).to eql("<span class='term-fgi90'>․․․․</span>\n<span class='term-fgi90'>․․․․</span>")
     end
 
     it "escapes HTML" do
@@ -173,6 +173,24 @@ describe Terminal::Renderer do
       raw = "hello \e[\"hellomfriend"
 
       expect(render(raw)).to eql("hello \e[&quot;hellomfriend")
+    end
+
+    it "handles background colors" do
+      raw = "\e[30;42m\e[2KOK (244 tests, 558 assertions)"
+
+      expect(render(raw)).to eql("<span class='term-fg30 term-bg42'>OK (244 tests, 558 assertions)</span>")
+    end
+
+    it "handles xterm colors" do
+      raw = "\e[38;5;169mhello\e[0m \e[38;5;179mgoodbye"
+
+      expect(render(raw)).to eql("<span class='term-fgx169'>hello</span> <span class='term-fgx179'>goodbye</span>")
+    end
+
+    it "handles broken escape characters" do
+      raw = "hi amazing \e[12 nom nom nom friends"
+
+      expect(render(raw)).to eql("hi amazing \e[12 nom nom nom friends")
     end
   end
 

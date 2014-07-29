@@ -23,6 +23,14 @@ module Terminal
         blob == value
       end
 
+      def style
+        if fg || bg
+          "#{fg};#{bg};"
+        else
+          nil
+        end
+      end
+
       def to_s
         blob
       end
@@ -76,6 +84,9 @@ module Terminal
     def clear(y, x_start, x_end)
       line = @screen[y]
 
+      # If the line isn't there, we can't clean it.
+      return if line.nil?
+
       x_start = 0 if x_start == START_OF_LINE
       x_end = line.length - 1 if x_end == END_OF_LINE
 
@@ -88,42 +99,54 @@ module Terminal
 
     # Changes the current foreground color that all new characters
     # will be written with.
-    def fg(color)
-      codes = color.to_s.split(";")
-      base = codes[0]
-
-      # fg x-term color
-      if base == "38" && codes[1] == "5"
-        return @fg = "fgx#{codes[2]}"
-      end
-
-      # bg x-term color
-      if base == "48" && codes[1] == "5"
-        return @bg = "fgx#{codes[2]}"
-      end
-
-      # reset all styles
-      if base == "0"
+    def color(color)
+      # Reset all styles
+      if color == "0"
         @fg = nil
         @bg = nil
-        return base
+        return color
       end
 
-      if base == "39" # reset fg only
+      # Reset foreground color only
+      if color == "39"
         @fg = nil
-        return base
+        return color
       end
 
-      if base == "99" # reset bg only
-        @fg = nil
-        return base
+      # Reset background color only
+      if color == "49"
+        @bg = nil
+        return color
       end
 
-      if color.to_i > 0 # quick validation to make sure it's a number
-        return @fg = "fg#{base}"
+      colors = color.to_s.split(";")
+
+      # Extended set foreground x-term color
+      if colors[0] == "38" && colors[1] == "5"
+        return @fg = "fgx#{colors[2]}"
       end
 
-      false
+      # Extended set background x-term color
+      if colors[0] == "48" && colors[1] == "5"
+        return @bg = "bgx#{colors[2]}"
+      end
+
+      # If multiple colors are defined, i.e. \e[30;42m\e
+      # then loop through each one, and assign it to @fg
+      # or @bg
+      colors.each do |c|
+        # If the number is between 30–37, then it's a foreground color,
+        # if it's 40–47, then it's a background color. 90-97 is like the regular
+        # foreground 30-37, but it's high intensity
+        case c.to_i
+        when 30..37
+          @fg = "fg#{c}"
+        when 40..47
+          @bg = "bg#{c}"
+        when 90..97
+          @fg = "fgi#{c}"
+        end
+      end
     end
 
     def up(value = nil)
@@ -161,33 +184,33 @@ module Terminal
 
       @screen.each_with_index do |line, line_index|
         previous = nil
-        open_fgs = 0
+        open_styles = 0
 
         line.each do |node|
           # If there is no previous node, and the current node has a color
           # (think first node in a line) then add the escape character.
-          if !previous && node.fg
-            buffer << "\e[#{node.fg}m"
+          if !previous && node.style
+            buffer << "\e[#{node.style}m"
 
             # Increment the open style counter
-            open_fgs += 1
+            open_styles += 1
 
-          # If we have a previous node, and the last node's fg style doesn't
+          # If we have a previous node, and the last node's style doesn't
           # match this nodes, then we start a new escape character.
-          elsif previous && previous.fg != node.fg
-            # If this fg is different to the last fg, and this fg is nil, that means
+          elsif previous && previous.style != node.style
+            # If this style is different to the last style, and this style is nil, that means
             # the styling has stopped.
-            if !node.fg
+            if !node.style
               # Add our reset escape character
               buffer << "\e[0m"
 
               # Decrement the open style counter
-              open_fgs -= 1
+              open_styles -= 1
             else
-              buffer << "\e[#{node.fg}m"
+              buffer << "\e[#{node.style}m"
 
               # Increment the open style counter
-              open_fgs += 1
+              open_styles += 1
             end
           end
 
@@ -198,8 +221,8 @@ module Terminal
           previous = node
         end
 
-        # Be sure to close off any open fg's for this line
-        open_fgs.times { buffer << "\e[0m" }
+        # Be sure to close off any open styles for this line
+        open_styles.times { buffer << "\e[0m" }
 
         # Add a new line as long as this line isn't the last
         buffer << "\n" if line_index != last_line_index

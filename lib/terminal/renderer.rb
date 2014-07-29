@@ -106,7 +106,7 @@ module Terminal
       when ""
         # no-op - an empty \e
       when "m"
-        @screen.fg(instruction)
+        @screen.color(instruction)
       when "G", "g"
         @screen.x = 0
       when "K", "k"
@@ -132,15 +132,15 @@ module Terminal
     end
 
     def convert_to_html(string)
-      string = string.gsub(/\e\[((?:xfg|fg)?\d+)m/) do |match, x|
-        if $1 == "0"
-          %{</span>}
+      string = string.gsub(/\e\[([^;m]+);([^;m]+)?;m/) do |match|
+        if $2
+          %{<span class='term-#{$1} term-#{$2}'>}
         else
-          # the colors have already been sorted into xterm or regular colors
-          # by the screen.
           %{<span class='term-#{$1}'>}
         end
       end
+
+      string = string.gsub("\e[0m", "</span>")
 
       # Replace empty lines with a non breaking space.
       string.gsub(/$^/, "&nbsp;")
