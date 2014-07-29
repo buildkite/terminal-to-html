@@ -12,7 +12,7 @@ Benchmark.bm(30) do |bm|
     basename = File.basename(file)
 
     bm.report basename do
-      Timeout.timeout(5) do
+      Timeout.timeout(100) do
         Terminal.render(output)
       end
     end

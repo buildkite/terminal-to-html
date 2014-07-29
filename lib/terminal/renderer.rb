@@ -97,7 +97,7 @@ module Terminal
 
     def handle_escape_code(sequence)
       # Escapes have the following: \e [ (instruction) (code)
-      parts = sequence.match(/\e\[([\d;]+)?([#{ESCAPE_CONTROL_CHARACTERS}])/)
+      parts = sequence.match(/\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/)
 
       instruction = parts[1].to_s
       code = parts[2].to_s
