@@ -116,27 +116,27 @@ module Terminal
 
     # Changes the current foreground color that all new characters
     # will be written with.
-    def color(color)
+    def color(color_code)
       # Reset all styles
-      if color == "0"
+      if color_code == "0"
         @fg = nil
         @bg = nil
-        return color
+        return color_code
       end
 
       # Reset foreground color only
-      if color == "39"
+      if color_code == "39"
         @fg = nil
-        return color
+        return color_code
       end
 
       # Reset background color only
-      if color == "49"
+      if color_code == "49"
         @bg = nil
-        return color
+        return color_code
       end
 
-      colors = color.to_s.split(";")
+      colors = color_code.to_s.split(";")
 
       # Extended set foreground x-term color
       if colors[0] == "38" && colors[1] == "5"
@@ -151,17 +151,20 @@ module Terminal
       # If multiple colors are defined, i.e. \e[30;42m\e
       # then loop through each one, and assign it to @fg
       # or @bg
-      colors.each do |c|
+      colors.each do |cc|
         # If the number is between 30–37, then it's a foreground color,
         # if it's 40–47, then it's a background color. 90-97 is like the regular
         # foreground 30-37, but it's high intensity
-        case c.to_i
-        when 30..37
-          @fg = "fg#{c}"
-        when 40..47
-          @bg = "bg#{c}"
-        when 90..97
-          @fg = "fgi#{c}"
+        #
+        # I don't use ranges and a select because I've found that to be rather
+        # slow.
+        c_integer = cc.to_i
+        if c_integer >= 30 && c_integer <= 37
+          @fg = "fg#{cc}"
+        elsif c_integer >= 40 && c_integer <= 47
+          @bg = "bg#{cc}"
+        elsif c_integer >= 90 && c_integer <= 97
+          @fg = "fgi#{cc}"
         end
       end
     end
