@@ -39,7 +39,7 @@ in your Gemfile:
 gem "terminal"
 ```
 
-Then in your `app/assets/application.css` file, add `terminal.css`
+Then in your `app/assets/application.css` file:
 
 ```css
 /* require "terminal" */
@@ -47,13 +47,13 @@ Then in your `app/assets/application.css` file, add `terminal.css`
 
 Now in your views:
 
-```html
+```
 <div class="code"><%= Terminal.render(output)</div>
 ```
 
 ### Emojis :+1:
 
-Terminal converts unicode to proper `<img>` emoji tags. We use the [gemoji](https://github.com/github/gemoji)
+Terminal converts unicode to proper `<img>` tags. We use the [gemoji](https://github.com/github/gemoji)
 gem to do this. The path to the assets can be customized by passing the `:emoji_asset_path` option to `Terminal.render`
 
 ```ruby
