@@ -30,6 +30,27 @@ gem install terminal
 Terminal.render("...")
 ```
 
+### Rails Integration
+
+You can use Terminal directly within your Ruby on Rails application. First require the gem
+in your Gemfile:
+
+```ruby
+gem "terminal"
+```
+
+Then in your `app/assets/application.css` file, add `terminal.css`
+
+```css
+//= require "terminal"
+```
+
+Now in your views:
+
+```erb
+<div class="code"><%= Terminal.render(output)</div>
+```
+
 ### Command Line
 
 Terminal ships with a command line utility. For example, you can pipe `rspec` output to it:
