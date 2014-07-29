@@ -1,3 +1,3 @@
 module Terminal
-  VERSION = "0.3.beta1"
+  VERSION = "0.3"
 end
