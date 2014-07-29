@@ -39,11 +39,14 @@ module Terminal
       # Force encoding on the output first
       force_encoding!(output)
 
-      # Now do the terminal rendering (handles all the special characters)
-      output = emulate_terminal_rendering(output)
+      # Now do the render the output to the screen
+      render_to_screen(output)
+
+      # Convert the screen to a string
+      output = convert_screen_to_string
 
       # Escape any HTML
-      output = EscapeUtils.escape_html(output)
+      output = escape_html(output)
 
       # Now convert the colors to HTML
       convert_to_html(output)
@@ -61,16 +64,11 @@ module Terminal
       end
     end
 
-    def emulate_terminal_rendering(string)
-      # Scan the string to create an array of interesting things, for example
-      # it would look like this:
-      # [ '\n', '\r', 'a', 'b', '\e123m' ]
-      parts = string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
-
+    def render_to_screen(string)
       # The when cases are ordered by most likely, the lest checks it has to go
       # through before matching, the faster the render will be. Colors are
       # usually most likey, so that's first.
-      parts.each do |char|
+      split_by_escape_character(string).each do |char|
         # Hackers way of not having to run a regex over every
         # character.
         if char.length == 1
@@ -91,7 +89,13 @@ module Terminal
           handle_escape_code(char)
         end
       end
+    end
 
+    def escape_html(string)
+      EscapeUtils.escape_html(string)
+    end
+
+    def convert_screen_to_string
       @screen.to_s
     end
 
@@ -144,6 +148,13 @@ module Terminal
 
       # Replace empty lines with a non breaking space.
       string.gsub(/$^/, "&nbsp;")
+    end
+
+    # Scan the string to create an array of interesting things, for example
+    # it would look like this:
+    # [ '\n', '\r', 'a', 'b', '\e123m' ]
+    def split_by_escape_character(string)
+      string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
     end
   end
 end
