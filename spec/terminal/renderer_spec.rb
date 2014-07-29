@@ -109,6 +109,12 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("goodbye buddy!")
     end
 
+    it "preserves opening colors when using \\e[0G" do
+      raw = "\e[33mhello\e[0m\e[33m\e[44m\e[0Ggoodbye"
+
+      expect(render(raw)).to eql("<span class='term-fg33'><span class='term-fg44'>goodbye</span></span>")
+    end
+
     it "allows erasing the current line up to a point" do
       raw = "hello friend\e[1K!"
 
