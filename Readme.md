@@ -88,16 +88,12 @@ rspec --color --tty | terminal --preview
 
 ### With the Buildbox API
 
-First install [jq](http://stedolan.github.io/jq/), if you have [Homebrew](http://brew.sh/) installed, you can just `brew install jq`.
-
-Then, you can:
+After fetching the job log URL via the [Buildbox Builds API](https://buildbox.io/docs/api/builds), you can pipe it directly into terminal by adding `.txt` and your API key:
 
 ```bash
-export JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log?api_key=[api-key]"
-curl $JOB_LOG_URL -s | jq '.content' -r | terminal
+JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log.txt?api_key=[api-key]"
+curl $JOB_LOG_URL | terminal --preview
 ```
-
-For more information on the Buildbox Builds API, see: https://buildbox.io/docs/api/builds
 
 ## Generating Fixtures
 
