@@ -13,18 +13,29 @@ Usage:
 
 Help:
   $ terminal -h
+  $ terminal --help
+
+Version:
+  $ terminal -v
+  $ terminal --version
 
 Preview in the browser:
   $ terminal --preview
 
-See https://buildboxhq.github.io/terminal for more information.
+See https://buildbox.github.io/terminal for more information.
   usage
+end
+
+def version
+  puts "terminal v#{Terminal::VERSION}"
 end
 
 preview = ARGV.delete('--preview')
 
 if ($stdin.tty? && ARGV.empty?) || ARGV.delete('-h') || ARGV.delete('--help')
   help
+elsif ARGV.delete('-v') || ARGV.delete('--version')
+  version
 else
   raw = ARGF.read
   rendered = Terminal.render(raw)
