@@ -6,15 +6,23 @@ require 'terminal'
 require 'benchmark/ips'
 require 'timeout'
 
-Benchmark.ips do |bm|
-  Dir.glob("spec/fixtures/*.raw").each do |file|
-    output = File.read(file)
-    basename = File.basename(file)
+def benchmark(bm, file)
+  output = File.read(file)
+  basename = File.basename(file)
 
-    bm.report basename do
-      Timeout.timeout(100) do
-        Terminal.render(output)
-      end
+  bm.report basename do
+    Timeout.timeout(100) do
+      Terminal.render(output)
+    end
+  end
+end
+
+Benchmark.ips do |bm|
+  if ARGV[0]
+    benchmark(bm, ARGV[0])
+  else
+    Dir.glob("spec/fixtures/*.raw").each do |file|
+      benchmark(bm, file)
     end
   end
 end
