@@ -5,10 +5,13 @@ require 'emoji'
 
 module Terminal
   class Renderer
+    MEGABYTES = 1024 * 1024
+
     EMOJI_UNICODE_REGEXP = /[\u{1f600}-\u{1f64f}]|[\u{2702}-\u{27b0}]|[\u{1f680}-\u{1f6ff}]|[\u{24C2}-\u{1F251}]|[\u{1f300}-\u{1f5ff}]/
     EMOJI_IGNORE = [ "heavy_check_mark", "heavy_multiplication_x" ]
+
     ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd"
-    MEGABYTES = 1024 * 1024
+    CAPTURE_ESCAPE_REGEX = /\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/
 
     def initialize(output, options = {})
       @output = output
@@ -86,22 +89,60 @@ module Terminal
         # Hackers way of not having to run a regex over every
         # character.
         if char.length == 1
-          case char
-          when "\n"
-            @screen.x = 0
-            @screen.y += 1
-          when "\r"
-            @screen.x = 0
-          when "\r"
-            @screen.x = 0
-          when "\b"
-            @screen.x -= 1
-          else
-            @screen << char
-          end
+          handle_character(char)
         else
           handle_escape_code(char)
         end
+      end
+    end
+
+    def handle_character(char)
+      if char == "\n"
+        @screen.x = 0
+        @screen.y += 1
+      elsif char == "\r"
+        @screen.x = 0
+      elsif char == "\r"
+        @screen.x = 0
+      elsif char == "\b"
+        @screen.x -= 1
+      else
+        @screen.write(char)
+        @screen.x += 1
+      end
+    end
+
+    def handle_escape_code(sequence)
+      # Escapes have the following: \e [ (instruction) (code)
+      parts = sequence.match(CAPTURE_ESCAPE_REGEX)
+
+      instruction = parts[1].to_s
+      code = parts[2].to_s
+
+      if code == ""
+        # no-op - an empty \e
+      elsif code == "m"
+        @screen.color(instruction)
+      elsif code == "G" || code == "g"
+        @screen.x = 0
+      elsif code == "K" || code == "k"
+        if instruction == nil || instruction == "0"
+          # clear everything after the current x co-ordinate
+          @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
+        elsif instruction == "1"
+          # clear everything before the current x co-ordinate
+          @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
+        elsif instruction == "2"
+          @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
+        end
+      elsif code == "A"|| code == "a"
+        @screen.up(instruction)
+      elsif code == "B"|| code == "b"
+        @screen.down(instruction)
+      elsif code == "C"|| code == "c"
+        @screen.foward(instruction)
+      elsif code == "D"|| code == "d"
+        @screen.backward(instruction)
       end
     end
 
@@ -118,42 +159,6 @@ module Terminal
     # [ '\n', '\r', 'a', 'b', '\e123m' ]
     def split_by_escape_character(string)
       string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
-    end
-
-    def handle_escape_code(sequence)
-      # Escapes have the following: \e [ (instruction) (code)
-      parts = sequence.match(/\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/)
-
-      instruction = parts[1].to_s
-      code = parts[2].to_s
-
-      case code
-      when ""
-        # no-op - an empty \e
-      when "m"
-        @screen.color(instruction)
-      when "G", "g"
-        @screen.x = 0
-      when "K", "k"
-        case instruction
-        when nil, "0"
-          # clear everything after the current x co-ordinate
-          @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
-        when "1"
-          # clear everything before the current x co-ordinate
-          @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
-        when "2"
-          @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
-        end
-      when "A"
-        @screen.up(instruction)
-      when "B"
-        @screen.down(instruction)
-      when "C"
-        @screen.foward(instruction)
-      when "D"
-        @screen.backward(instruction)
-      end
     end
 
     def convert_to_html!(string)
