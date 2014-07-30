@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    terminal (0.3.2)
+    terminal (0.3.3)
       escape_utils (~> 1.0)
       gemoji (~> 2.0)
 
