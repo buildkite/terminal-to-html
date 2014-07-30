@@ -203,9 +203,9 @@ describe Terminal::Renderer do
 
     it "returns nothing if the unicode emoji can't be found" do
       expect(Emoji).to receive(:unicodes_index) { {} }
-      raw = "this is great 👍"
+      raw = "this is great 😎"
 
-      expect(render(raw)).to eql(%{this is great 👍})
+      expect(render(raw)).to eql(%{this is great 😎})
     end
 
     it "leaves the tick emoji alone (it looks better and is colored)" do

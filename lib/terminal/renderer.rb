@@ -5,10 +5,15 @@ require 'emoji'
 
 module Terminal
   class Renderer
-    EMOJI_UNICODE_REGEXP = /[\u{1f600}-\u{1f64f}]|[\u{2702}-\u{27b0}]|[\u{1f680}-\u{1f6ff}]|[\u{24C2}-\u{1F251}]|[\u{1f300}-\u{1f5ff}]/
-    EMOJI_IGNORE = [ "heavy_check_mark", "heavy_multiplication_x" ]
-    ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd"
     MEGABYTES = 1024 * 1024
+
+    EMOJI_UNICODE_REGEXP = /[\u{1f600}-\u{1f64f}]|[\u{2702}-\u{27b0}]|[\u{1f680}-\u{1f6ff}]|[\u{24C2}-\u{1F251}]|[\u{1f300}-\u{1f5ff}]/
+    EMOJI_IGNORE = [ "heavy_check_mark".freeze, "heavy_multiplication_x".freeze ]
+
+    ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd".freeze
+    ESCAPE_CAPTURE_REGEX = /\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/
+
+    INTERESTING_PARTS_REGEX=/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./
 
     def initialize(output, options = {})
       @output = output
@@ -20,30 +25,14 @@ module Terminal
     end
 
     def render
-      return "" if @output.nil? || @output.strip.length == 0
+      return "" if @output.nil?
 
       # First duplicate the string, because we're going to be editing and chopping it
       # up directly.
-      output = @output.dup
+      output = @output.to_s.dup
 
-      # Limit the entire size of the output to 4 meg
-      max_total_size = 4 * MEGABYTES
-      if output.bytesize > max_total_size
-        output = output.byteslice(0, max_total_size)
-        output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed 4 megabyte limit for logs."
-      end
-
-      # Limit each line to (x) chars
-      # TODO: Move this to the screen
-      max_line_length = 50_000
-      output = output.split("\n").map do |line|
-        if line.length > max_line_length
-          line = line[0..max_line_length]
-          line << " Warning: Terminal has chopped the rest of this line off as it's over the allowed #{max_line_length} characters per line limit."
-        else
-          line
-        end
-      end.join("\n")
+      output = check_size(output)
+      output = check_line_lengths(output)
 
       # Force encoding on the output first
       force_encoding!(output)
@@ -68,6 +57,32 @@ module Terminal
 
     private
 
+    def check_size(output)
+      # Limit the entire size of the output to 4 meg
+      max_total_size = 4 * MEGABYTES
+      if output.bytesize > max_total_size
+        new_output = output.byteslice(0, max_total_size)
+        new_output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed 4 megabyte limit for logs."
+        new_output
+      else
+        output
+      end
+    end
+
+    def check_line_lengths(output)
+      # Limit each line to (x) chars
+      # TODO: Move this to the screen
+      max_line_length = 50_000
+       output.split("\n".freeze).map do |line|
+        if line.length > max_line_length
+          line = line[0..max_line_length]
+          line << " Warning: Terminal has chopped the rest of this line off as it's over the allowed #{max_line_length} characters per line limit."
+        else
+          line
+        end
+      end.join("\n".freeze)
+    end
+
     def force_encoding!(string)
       string.force_encoding('UTF-8')
 
@@ -78,29 +93,58 @@ module Terminal
       end
     end
 
+    # Scan the string to create an array of interesting things, for example
+    # it would look like this:
+    # [ '\n', '\r', 'a', 'b', '\e123m' ]
+    def split_by_escape_character(string)
+      string.scan(INTERESTING_PARTS_REGEX)
+    end
+
     def render_to_screen(string)
       # The when cases are ordered by most likely, the lest checks it has to go
       # through before matching, the faster the render will be. Colors are
       # usually most likey, so that's first.
       split_by_escape_character(string).each do |char|
-        # Hackers way of not having to run a regex over every
-        # character.
-        if char.length == 1
-          case char
-          when "\n"
+        if char == "\n".freeze
+          @screen.x = 0
+          @screen.y += 1
+        elsif char == "\r".freeze
+          @screen.x = 0
+        elsif char == "\b".freeze
+          @screen.x -= 1
+        elsif char[0] == "\e".freeze && char.length > 1
+          sequence = char.match(ESCAPE_CAPTURE_REGEX)
+
+          instruction = sequence[1]
+          code = sequence[2]
+
+          if code == "".freeze
+            # no-op - an empty \e
+          elsif code == "m".freeze
+            @screen.color(instruction)
+          elsif code == "G".freeze || code == "g".freeze
             @screen.x = 0
-            @screen.y += 1
-          when "\r"
-            @screen.x = 0
-          when "\r"
-            @screen.x = 0
-          when "\b"
-            @screen.x -= 1
-          else
-            @screen << char
+          elsif code == "K".freeze || code == "k".freeze
+            if instruction == nil || instruction == "0".freeze
+              # clear everything after the current x co-ordinate
+              @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
+            elsif instruction == "1".freeze
+              # clear everything before the current x co-ordinate
+              @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
+            elsif instruction == "2".freeze
+              @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
+            end
+          elsif code == "A".freeze
+            @screen.up(instruction)
+          elsif code == "B".freeze
+            @screen.down(instruction)
+          elsif code == "C".freeze
+            @screen.foward(instruction)
+          elsif code == "D".freeze
+            @screen.backward(instruction)
           end
         else
-          handle_escape_code(char)
+          @screen << char
         end
       end
     end
@@ -111,49 +155,6 @@ module Terminal
 
     def convert_screen_to_string
       @screen.to_s
-    end
-
-    # Scan the string to create an array of interesting things, for example
-    # it would look like this:
-    # [ '\n', '\r', 'a', 'b', '\e123m' ]
-    def split_by_escape_character(string)
-      string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
-    end
-
-    def handle_escape_code(sequence)
-      # Escapes have the following: \e [ (instruction) (code)
-      parts = sequence.match(/\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/)
-
-      instruction = parts[1].to_s
-      code = parts[2].to_s
-
-      case code
-      when ""
-        # no-op - an empty \e
-      when "m"
-        @screen.color(instruction)
-      when "G", "g"
-        @screen.x = 0
-      when "K", "k"
-        case instruction
-        when nil, "0"
-          # clear everything after the current x co-ordinate
-          @screen.clear(@screen.y, @screen.x, Screen::END_OF_LINE)
-        when "1"
-          # clear everything before the current x co-ordinate
-          @screen.clear(@screen.y, Screen::START_OF_LINE, @screen.x)
-        when "2"
-          @screen.clear(@screen.y, Screen::START_OF_LINE, Screen::END_OF_LINE)
-        end
-      when "A"
-        @screen.up(instruction)
-      when "B"
-        @screen.down(instruction)
-      when "C"
-        @screen.foward(instruction)
-      when "D"
-        @screen.backward(instruction)
-      end
     end
 
     def convert_to_html!(string)
@@ -169,7 +170,7 @@ module Terminal
 
     def replace_unicode_with_emoji!(string)
       string.gsub!(EMOJI_UNICODE_REGEXP) do |match|
-        emoji_image_from_unicode(match)
+        Terminal::Cache.cache(:emoji, match) { emoji_image_from_unicode(match) }
       end
     end
 
