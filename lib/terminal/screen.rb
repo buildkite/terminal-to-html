@@ -74,15 +74,22 @@ module Terminal
     def <<(character)
       write(character)
       @x += 1
-      character
     end
 
     def x=(value)
-      @x = value > 0 ? value : 0
+      if value > 0
+        @x = value
+      else
+        @x = 0
+      end
     end
 
     def y=(value)
-      @y = value > 0 ? value : 0
+      if value > 0
+        @y = value
+      else
+        @y = 0
+      end
     end
 
     def clear(y, x_start, x_end)
@@ -269,7 +276,11 @@ module Terminal
     private
 
     def parse_integer(value)
-      value.nil? || value == "" ? 1 : value.to_i
+      if value == nil || value == ""
+        1
+      else
+        value.to_i
+      end
     end
   end
 end

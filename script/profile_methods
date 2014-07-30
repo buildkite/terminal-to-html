@@ -8,19 +8,24 @@ require 'method_profiler'
 screen_profiler = MethodProfiler.observe(Terminal::Screen)
 render_profiler = MethodProfiler.observe(Terminal::Renderer)
 
-def profile(file)
+iterations = if ARGV[1]
+               ARGV[1].to_i
+             else
+               10
+             end
+
+def profile(file, iterations)
   output = File.read(file)
   basename = File.basename(file)
-  iterations = 10
 
   puts "Rendering `#{basename}` #{iterations} times..."
   iterations.times { Terminal.render(output) }
 end
 
 if ARGV[0]
-  profile(ARGV[0])
+  profile(ARGV[0], iterations)
 else
-  Dir.glob("spec/fixtures/*.raw").each { |file| profile(file) }
+  Dir.glob("spec/fixtures/*.raw").each { |file| profile(file, iterations) }
 end
 
 puts screen_profiler.report
