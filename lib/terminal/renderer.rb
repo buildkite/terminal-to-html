@@ -6,6 +6,7 @@ require 'emoji'
 module Terminal
   class Renderer
     EMOJI_UNICODE_REGEXP = /[\u{1f600}-\u{1f64f}]|[\u{2702}-\u{27b0}]|[\u{1f680}-\u{1f6ff}]|[\u{24C2}-\u{1F251}]|[\u{1f300}-\u{1f5ff}]/
+    EMOJI_IGNORE = [ "heavy_check_mark", "heavy_multiplication_x" ]
     ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd"
     MEGABYTES = 1024 * 1024
 
@@ -179,7 +180,7 @@ module Terminal
     def emoji_image_from_unicode(unicode)
       emoji = Emoji.find_by_unicode(unicode)
 
-      if emoji
+      if emoji && !EMOJI_IGNORE.include?(emoji.name)
         name = ":#{emoji.name}:"
         path = File.join(@options[:emoji_asset_path], emoji.image_filename)
 

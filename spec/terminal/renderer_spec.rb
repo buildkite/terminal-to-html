@@ -208,6 +208,18 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql(%{this is great 👍})
     end
 
+    it "leaves the tick emoji alone (it looks better and is colored)" do
+      raw = "works ✔"
+
+      expect(render(raw)).to eql(%{works ✔})
+    end
+
+    it "leaves the ✖ emoji alone as well" do
+      raw = "broke ✖"
+
+      expect(render(raw)).to eql(%{broke ✖})
+    end
+
     it "handles colors with 3 attributes" do
       raw = "\e[0;10;4m\e[1m\e[34mgood news\e[0;10m\n\neveryone"
 

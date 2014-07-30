@@ -16,10 +16,10 @@
 
 .term-fg30 { color: #666; } /* black (but we can't use black, so a diff color) */
 .term-fg31 { color: #e10c02; } /* red */
-.term-fg32 { color: #00bd02; } /* green */
+.term-fg32 { color: #99ff5e; } /* green */
 .term-fg33 { color: #c6c502; } /* yellow */
 .term-fg34 { color: #8db7e0; } /* blue */
-.term-fg35 { color: #ceacde; } /* magenta */
+.term-fg35 { color: #f271fb; } /* magenta */
 .term-fg36 { color: #00cdd9; } /* cyan */
 
 /* high intense colors */
@@ -28,6 +28,10 @@
 
 /* background colors */
 .term-bg42 { background: #99ff5f; }
+.term-bg40 { background: #676767; }
+
+/* custom foreground/background combos for readability */
+.term-fg31.term-bg40 { color: #F8A39F; }
 
 /* xterm colors */
 .term-fgx16 { color: #000000; }
