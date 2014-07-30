@@ -207,6 +207,12 @@ describe Terminal::Renderer do
 
       expect(render(raw)).to eql(%{this is great 👍})
     end
+
+    it "handles colors with 3 attributes" do
+      raw = "\e[0;10;4m\e[1m\e[34mgood news\e[0;10m\n\neveryone"
+
+      expect(render(raw)).to eql("<span class='term-fg34 term-fg4 term-fg1'>good news</span>\n&nbsp;\neveryone")
+    end
   end
 
   private

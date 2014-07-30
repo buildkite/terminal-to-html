@@ -54,13 +54,15 @@ module Terminal
       output = convert_screen_to_string
 
       # Escape any HTML
-      output = escape_html(output)
+      escaped_html = escape_html(output)
 
       # Now convert the colors to HTML
-      output = convert_to_html(output)
+      convert_to_html!(escaped_html)
 
       # And emojify
-      replace_unicode_with_emoji(output)
+      replace_unicode_with_emoji!(escaped_html)
+
+      escaped_html
     end
 
     private
@@ -110,6 +112,13 @@ module Terminal
       @screen.to_s
     end
 
+    # Scan the string to create an array of interesting things, for example
+    # it would look like this:
+    # [ '\n', '\r', 'a', 'b', '\e123m' ]
+    def split_by_escape_character(string)
+      string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
+    end
+
     def handle_escape_code(sequence)
       # Escapes have the following: \e [ (instruction) (code)
       parts = sequence.match(/\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/)
@@ -146,30 +155,19 @@ module Terminal
       end
     end
 
-    def convert_to_html(string)
-      string = string.gsub(/\e\[([^;m]+);([^;m]+)?;m/) do |match|
-        if $2
-          %{<span class='term-#{$1} term-#{$2}'>}
-        else
-          %{<span class='term-#{$1}'>}
-        end
+    def convert_to_html!(string)
+      string.gsub!("\terminal[0]", "</span>")
+
+      string.gsub!(/\terminal\[([^\]]+)\]/) do |match|
+        %{<span class='#{$1}'>}
       end
 
-      string = string.gsub("\e[0m", "</span>")
-
       # Replace empty lines with a non breaking space.
-      string.gsub(/$^/, "&nbsp;")
+      string.gsub!(/$^/, "&nbsp;")
     end
 
-    # Scan the string to create an array of interesting things, for example
-    # it would look like this:
-    # [ '\n', '\r', 'a', 'b', '\e123m' ]
-    def split_by_escape_character(string)
-      string.scan(/[\n\r\b]|\e\[[\d;]*[#{ESCAPE_CONTROL_CHARACTERS}]|./)
-    end
-
-    def replace_unicode_with_emoji(string)
-      string.gsub(EMOJI_UNICODE_REGEXP) do |match|
+    def replace_unicode_with_emoji!(string)
+      string.gsub!(EMOJI_UNICODE_REGEXP) do |match|
         emoji_image_from_unicode(match)
       end
     end

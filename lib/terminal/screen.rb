@@ -27,25 +27,9 @@
 
 module Terminal
   class Screen
-    class Node < Struct.new(:blob, :fg, :bg)
+    class Node < Struct.new(:blob, :style)
       def ==(value)
         blob == value
-      end
-
-      # Every node has a style, a foreground style, and a background
-      # style. This method returns what essentially becomes the escape
-      # sequence:
-      #
-      # \e[fg;bg;
-      #
-      # As the screen is turned into a string, the style is used to compare
-      # whether or not a new escape sequence is required.
-      def style
-        if fg || bg
-          "#{fg};#{bg};"
-        else
-          nil
-        end
       end
 
       def to_s
@@ -55,7 +39,7 @@ module Terminal
 
     END_OF_LINE = :end_of_line
     START_OF_LINE = :start_of_line
-    EMPTY = Node.new(" ")
+    EMPTY = Node.new(" ", [])
 
     attr_reader :x, :y
 
@@ -63,7 +47,10 @@ module Terminal
       @x = 0
       @y = 0
       @screen = []
-      @fg = nil
+
+      @fg_color = nil
+      @bg_color = nil
+      @other_colors = []
     end
 
     def write(character)
@@ -81,7 +68,7 @@ module Terminal
       end
 
       # Write the character to the slot
-      line[@x] = Node.new(character, @fg, @bg)
+      line[@x] = Node.new(character, [ @fg_color, @bg_color, *@other_colors ].compact)
     end
 
     def <<(character)
@@ -117,54 +104,60 @@ module Terminal
     # Changes the current foreground color that all new characters
     # will be written with.
     def color(color_code)
-      # Reset all styles
-      if color_code == "0"
-        @fg = nil
-        @bg = nil
-        return color_code
-      end
-
-      # Reset foreground color only
-      if color_code == "39"
-        @fg = nil
-        return color_code
-      end
-
-      # Reset background color only
-      if color_code == "49"
-        @bg = nil
-        return color_code
-      end
-
-      colors = color_code.to_s.split(";")
+      colors = color_code.scan(/\d+/)
 
       # Extended set foreground x-term color
       if colors[0] == "38" && colors[1] == "5"
-        return @fg = "fgx#{colors[2]}"
+        return @fg_color = "term-fgx#{colors[2]}"
       end
 
       # Extended set background x-term color
       if colors[0] == "48" && colors[1] == "5"
-        return @bg = "bgx#{colors[2]}"
+        return @bg_color = "term-bgx#{colors[2]}"
       end
 
-      # If multiple colors are defined, i.e. \e[30;42m\e
-      # then loop through each one, and assign it to @fg
-      # or @bg
+      # If multiple colors are defined, i.e. \e[30;42m\e then loop through each
+      # one, and assign it to @fg_color or @bg_color
       colors.each do |cc|
-        # If the number is between 30–37, then it's a foreground color,
-        # if it's 40–47, then it's a background color. 90-97 is like the regular
-        # foreground 30-37, but it's high intensity
-        #
-        # I don't use ranges and a select because I've found that to be rather
-        # slow.
         c_integer = cc.to_i
-        if c_integer >= 30 && c_integer <= 37
-          @fg = "fg#{cc}"
+
+        # Reset all styles
+        if c_integer == 0
+          @fg_color = nil
+          @bg_color = nil
+          @other_colors = []
+
+        # Primary (default) font
+        elsif c_integer == 10
+          # no-op
+
+        # Reset foreground color only
+        elsif c_integer ==  39
+          @fg_color = nil
+
+        # Reset background color only
+        elsif c_integer ==  49
+          @bg_color = nil
+
+        # 30–37, then it's a foreground color
+        elsif c_integer >= 30 && c_integer <= 37
+          @fg_color = "term-fg#{cc}"
+
+        # 40–47, then it's a background color.
         elsif c_integer >= 40 && c_integer <= 47
-          @bg = "bg#{cc}"
+          @bg_color = "term-bg#{cc}"
+
+        # 90-97 is like the regular fg color, but high intensity
         elsif c_integer >= 90 && c_integer <= 97
-          @fg = "fgi#{cc}"
+          @fg_color = "term-fgi#{cc}"
+
+        # 100-107 is like the regular bg color, but high intensity
+        elsif c_integer >= 100 && c_integer <= 107
+          @fg_color = "term-bgi#{cc}"
+
+        # 1-9 random other styles
+        elsif c_integer >= 1 && c_integer <= 9
+          @other_colors << "term-fg#{cc}"
         end
       end
     end
@@ -231,8 +224,8 @@ module Terminal
         line.each do |node|
           # If there is no previous node, and the current node has a color
           # (first node in a line) then add the escape character.
-          if !previous && node.style
-            buffer << "\e[#{node.style}m"
+          if !previous && node.style.length > 0
+            buffer << "\terminal[#{node.style.join(" ")}]"
 
             # Increment the open style counter
             open_styles += 1
@@ -242,14 +235,14 @@ module Terminal
           elsif previous && previous.style != node.style
             # If the new node has no style, that means that all the styles
             # have been closed.
-            if !node.style
+            if node.style.length == 0
               # Add our reset escape character
-              buffer << "\e[0m"
+              buffer << "\terminal[0]"
 
               # Decrement the open style counter
               open_styles -= 1
             else
-              buffer << "\e[#{node.style}m"
+              buffer << "\terminal[#{node.style.join(" ")}]"
 
               # Increment the open style counter
               open_styles += 1
@@ -264,7 +257,7 @@ module Terminal
         end
 
         # Be sure to close off any open styles for this line
-        open_styles.times { buffer << "\e[0m" }
+        open_styles.times { buffer << "\terminal[0]" }
 
         # Add a new line as long as this line isn't the last
         buffer << "\n" if line_index != last_line_index
