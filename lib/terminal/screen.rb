@@ -138,9 +138,14 @@ module Terminal
         elsif c_integer == 10
           # no-op
 
-        # Turn off bold
-        elsif c_integer == 21
+        # Turn off bold / Normal color or intensity (21 & 22 essentially do the same thing)
+        elsif c_integer == 21 || c_integer == 22
           @other_colors.delete("term-fg1")
+          @other_colors.delete("term-fg2")
+
+        # Turn off italic
+        elsif c_integer == 23
+          @other_colors.delete("term-fg3")
 
         # Turn off underline
         elsif c_integer == 24

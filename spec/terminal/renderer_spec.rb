@@ -39,9 +39,9 @@ describe Terminal::Renderer do
     end
 
     it "treats \\e[39m a reset" do
-      raw = "\e[32mhi\e[39m there"
+      raw = "\e[36mthis has a color\e[39mthis is normal now\r\n"
 
-      expect(render(raw)).to eql("<span class='term-fg32'>hi</span> there")
+      expect(render(raw)).to eql("<span class='term-fg36'>this has a color</span>this is normal now")
     end
 
     it "starts overwriting characters when you \\r midway through somehing" do
@@ -238,10 +238,28 @@ describe Terminal::Renderer do
       expect(render(raw)).to eql("<span class='term-fg1'>begin</span>\nend")
     end
 
+    it "ends bold with \\e[22" do
+      raw = "\e[1mbegin\e[22m\r\nend"
+
+      expect(render(raw)).to eql("<span class='term-fg1'>begin</span>\nend")
+    end
+
     it "ends crossed out with \\e[29" do
       raw = "\e[9mbegin\e[29m\r\nend"
 
       expect(render(raw)).to eql("<span class='term-fg9'>begin</span>\nend")
+    end
+
+    it "ends italic out with \\e[23" do
+      raw = "\e[3mbegin\e[23m\r\nend"
+
+      expect(render(raw)).to eql("<span class='term-fg3'>begin</span>\nend")
+    end
+
+    it "ends decreased intensity with \\e[22" do
+      raw = "\e[2mbegin\e[22m\r\nend"
+
+      expect(render(raw)).to eql("<span class='term-fg2'>begin</span>\nend")
     end
   end
 
