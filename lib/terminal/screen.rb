@@ -138,6 +138,18 @@ module Terminal
         elsif c_integer == 10
           # no-op
 
+        # Turn off bold
+        elsif c_integer == 21
+          @other_colors.delete("term-fg1")
+
+        # Turn off underline
+        elsif c_integer == 24
+          @other_colors.delete("term-fg4")
+
+        # Turn off crossed-out
+        elsif c_integer == 29
+          @other_colors.delete("term-fg9")
+
         # Reset foreground color only
         elsif c_integer ==  39
           @fg_color = nil

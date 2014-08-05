@@ -13,6 +13,7 @@
 
 .term-fg1 { } /* don't bold beccause it looks weird */
 .term-fg4 { text-decoration: underline; } /* underline */
+.term-fg9 { text-decoration: line-through; } /* crossed-out */
 
 .term-fg30 { color: #666; } /* black (but we can't use black, so a diff color) */
 .term-fg31 { color: #e10c02; } /* red */

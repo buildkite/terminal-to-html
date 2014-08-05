@@ -225,6 +225,24 @@ describe Terminal::Renderer do
 
       expect(render(raw)).to eql("<span class='term-fg34 term-fg4 term-fg1'>good news</span>\n&nbsp;\neveryone")
     end
+
+    it "ends underlining with \\e[24" do
+      raw = "\e[4mbegin\e[24m\r\nend"
+
+      expect(render(raw)).to eql("<span class='term-fg4'>begin</span>\nend")
+    end
+
+    it "ends bold with \\e[21" do
+      raw = "\e[1mbegin\e[21m\r\nend"
+
+      expect(render(raw)).to eql("<span class='term-fg1'>begin</span>\nend")
+    end
+
+    it "ends crossed out with \\e[29" do
+      raw = "\e[9mbegin\e[29m\r\nend"
+
+      expect(render(raw)).to eql("<span class='term-fg9'>begin</span>\nend")
+    end
   end
 
   private
