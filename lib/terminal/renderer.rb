@@ -175,8 +175,6 @@ module Terminal
       else
         unicode
       end
-    rescue
-      unicode
     end
   end
 end
