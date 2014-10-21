@@ -31,8 +31,8 @@ module Terminal
       # up directly.
       output = @output.to_s.dup
 
-      output = check_size(output)
-      output = check_line_lengths(output)
+      # Don't allow parsing of outputs longer than 4 meg
+      output = check_and_chomp_length(output)
 
       # Force encoding on the output first
       force_encoding!(output)
@@ -57,7 +57,7 @@ module Terminal
 
     private
 
-    def check_size(output)
+    def check_and_chomp_length(output)
       # Limit the entire size of the output to 4 meg
       max_total_size = 4 * MEGABYTES
       if output.bytesize > max_total_size
@@ -67,20 +67,6 @@ module Terminal
       else
         output
       end
-    end
-
-    def check_line_lengths(output)
-      # Limit each line to (x) chars
-      # TODO: Move this to the screen
-      max_line_length = 50_000
-       output.split("\n".freeze).map do |line|
-        if line.length > max_line_length
-          line = line[0..max_line_length]
-          line << " Warning: Terminal has chopped the rest of this line off as it's over the allowed #{max_line_length} characters per line limit."
-        else
-          line
-        end
-      end.join("\n".freeze)
     end
 
     def force_encoding!(string)

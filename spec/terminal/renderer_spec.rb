@@ -21,9 +21,10 @@ describe Terminal::Renderer do
 
   describe "#render" do
     it "chops off logs longer than 4 megabytes" do
-      long_string = "x" * 4.5 * 1024 * 1024
+      long_string = "x" * 5 * 1024 * 1024
+      last_part_of_long_string = render(long_string).split("").last(1000).join("")
 
-      expect(render(long_string)).to end_with("Warning: Terminal has chopped the rest of this line off as it&#39;s over the allowed 50000 characters per line limit.")
+      expect(last_part_of_long_string).to end_with("Warning: Terminal has chopped off the rest of the build as it&#39;s over the allowed 4 megabyte limit for logs.")
     end
 
     it "closes colors that get opened" do
