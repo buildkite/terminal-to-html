@@ -5,24 +5,50 @@ $:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
 require 'terminal'
 require 'benchmark/ips'
 require 'timeout'
+require 'net/http'
+require 'tempfile'
+
 
 def benchmark(bm, file)
   output = File.read(file)
   basename = File.basename(file)
 
-  bm.report basename do
+  bm.report "#{basename} ruby" do
     Timeout.timeout(100) do
       Terminal.render(output)
     end
   end
-end
 
-Benchmark.ips do |bm|
-  if ARGV[0]
-    benchmark(bm, ARGV[0])
-  else
-    Dir.glob("spec/fixtures/*.raw").each do |file|
-      benchmark(bm, file)
+  conn = Net::HTTP.start('localhost', 1337)
+  bm.report "#{basename} gosrv" do
+    resp = conn.request_post('/terminal', output)
+    raise resp.code unless resp.code == "200"
+  end
+
+  bm.report "#{basename} gocmd" do
+    IO.popen("./terminal", 'r+') do |p|
+      p.write(output)
+      p.close_write
+      f = p.read
+      raise unless f.length > (output.length / 2)
     end
   end
+end
+
+system "go build terminal.go"
+terminal_pid = spawn "./terminal -serve", out: "/dev/null"
+sleep 1
+Process.detach terminal_pid
+begin
+  Benchmark.ips do |bm|
+    if ARGV[0]
+      benchmark(bm, ARGV[0])
+    else
+      Dir.glob("spec/fixtures/*.raw").each do |file|
+        benchmark(bm, file)
+      end
+    end
+  end
+ensure
+  Process.kill "TERM", terminal_pid
 end
