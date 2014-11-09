@@ -26,7 +26,7 @@ def benchmark(bm, file)
   end
 
   bm.report "#{basename} gocmd" do
-    IO.popen("./terminal", 'r+') do |p|
+    IO.popen("./ansi2html", 'r+') do |p|
       p.write(output)
       p.close_write
       f = p.read
@@ -35,8 +35,8 @@ def benchmark(bm, file)
   end
 end
 
-system "go build terminal.go"
-terminal_pid = spawn "./terminal -serve", out: "/dev/null"
+system "go build cmd/ansi2html/ansi2html.go"
+terminal_pid = spawn "./ansi2html -serve", out: "/dev/null"
 sleep 1
 Process.detach terminal_pid
 begin

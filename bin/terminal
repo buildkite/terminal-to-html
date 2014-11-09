@@ -43,8 +43,8 @@ else
   tempfile.write(raw)
   tempfile.close
 
-  system "go build terminal.go"
-  rendered = `./terminal #{tempfile.path}`
+  system "go build cmd/ansi2html/ansi2html.go"
+  rendered = `./ansi2html #{tempfile.path}`
 
   if preview
 

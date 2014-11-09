@@ -1,13 +1,8 @@
-package main
+package terminal
 
 import (
 	"bytes"
-	"fmt"
-	"io/ioutil"
-	"log"
 	"math"
-	"net/http"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -354,32 +349,5 @@ func Render(input []byte) string {
 func check(e error) {
 	if e != nil {
 		panic(e)
-	}
-}
-
-func main() {
-	if len(os.Args) > 1 {
-		if os.Args[1] == "-serve" {
-			http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
-				input, err := ioutil.ReadAll(r.Body)
-				check(err)
-				// t0 := time.Now()
-				output := Render(input)
-				// t1 := time.Now()
-				w.Write([]byte(output))
-				// log.Printf("recv %d bytes, xmit %d bytes, took %v", len(input), len(output), t1.Sub(t0))
-			})
-
-			log.Printf("Listening on port 1337")
-			log.Fatal(http.ListenAndServe(":1337", nil))
-		} else {
-			input, err := ioutil.ReadFile(os.Args[1])
-			check(err)
-			fmt.Printf("%v", Render(input))
-		}
-	} else {
-		input, err := ioutil.ReadAll(os.Stdin)
-		check(err)
-		fmt.Printf("%v", Render(input))
 	}
 }
