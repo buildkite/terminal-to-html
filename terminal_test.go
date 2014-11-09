@@ -15,7 +15,7 @@ var TestFiles = []string{
 }
 
 func loadFixture(base string, ext string) []byte {
-	filename := fmt.Sprintf("spec/fixtures/%s.%s", base, ext)
+	filename := fmt.Sprintf("fixtures/%s.%s", base, ext)
 	data, err := ioutil.ReadFile(filename)
 	check(err)
 	return data
