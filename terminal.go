@@ -13,7 +13,6 @@ var emptyLineRegex = regexp.MustCompile(`^$`)
 const screenEndOfLine = -1
 const screenStartOfLine = 0
 
-var emptyStyle = style{}
 var emptyNode = node{' ', &emptyStyle}
 
 type node struct {
@@ -28,29 +27,22 @@ type screen struct {
 	style  *style
 }
 
-type style struct {
-	fgColor     string
-	bgColor     string
-	otherColors []string
-	asString    string
+type outputBuffer struct {
+	buf bytes.Buffer
 }
 
 func (n *node) hasSameStyle(o node) bool {
-	return n.style.String() == o.style.String()
+	return n.style.string() == o.style.string()
 }
 
-func appendNodeStyle(b *bytes.Buffer, n node) {
-	b.Write([]byte(`<span class="`))
-	b.Write([]byte(n.style.String()))
-	b.Write([]byte(`">`))
+func (b *outputBuffer) appendNodeStyle(n node) {
+	b.buf.Write([]byte(`<span class="`))
+	b.buf.Write([]byte(n.style.string()))
+	b.buf.Write([]byte(`">`))
 }
 
-func closeStyle(b *bytes.Buffer) {
-	b.Write([]byte("</span>"))
-}
-
-func (s *style) emptyNode() bool {
-	return s.fgColor == "" && s.bgColor == "" && len(s.otherColors) == 0
+func (b *outputBuffer) closeStyle() {
+	b.buf.Write([]byte("</span>"))
 }
 
 func (s *screen) output() []byte {
@@ -58,30 +50,30 @@ func (s *screen) output() []byte {
 
 	for _, line := range s.screen {
 		var openStyles int
-		var lineBuf bytes.Buffer
+		var lineBuf outputBuffer
 
 		for idx, node := range line {
-			if idx == 0 && !node.style.emptyNode() {
-				appendNodeStyle(&lineBuf, node)
+			if idx == 0 && !node.style.empty() {
+				lineBuf.appendNodeStyle(node)
 				openStyles++
 			} else if idx > 0 {
 				previous := line[idx-1]
 				if !node.hasSameStyle(previous) {
-					if node.style.emptyNode() {
-						closeStyle(&lineBuf)
+					if node.style.empty() {
+						lineBuf.closeStyle()
 						openStyles--
 					} else {
-						appendNodeStyle(&lineBuf, node)
+						lineBuf.appendNodeStyle(node)
 						openStyles++
 					}
 				}
 			}
-			appendChar(&lineBuf, node.blob)
+			lineBuf.appendChar(node.blob)
 		}
 		for i := 0; i < openStyles; i++ {
-			closeStyle(&lineBuf)
+			lineBuf.closeStyle()
 		}
-		asString := strings.TrimRight(lineBuf.String(), " \t")
+		asString := strings.TrimRight(lineBuf.buf.String(), " \t")
 
 		lines = append(lines, asString)
 	}
@@ -89,107 +81,20 @@ func (s *screen) output() []byte {
 	return []byte(strings.Join(lines, "\n") + "\n")
 }
 
-func appendChar(b *bytes.Buffer, char byte) {
+func (b *outputBuffer) appendChar(char byte) {
 	switch char {
 	case '&':
-		b.WriteString("&amp;")
+		b.buf.WriteString("&amp;")
 	case '\'':
-		b.WriteString("&#39;")
+		b.buf.WriteString("&#39;")
 	case '<':
-		b.WriteString("&lt;")
+		b.buf.WriteString("&lt;")
 	case '>':
-		b.WriteString("&gt;")
+		b.buf.WriteString("&gt;")
 	case '"':
-		b.WriteString("&#34;")
+		b.buf.WriteString("&#34;")
 	default:
-		b.WriteByte(char)
-	}
-}
-
-func remove(a []string, r string) []string {
-	// Must be a better way ..
-	var removed []string
-
-	for _, s := range a {
-		if s != r {
-			removed = append(removed, s)
-		}
-	}
-	return removed
-}
-
-func (screen *screen) color(i string) {
-	colors := strings.Split(i, ";")
-
-	s := new(style)
-	if screen.style != nil {
-		s.fgColor = screen.style.fgColor
-		s.bgColor = screen.style.bgColor
-		s.otherColors = screen.style.otherColors
-	}
-	screen.style = s
-
-	if len(colors) >= 2 {
-		if colors[0] == "38" && colors[1] == "5" {
-			// Extended set foreground x-term color
-			s.fgColor = "term-fgx" + colors[2]
-			return
-		}
-
-		// Extended set background x-term color
-		if colors[0] == "48" && colors[1] == "5" {
-			s.bgColor = "term-bgx" + colors[2]
-			return
-		}
-	}
-
-	for _, cc := range colors {
-		// // If multiple colors are defined, i.e. \e[30;42m\e then loop through each
-		// // one, and assign it to s.fgColor or s.bgColor
-		cInteger := pi(cc)
-		if cInteger == 0 {
-			// Reset all styles
-			s.fgColor = ""
-			s.bgColor = ""
-			s.otherColors = make([]string, 0)
-			// Primary (default) font
-		} else if cInteger == 10 {
-			// no-op
-			// Turn off bold / Normal color or intensity (21 & 22 essentially do the same thing)
-		} else if cInteger == 21 || cInteger == 22 {
-			s.otherColors = remove(s.otherColors, "term-fg1")
-			s.otherColors = remove(s.otherColors, "term-fg2")
-			// Turn off italic
-		} else if cInteger == 23 {
-			s.otherColors = remove(s.otherColors, "term-fg3")
-			// Turn off underline
-		} else if cInteger == 24 {
-			s.otherColors = remove(s.otherColors, "term-fg4")
-			// Turn off crossed-out
-		} else if cInteger == 29 {
-			s.otherColors = remove(s.otherColors, "term-fg9")
-			// Reset foreground color only
-		} else if cInteger == 39 {
-			s.fgColor = ""
-			// Reset background color only
-		} else if cInteger == 49 {
-			s.bgColor = ""
-			// 30–37, then it's a foreground color
-		} else if cInteger >= 30 && cInteger <= 37 {
-			s.fgColor = "term-fg" + cc
-			// 40–47, then it's a background color.
-		} else if cInteger >= 40 && cInteger <= 47 {
-			s.bgColor = "term-bg" + cc
-			// 90-97 is like the regular fg color, but high intensity
-		} else if cInteger >= 90 && cInteger <= 97 {
-			s.fgColor = "term-fgi" + cc
-			// 100-107 is like the regular bg color, but high intensity
-		} else if cInteger >= 100 && cInteger <= 107 {
-			s.fgColor = "term-bgi" + cc
-			// 1-9 random other styles
-		} else if cInteger >= 1 && cInteger <= 9 {
-			s.otherColors = append(s.otherColors, "term-fg"+cc)
-		}
+		b.buf.WriteByte(char)
 	}
 }
 
@@ -250,23 +155,6 @@ func (s *screen) growLineWidth(line []node) []node {
 	return line
 }
 
-func (s *style) String() string {
-	if s.asString != "" || s.emptyNode() {
-		return s.asString
-	}
-
-	var styles []string
-	if s.fgColor != "" {
-		styles = append(styles, s.fgColor)
-	}
-	if s.bgColor != "" {
-		styles = append(styles, s.bgColor)
-	}
-	styles = append(styles, s.otherColors...)
-	s.asString = strings.Join(styles, " ")
-	return s.asString
-}
-
 func (s *screen) write(data uint8) {
 	s.growScreenHeight()
 
@@ -284,6 +172,10 @@ func (s *screen) append(data uint8) {
 
 func convertToHTML(input string) string {
 	return emptyLineRegex.ReplaceAllLiteralString(input, "&nbsp;")
+}
+
+func (s *screen) color(i string) {
+	s.style = s.style.color(i)
 }
 
 func renderToScreen(input []byte) string {
