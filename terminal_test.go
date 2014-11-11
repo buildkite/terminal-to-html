@@ -21,7 +21,167 @@ func loadFixture(base string, ext string) []byte {
 	return data
 }
 
-func TestRenderer(t *testing.T) {
+var rendererTestCases = [][]string{
+	{
+		// closes colors that get opened
+		"he\033[32mllo",
+		"he<span class='term-fg32'>llo</span>",
+	}, {
+		// skips over colors when backspacing
+		"he\x1b[32m\x1b[33m\bllo",
+		"h<span class='term-fg33'>llo</span>",
+	}, {
+		// treats \x1b[39m as a reset
+		"\x1b[36mthis has a color\x1b[39mthis is normal now\r\n",
+		"<span class='term-fg36'>this has a color</span>this is normal now",
+	}, {
+		// starts overwriting characters when you \r midway through something
+		"hello\rb",
+		"bello",
+	}, {
+		// colors across multiple lines
+		"\x1b[32mhello\n\nfriend\x1b[0m",
+		"<span class='term-fg32'>hello</span>\n&nbsp;\n<span class='term-fg32'>friend</span>",
+	}, {
+		// allows you to control the cursor forwards
+		"this is\x1b[4Cpoop and stuff",
+		"this is    poop and stuff",
+	}, {
+		// doesn't allow you to jump down lines if the line doesn't exist"
+		"this is great \x1b[1Bhello",
+		"this is great hello",
+	}, {
+		// allows you to control the cursor backwards
+		"this is good\x1b[4Dpoop and stuff",
+		"this is poop and stuff",
+	}, {
+		// allows you to control the cursor upwards
+		"1234\n56\x1b[1A78\x1b[B",
+		"1278\n56",
+	}, {
+		// allows you to control the cursor downwards
+		// creates a grid of:
+		// aaaa
+		// bbbb
+		// cccc
+		// Then goes up 2 rows, down 1 row, jumps to the begining
+		// of the line, rewrites it to 1234, then jumps back down
+		// to the end of the grid.
+		"aaaa\nbbbb\ncccc\x1b[2A\x1b[1B\r1234\x1b[1B",
+		"aaaa\n1234\ncccc",
+	}, {
+		// doesn't blow up if you go back too many characters
+		"this is good\x1b[100Dpoop and stuff",
+		"poop and stuff",
+	}, {
+		// \x1b[1K clears everything before it
+		"hello\x1b[1Kfriend!",
+		"     friend!",
+	}, {
+		// clears everything after the \x1b[0K
+		"hello\nfriend!\x1b[A\r\x1b[0K",
+		"     \nfriend!",
+	}, {
+		// handles \x1b[0G ghetto style
+		"hello friend\x1b[Ggoodbye buddy!",
+		"goodbye buddy!",
+	}, {
+		// preserves characters already written in a certain color
+		"  \x1b[90m․\x1b[0m\x1b[90m․\x1b[0m\x1b[0G\x1b[90m․\x1b[0m\x1b[90m․\x1b[0m",
+		"<span class='term-fgi90'>․․․․</span>",
+	}, {
+		// replaces empty lines with non-breaking spaces
+		"hello\n\nfriend",
+		"hello\n&nbsp;\nfriend",
+	}, {
+		// preserves opening colors when using \x1b[0G
+		"\x1b[33mhello\x1b[0m\x1b[33m\x1b[44m\x1b[0Ggoodbye",
+		"<span class='term-fg33 term-bg44'>goodbye</span>",
+	}, {
+		// allows erasing the current line up to a point
+		"hello friend\x1b[1K!",
+		"            !",
+	}, {
+		// allows clearing of the current line
+		"hello friend\x1b[2K!",
+		"            !",
+	}, {
+		// doesn't close spans if no colors have been opened
+		"hello \x1b[0mfriend",
+		"hello friend",
+	}, {
+		// \x1b[K correctly clears all previous parts of the string
+		"remote: Compressing objects:   0% (1/3342)\x1b[K\rremote: Compressing objects:   1% (34/3342)",
+		"remote: Compressing objects:   1% (34&#47;3342)",
+	}, {
+		// collapses many spans of the same color into 1
+		"\x1b[90m․\x1b[90m․\x1b[90m․\x1b[90m․\n\x1b[90m․\x1b[90m․\x1b[90m․\x1b[90m․",
+		"<span class='term-fgi90'>․․․․</span>\n<span class='term-fgi90'>․․․․</span>",
+	}, {
+		// escapes HTML
+		"hello <strong>friend</strong>",
+		"hello &lt;strong&gt;friend&lt;&#47;strong&gt;",
+	}, {
+		// escapes HTML in color codes
+		"hello \x1b[\"hellomfriend",
+		"hello \x1b[&quot;hellomfriend",
+	}, {
+		// handles background colors
+		"\x1b[30;42m\x1b[2KOK (244 tests, 558 assertions)",
+		"<span class='term-fg30 term-bg42'>OK (244 tests, 558 assertions)</span>",
+	}, {
+		// handles xterm colors
+		"\x1b[38;5;169mhello\x1b[0m \x1b[38;5;179mgoodbye",
+		"<span class='term-fgx169'>hello</span> <span class='term-fgx179'>goodbye</span>",
+	}, {
+		// handles broken escape characters
+		"hi amazing \x1b[12 nom nom nom friends",
+		"hi amazing \x1b[12 nom nom nom friends",
+	}, {
+		// handles colors with 3 attributes
+		"\x1b[0;10;4m\x1b[1m\x1b[34mgood news\x1b[0;10m\n\neveryone",
+		"<span class='term-fg34 term-fg4 term-fg1'>good news</span>\n&nbsp;\neveryone",
+	}, {
+		// ends underlining with \x1b[24
+		"\x1b[4mbegin\x1b[24m\r\nend",
+		"<span class='term-fg4'>begin</span>\nend",
+	}, {
+		// ends bold with \x1b[21
+		"\x1b[1mbegin\x1b[21m\r\nend",
+		"<span class='term-fg1'>begin</span>\nend",
+	}, {
+		// ends bold with \x1b[22
+		"\x1b[1mbegin\x1b[22m\r\nend",
+		"<span class='term-fg1'>begin</span>\nend",
+	}, {
+		// ends crossed out with \x1b[29
+		"\x1b[9mbegin\x1b[29m\r\nend",
+		"<span class='term-fg9'>begin</span>\nend",
+	}, {
+		// ends italic out with \x1b[23
+		"\x1b[3mbegin\x1b[23m\r\nend",
+		"<span class='term-fg3'>begin</span>\nend",
+	}, {
+		// ends decreased intensity with \x1b[22
+		"\x1b[2mbegin\x1b[22m\r\nend",
+		"<span class='term-fg2'>begin</span>\nend",
+	},
+}
+
+func TestRendererAgainstCases(t *testing.T) {
+	for _, testCase := range rendererTestCases {
+		input := testCase[0]
+		fmt.Printf("Input %q\n", input)
+
+		expected := testCase[1]
+		output := string(Render([]byte(input)))
+		if output != expected {
+			t.Fatalf("With input %q\nreceived %q\nand expected %q", input, output, expected)
+		}
+	}
+}
+
+func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
 		raw := loadFixture(base, "raw")
 		expected := string(loadFixture(base, "rendered"))
