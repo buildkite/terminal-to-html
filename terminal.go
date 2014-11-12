@@ -3,12 +3,9 @@ package terminal
 import (
 	"bytes"
 	"math"
-	"regexp"
 	"strconv"
 	"strings"
 )
-
-var emptyLineRegex = regexp.MustCompile(`^$`)
 
 const screenEndOfLine = -1
 const screenStartOfLine = 0
@@ -78,7 +75,7 @@ func (s *screen) output() []byte {
 		lines = append(lines, asString)
 	}
 
-	return []byte(strings.Join(lines, "\n") + "\n")
+	return []byte(strings.Join(lines, "\n"))
 }
 
 func (b *outputBuffer) appendChar(char byte) {
@@ -93,13 +90,15 @@ func (b *outputBuffer) appendChar(char byte) {
 		b.buf.WriteString("&gt;")
 	case '"':
 		b.buf.WriteString("&#34;")
+	case '/':
+		b.buf.WriteString("&#47;")
 	default:
 		b.buf.WriteByte(char)
 	}
 }
 
 func (s *screen) clear(y int, xStart int, xEnd int) {
-	if len(s.screen) < y {
+	if len(s.screen) <= y {
 		return
 	}
 
@@ -111,15 +110,14 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 		if xEnd == screenEndOfLine {
 			xEnd = len(line) - 1
 		}
-		for i := xStart; i <= xEnd; i++ {
+		for i := xStart; i <= xEnd && i < len(line); i++ {
 			line[i] = emptyNode
 		}
 	}
 }
 
 func pi(s string) int {
-	i, err := strconv.ParseInt(s, 10, 8)
-	check(err)
+	i, _ := strconv.ParseInt(s, 10, 8)
 	return int(i)
 }
 
@@ -130,7 +128,7 @@ func (s *screen) up(i string) {
 
 func (s *screen) down(i string) {
 	s.y += pi(i)
-	s.y = int(math.Min(float64(s.y), float64(len(s.screen))))
+	s.y = int(math.Min(float64(s.y), float64(len(s.screen)-1)))
 }
 
 func (s *screen) forward(i string) {
@@ -171,7 +169,7 @@ func (s *screen) append(data uint8) {
 }
 
 func convertToHTML(input string) string {
-	return emptyLineRegex.ReplaceAllLiteralString(input, "&nbsp;")
+	return strings.Replace(input, "\n\n", "\n&nbsp;\n", -1)
 }
 
 func (s *screen) color(i string) {
@@ -191,7 +189,7 @@ func renderToScreen(input []byte) string {
 		} else if char == '\b' {
 			screen.x--
 		} else if char == '\x1b' {
-			len, instruction, code := captureEscapeCode(input[i+1 : i+50])
+			len, instruction, code := captureEscapeCode(input[i+1:])
 			i += len
 
 			if code == ' ' {
@@ -225,7 +223,8 @@ func renderToScreen(input []byte) string {
 }
 
 func captureEscapeCode(input []byte) (length int, instruction string, code byte) {
-	codeIndex := bytes.IndexAny(input, "qQmKGgKAaBbCcDd")
+	maxCaptureLength := int(math.Min(float64(len(input)), 50))
+	codeIndex := bytes.IndexAny(input[:maxCaptureLength], "qQmKGgKAaBbCcDd")
 	if codeIndex == -1 {
 		return 0, "", ' '
 	}
