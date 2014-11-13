@@ -44,9 +44,7 @@ func (s *style) removeOther(r string) {
 	s.otherColors = removed
 }
 
-func (s *style) color(i string) *style {
-	colors := strings.Split(i, ";")
-
+func (s *style) color(colors []string) *style {
 	if len(colors) == 0 {
 		return s
 	}

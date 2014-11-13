@@ -5,6 +5,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 const screenEndOfLine = -1
@@ -13,7 +14,7 @@ const screenStartOfLine = 0
 var emptyNode = node{' ', &emptyStyle}
 
 type node struct {
-	blob  uint8
+	blob  rune
 	style *style
 }
 
@@ -29,7 +30,7 @@ type outputBuffer struct {
 }
 
 func (n *node) hasSameStyle(o node) bool {
-	return n.style.string() == o.style.string()
+	return n == &o || n.style.string() == o.style.string()
 }
 
 func (b *outputBuffer) appendNodeStyle(n node) {
@@ -78,7 +79,7 @@ func (s *screen) output() []byte {
 	return []byte(strings.Join(lines, "\n"))
 }
 
-func (b *outputBuffer) appendChar(char byte) {
+func (b *outputBuffer) appendChar(char rune) {
 	switch char {
 	case '&':
 		b.buf.WriteString("&amp;")
@@ -89,11 +90,11 @@ func (b *outputBuffer) appendChar(char byte) {
 	case '>':
 		b.buf.WriteString("&gt;")
 	case '"':
-		b.buf.WriteString("&#34;")
+		b.buf.WriteString("&quot;")
 	case '/':
 		b.buf.WriteString("&#47;")
 	default:
-		b.buf.WriteByte(char)
+		b.buf.WriteRune(char)
 	}
 }
 
@@ -117,6 +118,9 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 }
 
 func pi(s string) int {
+	if s == "" {
+		return 1
+	}
 	i, _ := strconv.ParseInt(s, 10, 8)
 	return int(i)
 }
@@ -153,7 +157,7 @@ func (s *screen) growLineWidth(line []node) []node {
 	return line
 }
 
-func (s *screen) write(data uint8) {
+func (s *screen) write(data rune) {
 	s.growScreenHeight()
 
 	line := s.screen[s.y]
@@ -163,72 +167,133 @@ func (s *screen) write(data uint8) {
 	s.screen[s.y] = line
 }
 
-func (s *screen) append(data uint8) {
+func (s *screen) append(data rune) {
 	s.write(data)
 	s.x++
+}
+
+func (s *screen) appendMany(data []rune) {
+	for _, char := range data {
+		s.append(char)
+	}
 }
 
 func convertToHTML(input string) string {
 	return strings.Replace(input, "\n\n", "\n&nbsp;\n", -1)
 }
 
-func (s *screen) color(i string) {
+func (s *screen) color(i []string) {
 	s.style = s.style.color(i)
+}
+
+type escapeCode struct {
+	instructions    []string
+	buffer          []rune
+	nextInstruction []rune
+	code            rune
+}
+
+func (e *escapeCode) endOfInstruction() {
+	e.instructions = append(e.instructions, string(e.nextInstruction))
+	e.nextInstruction = []rune{}
+}
+
+func (e *escapeCode) firstInstruction() string {
+	if len(e.instructions) == 0 {
+		return ""
+	}
+	return e.instructions[0]
 }
 
 func renderToScreen(input []byte) string {
 	var screen screen
 	screen.style = &emptyStyle
-	for i := 0; i < len(input); i++ {
-		char := input[i]
-		if char == '\n' {
-			screen.x = 0
-			screen.y++
-		} else if char == '\r' {
-			screen.x = 0
-		} else if char == '\b' {
-			screen.x--
-		} else if char == '\x1b' {
-			len, instruction, code := captureEscapeCode(input[i+1:])
-			i += len
-
-			if code == ' ' {
-				// noop
-			} else if code == 'm' {
-				screen.color(instruction)
-			} else if code == 'G' || code == 'g' {
-				screen.x = 0
-			} else if code == 'K' || code == 'k' {
-				if instruction == "" || instruction == "0" {
-					screen.clear(screen.y, screen.x, screenEndOfLine)
-				} else if instruction == "1" {
-					screen.clear(screen.y, screenStartOfLine, screen.x)
-				} else if instruction == "2" {
-					screen.clear(screen.y, screenStartOfLine, screenEndOfLine)
+	insideEscapeCode := false
+	var escape escapeCode
+	for _, char := range string(input) {
+		if insideEscapeCode {
+			escape.buffer = append(escape.buffer, char)
+			if len(escape.buffer) == 2 {
+				if char != '[' {
+					// Not really an escape code, abort
+					screen.appendMany(escape.buffer)
+					insideEscapeCode = false
 				}
-			} else if code == 'A' {
-				screen.up(instruction)
-			} else if code == 'B' {
-				screen.down(instruction)
-			} else if code == 'C' {
-				screen.forward(instruction)
-			} else if code == 'D' {
-				screen.backward(instruction)
+			} else {
+				char = unicode.ToUpper(char)
+				switch char {
+				case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+					escape.nextInstruction = append(escape.nextInstruction, char)
+				case ';':
+					escape.endOfInstruction()
+				case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
+					escape.code = char
+					escape.endOfInstruction()
+					escape.applyToScreen(&screen)
+					insideEscapeCode = false
+				default:
+					// abort the escapeCode
+					screen.appendMany(escape.buffer)
+					insideEscapeCode = false
+				}
 			}
 		} else {
-			screen.append(char)
+			switch char {
+			case '\n':
+				screen.x = 0
+				screen.y++
+			case '\r':
+				screen.x = 0
+			case '\b':
+				if screen.x > 0 {
+					screen.x--
+				}
+			case '\x1b':
+				escape = escapeCode{buffer: []rune{char}}
+				insideEscapeCode = true
+			default:
+				screen.append(char)
+			}
 		}
 	}
 	return string(screen.output())
 }
 
-func captureEscapeCode(input []byte) (length int, instruction string, code byte) {
-	maxCaptureLength := int(math.Min(float64(len(input)), 50))
-	codeIndex := bytes.IndexAny(input[:maxCaptureLength], "qQmKGgKAaBbCcDd")
-	if codeIndex == -1 {
+func (e *escapeCode) applyToScreen(s *screen) {
+	switch e.code {
+	case 'M':
+		s.color(e.instructions)
+	case 'G':
+		s.x = 0
+	case 'K':
+		switch e.firstInstruction() {
+		case "0", "":
+			s.clear(s.y, s.x, screenEndOfLine)
+		case "1":
+			s.clear(s.y, screenStartOfLine, s.x)
+		case "2":
+			s.clear(s.y, screenStartOfLine, screenEndOfLine)
+		}
+	case 'A':
+		s.up(e.firstInstruction())
+	case 'B':
+		s.down(e.firstInstruction())
+	case 'C':
+		s.forward(e.firstInstruction())
+	case 'D':
+		s.backward(e.firstInstruction())
+	}
+}
+
+func captureEscapeCode(inputRunes []rune) (length int, instructions string, code byte) {
+	maxCaptureLength := int(math.Min(float64(len(inputRunes)), 50))
+	input := string(inputRunes[:maxCaptureLength])
+
+	codeIndex := strings.IndexAny(input, " qQmKGgKAaBbCcDd")
+	if codeIndex == -1 || input[codeIndex] == ' ' {
 		return 0, "", ' '
 	}
-	return codeIndex + 1, string(input[1:codeIndex]), input[codeIndex]
+	return codeIndex + 1, input[1:codeIndex], input[codeIndex]
 }
 
 func Render(input []byte) string {

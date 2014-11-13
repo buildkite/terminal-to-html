@@ -35,6 +35,10 @@ var rendererTestCases = []struct {
 		"he\033[32mllo",
 		"he<span class=\"term-fg32\">llo</span>",
 	}, {
+		`treats multi-byte unicode characters as individual runes`,
+		"€€€€€€\b\b\baaa",
+		"€€€aaa",
+	}, {
 		`skips over colors when backspacing`,
 		"he\x1b[32m\x1b[33m\bllo",
 		"h<span class=\"term-fg33\">llo</span>",
@@ -82,13 +86,17 @@ var rendererTestCases = []struct {
 		"this is good\x1b[100Dpoop and stuff",
 		"poop and stuff",
 	}, {
+		`doesn't blow up if you backspace too many characters`,
+		"hi\b\b\b\b\b\b\b\bbye",
+		"bye",
+	}, {
 		`\x1b[1K clears everything before it`,
 		"hello\x1b[1Kfriend!",
 		"     friend!",
 	}, {
 		`clears everything after the \x1b[0K`,
 		"hello\nfriend!\x1b[A\r\x1b[0K",
-		"     \nfriend!",
+		"\nfriend!",
 	}, {
 		`handles \x1b[0G ghetto style`,
 		"hello friend\x1b[Ggoodbye buddy!",
@@ -189,7 +197,9 @@ func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
 		raw := loadFixture(base, "raw")
 		expected := string(loadFixture(base, "rendered"))
+
 		output := string(Render(raw))
+
 		if output != expected {
 			t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
 		}
