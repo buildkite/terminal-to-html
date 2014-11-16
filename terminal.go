@@ -178,10 +178,6 @@ func (s *screen) appendMany(data []rune) {
 	}
 }
 
-func convertToHTML(input string) string {
-	return strings.Replace(input, "\n\n", "\n&nbsp;\n", -1)
-}
-
 func (s *screen) color(i []string) {
 	s.style = s.style.color(i)
 }
@@ -205,9 +201,8 @@ func (e *escapeCode) firstInstruction() string {
 	return e.instructions[0]
 }
 
-func renderToScreen(input []byte) string {
-	var screen screen
-	screen.style = &emptyStyle
+func (s *screen) render(input []byte) {
+	s.style = &emptyStyle
 	insideEscapeCode := false
 	var escape escapeCode
 	for _, char := range string(input) {
@@ -216,7 +211,7 @@ func renderToScreen(input []byte) string {
 			if len(escape.buffer) == 2 {
 				if char != '[' {
 					// Not really an escape code, abort
-					screen.appendMany(escape.buffer)
+					s.appendMany(escape.buffer)
 					insideEscapeCode = false
 				}
 			} else {
@@ -229,34 +224,33 @@ func renderToScreen(input []byte) string {
 				case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
 					escape.code = char
 					escape.endOfInstruction()
-					escape.applyToScreen(&screen)
+					escape.applyToScreen(s)
 					insideEscapeCode = false
 				default:
 					// abort the escapeCode
-					screen.appendMany(escape.buffer)
+					s.appendMany(escape.buffer)
 					insideEscapeCode = false
 				}
 			}
 		} else {
 			switch char {
 			case '\n':
-				screen.x = 0
-				screen.y++
+				s.x = 0
+				s.y++
 			case '\r':
-				screen.x = 0
+				s.x = 0
 			case '\b':
-				if screen.x > 0 {
-					screen.x--
+				if s.x > 0 {
+					s.x--
 				}
 			case '\x1b':
 				escape = escapeCode{buffer: []rune{char}}
 				insideEscapeCode = true
 			default:
-				screen.append(char)
+				s.append(char)
 			}
 		}
 	}
-	return string(screen.output())
 }
 
 func (e *escapeCode) applyToScreen(s *screen) {
@@ -296,9 +290,10 @@ func captureEscapeCode(inputRunes []rune) (length int, instructions string, code
 	return codeIndex + 1, input[1:codeIndex], input[codeIndex]
 }
 
-func Render(input []byte) string {
-	output := renderToScreen(input)
-	output = convertToHTML(output)
+func Render(input []byte) []byte {
+	screen := screen{}
+	screen.render(input)
+	output := bytes.Replace(screen.output(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
 	return output
 }
 
