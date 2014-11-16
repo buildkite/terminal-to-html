@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,33 +12,40 @@ import (
 	"github.com/buildbox/terminal"
 )
 
-func check(e error) {
+func check(m string, e error) {
 	if e != nil {
-		log.Fatal(e)
+		log.Fatalf("%s: %v", m, e)
 	}
 }
 
+var serve = flag.String("http", "", "HTTP service address (e.g., ':6060')")
+
 func main() {
-	if len(os.Args) > 1 {
-		if os.Args[1] == "-serve" {
-			http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
-				input, err := ioutil.ReadAll(r.Body)
+	flag.ErrHelp = errors.New("flag: help requested")
 
-				check(err)
-				output := terminal.Render(input)
-				w.Write([]byte(output))
-			})
+	flag.Parse()
 
-			log.Printf("Listening on port 1337")
-			log.Fatal(http.ListenAndServe(":1337", nil))
-		} else {
-			input, err := ioutil.ReadFile(os.Args[1])
-			check(err)
-			fmt.Printf("%s", terminal.Render(input))
-		}
+	if *serve != "" {
+		http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
+			input, err := ioutil.ReadAll(r.Body)
+
+			check("could not read from HTTP stream", err)
+			output := terminal.Render(input)
+			w.Write(output)
+		})
+
+		log.Printf("Listening on %s", *serve)
+		log.Fatal(http.ListenAndServe(*serve, nil))
 	} else {
-		input, err := ioutil.ReadAll(os.Stdin)
-		check(err)
+		var input []byte
+		var err error
+		if len(flag.Arg(0)) > 0 {
+			input, err = ioutil.ReadFile(flag.Arg(0))
+			check(fmt.Sprintf("could not read %s", flag.Arg(0)), err)
+		} else {
+			input, err = ioutil.ReadAll(os.Stdin)
+			check("could not read stdin", err)
+		}
 		fmt.Printf("%s", terminal.Render(input))
 	}
 }
