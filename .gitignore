@@ -22,5 +22,4 @@ mkmf.log
 examples/*.raw
 examples/*.rendered
 examples/*.html
-ansi2html
 terminal.test
