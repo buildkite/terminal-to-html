@@ -208,6 +208,25 @@ func TestRendererAgainstFixtures(t *testing.T) {
 	}
 }
 
+func TestScreenWriteToXY(t *testing.T) {
+	s := screen{style: &emptyStyle}
+	s.write('a')
+
+	s.x = 1
+	s.y = 1
+	s.write('b')
+
+	s.x = 2
+	s.y = 2
+	s.write('c')
+
+	output := string(s.output())
+	expected := "a\n b\n  c"
+	if output != expected {
+		t.Errorf("got %q, wanted %q", output, expected)
+	}
+}
+
 func BenchmarkRendererControl(b *testing.B) {
 	benchmark("control.sh", b)
 }
