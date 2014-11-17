@@ -37,16 +37,11 @@ if ($stdin.tty? && ARGV.empty?) || ARGV.delete('-h') || ARGV.delete('--help')
 elsif ARGV.delete('-v') || ARGV.delete('--version')
   version
 else
-  require 'tempfile'
   raw = ARGF.read
-  tempfile = Tempfile.new(['terminalraw', '.ansi'])
-  tempfile.write(raw)
-  tempfile.close
-
-  system "go build cmd/ansi2html/ansi2html.go"
-  rendered = `./ansi2html #{tempfile.path}`
+  rendered = Terminal.render(raw)
 
   if preview
+    require 'tempfile'
 
     tempfile = Tempfile.new([ 'preview', '.html' ])
     tempfile.write(Terminal::Preview.new(raw, rendered).render)

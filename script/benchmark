@@ -13,18 +13,14 @@ def benchmark(bm, file)
   output = File.read(file)
   basename = File.basename(file)
 
-  bm.report "#{basename} ruby" do
+  # Performance as it is via the gem
+  bm.report "#{basename}" do
     Timeout.timeout(100) do
-      Terminal.render(output)
+      Terminal.render(output, ansi2html_path: './ansi2html')
     end
   end
 
-  conn = Net::HTTP.start('localhost', 1337)
-  bm.report "#{basename} gosrv" do
-    resp = conn.request_post('/terminal', output)
-    raise resp.code unless resp.code == "200"
-  end
-
+  # run the go command directly so we can see how much time the emoji & ruby prep takes
   bm.report "#{basename} gocmd" do
     IO.popen("./ansi2html", 'r+') do |p|
       p.write(output)
@@ -32,6 +28,13 @@ def benchmark(bm, file)
       f = p.read
       raise unless f.length > (output.length / 2)
     end
+  end
+
+  # pipe from ruby to go for the fastest possible run
+  conn = Net::HTTP.start('localhost', 1337)
+  bm.report "#{basename} http" do
+    resp = conn.request_post('/terminal', output)
+    raise resp.code unless resp.code == "200"
   end
 end
 
