@@ -36,7 +36,7 @@ def benchmark(bm, file)
 end
 
 system "go build cmd/ansi2html/ansi2html.go"
-terminal_pid = spawn "./ansi2html -serve", out: "/dev/null"
+terminal_pid = spawn "./ansi2html -http=:1337", out: "/dev/null"
 sleep 1
 Process.detach terminal_pid
 begin
