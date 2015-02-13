@@ -1,4 +1,4 @@
-![logo](http://buildbox.github.io/terminal/images/logo.svg)
+![logo](http://buildkite.github.io/terminal/images/logo.svg)
 
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
 
@@ -84,14 +84,14 @@ and when the render has finished, it will open in your web browser with a before
 rspec --color --tty | terminal --preview
 ```
 
-![preview mode](http://buildbox.github.io/terminal/images/preview.png)
+![preview mode](http://buildkite.github.io/terminal/images/preview.png)
 
-### With the Buildbox API
+### With the Buildkite API
 
-You can use the `job_url` returned by the [Builds API](https://buildbox.io/docs/api/builds) to pipe a job's log directly into terminal, for example:
+You can use the `job_url` returned by the [Builds API](https://buildkite.com/docs/api/builds) to pipe a job's log directly into terminal, for example:
 
 ```bash
-JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log.txt?api_key=[api-key]"
+JOB_LOG_URL="https://api.buildkite.com/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log.txt?api_key=[api-key]"
 curl $JOB_LOG_URL | terminal --preview
 ```
 
@@ -120,7 +120,7 @@ mv examples/*{raw,rendered} spec/fixtures
 
 ## Licence
 
-> Copyright (c) 2014 Keith Pitt, Buildbox
+> Copyright (c) 2015 Keith Pitt, Tim Lucas, Buildkite Pty Ltd
 >
 > MIT License
 >

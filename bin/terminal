@@ -22,7 +22,7 @@ Version:
 Preview in the browser:
   $ terminal --preview
 
-See https://buildbox.github.io/terminal for more information.
+See https://buildkite.github.io/terminal for more information.
   usage
 end
 

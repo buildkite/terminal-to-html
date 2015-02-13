@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["me@keithpitt.com"]
   spec.summary       = %q{Converts ANSI to HTML}
   spec.description   = %q{Converts ANSI to HTML}
-  spec.homepage      = "https://github.com/buildbox/terminal"
+  spec.homepage      = "https://github.com/buildkite/terminal"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
