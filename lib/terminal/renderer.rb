@@ -168,10 +168,9 @@ module Terminal
       emoji = Emoji.find_by_unicode(unicode)
 
       if emoji && !EMOJI_IGNORE.include?(emoji.name)
-        name = ":#{emoji.name}:"
         path = File.join(@options[:emoji_asset_path], emoji.image_filename)
 
-        %(<img alt="#{name}" title="#{name}" src="#{path}" class="emoji" width="20" height="20" />)
+        %(<img alt="#{emoji.name}" title="#{emoji.name}" src="#{path}" class="emoji" width="20" height="20" />)
       else
         unicode
       end
