@@ -199,7 +199,7 @@ describe Terminal::Renderer do
     it "renders unicode emoji" do
       raw = "this is great 👍"
 
-      expect(render(raw)).to eql(%{this is great <img alt=":+1:" title=":+1:" src="/assets/emojis/unicode/1f44d.png" class="emoji" width="20" height="20" />})
+      expect(render(raw)).to eql(%{this is great <img alt="+1" title="+1" src="/assets/emojis/unicode/1f44d.png" class="emoji" width="20" height="20" />})
     end
 
     it "returns nothing if the unicode emoji can't be found" do
