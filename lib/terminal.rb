@@ -1,6 +1,4 @@
 require "terminal/version"
-require "terminal/cache"
-require "terminal/screen"
 require "terminal/renderer"
 require "terminal/cli"
 require "terminal/preview"

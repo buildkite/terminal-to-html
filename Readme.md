@@ -2,11 +2,21 @@
 
 [![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
 
-Terminal is a Ruby library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
+Terminal is a Go library (with a Ruby gem wrapper) for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
-## Installation
+## Go Installation
 
-Add this line to your application's Gemfile:
+Assuming a `$GOPATH/bin` that's globally accessible, run:
+
+```bash
+go install github.com/buildbox/terminal/cmd/ansi2html
+```
+
+This will give you the `ansi2html` command. It can be called directly or used by the Ruby Gem. It's called `ansi2html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
+
+## Ruby Installation
+
+Run the `go install` command above and add this line to your application's Gemfile:
 
 ```ruby
 gem 'terminal'
@@ -53,14 +63,13 @@ Now in your views:
 
 ### Emojis :+1:
 
-Terminal converts unicode to proper `<img>` tags. We use the [gemoji](https://github.com/github/gemoji)
-gem to do this. The path to the assets can be customized by passing the `:emoji_asset_path` option to `Terminal.render`
+The Ruby Gem wrapper of Terminal converts unicode to proper `<img>` tags. We use the [gemoji](https://github.com/github/gemoji) gem to do this. The path to the assets can be customized by passing the `:emoji_asset_path` option to `Terminal.render`
 
 ```ruby
 Terminal.render(output, emoji_asset_path: "https://your.cdn.com/images/emoji")
 ```
 
-### Command Line
+### Ruby Command Line
 
 Terminal ships with a command line utility. For example, you can pipe `rspec` output to it:
 
@@ -107,8 +116,20 @@ file as an example. You can then generate a `.raw` and `.rendered` file by runni
 You should then move the `raw` and `rendered` files to the `fixtures` folder.
 
 ```bash
-mv examples/*{raw,rendered} spec/fixtures
+mv examples/*{raw,rendered} fixtures
 ```
+
+## Benchmarking
+
+Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: this best represents the kind of use cases the original code was developed against. As a guide, this test was 80ms per iteration on an 2013 Retina MBP, and was 2500 ms per iteration in the original pure Ruby implementation.
+
+Run `script/benchmark` to see performance when pushed through the gem. Note that invocation of the binary itself applies a performance ceiling, but this is compensated for by performance on larger inputs.
+
+## TODO
+
+ * Have the Go version handle UTF8 enforcement
+ * Have the Go version handle Emoji
+ * Build the Go binary and place in gem directory as part of gem install
 
 ## Contributing
 
