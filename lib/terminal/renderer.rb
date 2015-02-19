@@ -27,12 +27,8 @@ module Terminal
     def render
       return "" if @output.nil?
 
-      # First duplicate the string, because we're going to be editing and chopping it
-      # up directly.
-      output = @output.to_s.dup
-
       # Don't allow parsing of outputs longer than 4 meg
-      output = check_and_chomp_length(output)
+      output = dup_check_and_chomp_length(@output)
 
       # Force encoding on the output first
       force_encoding!(output)
@@ -57,7 +53,7 @@ module Terminal
 
     private
 
-    def check_and_chomp_length(output)
+    def dup_check_and_chomp_length(output)
       # Limit the entire size of the output to 4 meg
       max_total_size = 4 * MEGABYTES
       if output.bytesize > max_total_size
@@ -65,7 +61,7 @@ module Terminal
         new_output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed 4 megabyte limit for logs."
         new_output
       else
-        output
+        output.dup
       end
     end
 
@@ -98,7 +94,7 @@ module Terminal
           @screen.x = 0
         elsif char == "\b".freeze
           @screen.x -= 1
-        elsif char[0] == "\e".freeze && char.length > 1
+        elsif char.index("\e".freeze) == 0 && char.length > 1
           sequence = char.match(ESCAPE_CAPTURE_REGEX)
 
           instruction = sequence[1]
