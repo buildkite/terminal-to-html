@@ -13,6 +13,7 @@ GEM
     escape_utils (1.0.1)
     gemoji (2.1.0)
     hirb (0.7.3)
+    memory_profiler (0.0.4)
     method_profiler (2.0.1)
       hirb (>= 0.6.0)
     rake (10.4.2)
@@ -36,6 +37,7 @@ PLATFORMS
 DEPENDENCIES
   benchmark-ips
   bundler (~> 1.6)
+  memory_profiler
   method_profiler
   rake
   rspec
