@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "method_profiler"
+  spec.add_development_dependency "memory_profiler"
 end
