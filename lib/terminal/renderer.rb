@@ -2,6 +2,7 @@
 
 require 'escape_utils'
 require 'emoji'
+require 'strscan'
 
 module Terminal
   class Renderer
@@ -75,18 +76,15 @@ module Terminal
       end
     end
 
-    # Scan the string to create an array of interesting things, for example
-    # it would look like this:
-    # [ '\n', '\r', 'a', 'b', '\e123m' ]
-    def split_by_escape_character(string)
-      string.scan(INTERESTING_PARTS_REGEX)
-    end
-
     def render_to_screen(string)
-      # The when cases are ordered by most likely, the lest checks it has to go
-      # through before matching, the faster the render will be. Colors are
-      # usually most likey, so that's first.
-      split_by_escape_character(string).each do |char|
+      scanner = StringScanner.new(string)
+
+      # Scan the string for interesting things, for example:
+      # [ '\n', '\r', 'a', 'b', '\e123m' ]
+      while char = scanner.scan(INTERESTING_PARTS_REGEX)
+        # The when cases are ordered by most likely, the lest checks it has to go
+        # through before matching, the faster the render will be. Colors are
+        # usually most likey, so that's first.
         if char == "\n".freeze
           @screen.x = 0
           @screen.y += 1
