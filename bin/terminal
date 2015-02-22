@@ -4,51 +4,48 @@
 $:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
 
 require 'terminal'
+require 'optparse'
 
-def help
-  puts <<-usage
-Usage:
-  $ cat output.text | terminal
-  $ terminal output.text
+options = Struct.new(:preview,
+                     :emoji_asset_path).new
 
-Help:
-  $ terminal -h
-  $ terminal --help
+option_parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{opts.program_name} [options] <input file>"
 
-Version:
-  $ terminal -v
-  $ terminal --version
-
-Preview in the browser:
-  $ terminal --preview
-
-See https://buildkite.github.io/terminal for more information.
-  usage
-end
-
-def version
-  puts "terminal v#{Terminal::VERSION}"
-end
-
-preview = ARGV.delete('--preview')
-
-if ($stdin.tty? && ARGV.empty?) || ARGV.delete('-h') || ARGV.delete('--help')
-  help
-elsif ARGV.delete('-v') || ARGV.delete('--version')
-  version
-else
-  raw = ARGF.read
-  rendered = Terminal.render(raw)
-
-  if preview
-    require 'tempfile'
-
-    tempfile = Tempfile.new([ 'preview', '.html' ])
-    tempfile.write(Terminal::Preview.new(raw, rendered).render)
-    tempfile.close
-
-    exec %{open "#{tempfile.path}"}
-  else
-    puts rendered
+  opts.on("--preview", "Preview in the browser") do
+    options.preview = true
   end
+
+  opts.on("--emoji-asset-path=PATH", "Path or URL to emoji image files") do |path|
+    options.emoji_asset_path = path
+  end
+
+  opts.on_tail("-h", "--help", "Show this help documentation") do
+    puts opts
+    exit
+  end
+
+  opts.on_tail("-v", "--version", "Print the version") do
+    puts "terminal v#{Terminal::VERSION}"
+    exit
+  end
+end.tap(&:parse!)
+
+if ($stdin.tty? && ARGV.empty?)
+  abort option_parser.help
+end
+
+raw = ARGF.read
+rendered = Terminal.render(raw, emoji_asset_path: options[:emoji_asset_path])
+
+if options[:preview]
+  require 'tempfile'
+
+  tempfile = Tempfile.new([ 'preview', '.html' ])
+  tempfile.write(Terminal::Preview.new(raw, rendered).render)
+  tempfile.close
+
+  exec %{open "#{tempfile.path}"}
+else
+  puts rendered
 end
