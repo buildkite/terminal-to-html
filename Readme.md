@@ -1,10 +1,10 @@
 ![logo](http://buildbox.github.io/terminal/images/logo.svg)
 
-[![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
+Terminal is a Go library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
-Terminal is a Go library (with a Ruby gem wrapper) for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
+It provides a single command, `ansi2html`, that can be used either as a simple webservice or via STDIN/STDOUT. It can also be used as a library.
 
-## Go Installation
+## Installation
 
 Assuming a `$GOPATH/bin` that's globally accessible, run:
 
@@ -12,124 +12,30 @@ Assuming a `$GOPATH/bin` that's globally accessible, run:
 go install github.com/buildbox/terminal/cmd/ansi2html
 ```
 
-This will give you the `ansi2html` command. It can be called directly or used by the Ruby Gem. It's called `ansi2html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
-
-## Ruby Installation
-
-Run the `go install` command above and add this line to your application's Gemfile:
-
-```ruby
-gem 'terminal'
-```
-
-And then execute:
-
-```bash
-$ bundle
-```
-
-Or install it yourself as:
-
-```bash
-gem install terminal
-```
+This will give you the `ansi2html` command. It's called `ansi2html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
 
 ## Usage
 
-```ruby
-Terminal.render("...")
+``` bash
+# STDIN/STDOUT Usage
+cat fixtures/pickachu.sh.raw | ansi2html > out.html
+
+# Webservice Usage
+ansi2html -http=:6060 &
+curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
 ```
 
-### Rails Integration
-
-You can use Terminal directly within your Ruby on Rails application. First require the gem
-in your Gemfile:
-
-```ruby
-gem "terminal"
-```
-
-Then in your `app/assets/application.css` file:
-
-```css
-/* require "terminal" */
-```
-
-Now in your views:
-
-```
-<div class="term-container"><%= Terminal.render(output) %></div>
-```
-
-### Emojis :+1:
-
-The Ruby Gem wrapper of Terminal converts unicode to proper `<img>` tags. We use the [gemoji](https://github.com/github/gemoji) gem to do this. The path to the assets can be customized by passing the `:emoji_asset_path` option to `Terminal.render`
-
-```ruby
-Terminal.render(output, emoji_asset_path: "https://your.cdn.com/images/emoji")
-```
-
-### Ruby Command Line
-
-Terminal ships with a command line utility. For example, you can pipe `rspec` output to it:
-
-```bash
-rspec --color --tty | terminal
-```
-
-Or use output saved earlier:
-
-```bash
-rspec --tty --color > output.txt
-terminal output.txt
-```
-
-With `rspec`, you'll need to use the `--tty` and `--color` options to force it to output colors.
-
-We also provide a utility to preview the rendered version in a web browser. Simply append `--preview` to the command,
-and when the render has finished, it will open in your web browser with a before/after show.
-
-```bash
-rspec --color --tty | terminal --preview
-```
-
-![preview mode](http://buildbox.github.io/terminal/images/preview.png)
-
-### With the Buildbox API
-
-You can use the `job_url` returned by the [Builds API](https://buildbox.io/docs/api/builds) to pipe a job's log directly into terminal, for example:
-
-```bash
-JOB_LOG_URL="https://api.buildbox.io/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log.txt?api_key=[api-key]"
-curl $JOB_LOG_URL | terminal --preview
-```
-
-## Generating Fixtures
-
-To generate a fixture, first create a test case inside the `examples` folder. See the `curl.sh`
-file as an example. You can then generate a `.raw` and `.rendered` file by running:
-
-```bash
-./generate curl.sh
-```
-
-You should then move the `raw` and `rendered` files to the `fixtures` folder.
-
-```bash
-mv examples/*{raw,rendered} fixtures
-```
+You'll need to wrap the resulting output inside a `.term-container` HTML entity and use the stylesheet in `assets/terminal.css`
 
 ## Benchmarking
 
 Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: this best represents the kind of use cases the original code was developed against. As a guide, this test was 80ms per iteration on an 2013 Retina MBP, and was 2500 ms per iteration in the original pure Ruby implementation.
 
-Run `script/benchmark` to see performance when pushed through the gem. Note that invocation of the binary itself applies a performance ceiling, but this is compensated for by performance on larger inputs.
-
 ## TODO
 
- * Have the Go version handle UTF8 enforcement
- * Have the Go version handle Emoji
- * Build the Go binary and place in gem directory as part of gem install
+ * UTF8 enforcement
+ * Emoji
+ * "Demo" functionality that wraps output in the stylesheet
 
 ## Contributing
 
