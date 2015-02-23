@@ -51,15 +51,6 @@ Now in your views:
 <div class="term-container"><%= Terminal.render(output) %></div>
 ```
 
-### Emojis :+1:
-
-Terminal converts unicode to proper `<img>` tags. We use the [gemoji](https://github.com/github/gemoji)
-gem to do this. The path to the assets can be customized by passing the `:emoji_asset_path` option to `Terminal.render`
-
-```ruby
-Terminal.render(output, emoji_asset_path: "https://your.cdn.com/images/emoji")
-```
-
 ### Command Line
 
 Terminal ships with a command line utility. For example, you can pipe `rspec` output to it:

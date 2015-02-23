@@ -1,7 +1,6 @@
 # encoding: UTF-8
 
 require 'escape_utils'
-require 'emoji'
 require 'strscan'
 
 module Terminal

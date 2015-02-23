@@ -3,7 +3,6 @@ PATH
   specs:
     terminal (2.0.0)
       escape_utils (~> 1.0)
-      gemoji (~> 2.1)
 
 GEM
   remote: https://rubygems.org/
@@ -11,7 +10,6 @@ GEM
     benchmark-ips (2.1.1)
     diff-lcs (1.2.5)
     escape_utils (1.0.1)
-    gemoji (2.1.0)
     hirb (0.7.3)
     memory_profiler (0.0.4)
     method_profiler (2.0.1)
