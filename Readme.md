@@ -1,4 +1,4 @@
-![logo](http://buildbox.github.io/terminal/images/logo.svg)
+![logo](http://buildkite.github.io/terminal/images/logo.svg)
 
 Terminal is a Go library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
@@ -47,7 +47,7 @@ Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: t
 
 ## Licence
 
-> Copyright (c) 2014 Keith Pitt, Buildbox
+> Copyright (c) 2015 Keith Pitt, Tim Lucas, Buildkite Pty Ltd
 >
 > MIT License
 >
