@@ -8,9 +8,6 @@ module Terminal
   class Renderer
     MEGABYTES = 1024 * 1024
 
-    EMOJI_UNICODE_REGEXP = /[\u{1f600}-\u{1f64f}]|[\u{2702}-\u{27b0}]|[\u{1f680}-\u{1f6ff}]|[\u{24C2}-\u{1F251}]|[\u{1f300}-\u{1f5ff}]/
-    EMOJI_IGNORE = [ "heavy_check_mark".freeze, "heavy_multiplication_x".freeze ]
-
     ESCAPE_CONTROL_CHARACTERS = "qQmKGgKAaBbCcDd".freeze
     ESCAPE_CAPTURE_REGEX = /\e\[(.*)([#{ESCAPE_CONTROL_CHARACTERS}])/
 
@@ -18,23 +15,15 @@ module Terminal
 
     def initialize(output, options = {})
       @output = output
-
       @options = options
-      @options[:emoji_asset_path] ||= "/assets/emojis"
-
       @screen = Screen.new
     end
 
     def render
       return "" if @output.nil?
 
-      # Don't allow parsing of outputs longer than 4 meg
-      output = dup_check_and_chomp_length(@output)
+      output = @output.dup
 
-      # Force encoding on the output first
-      force_encoding!(output)
-
-      # Now do the render the output to the screen
       render_to_screen(output)
 
       # Convert the screen to a string
@@ -46,35 +35,10 @@ module Terminal
       # Now convert the colors to HTML
       convert_to_html!(escaped_html)
 
-      # And emojify
-      replace_unicode_with_emoji!(escaped_html)
-
       escaped_html
     end
 
     private
-
-    def dup_check_and_chomp_length(output)
-      # Limit the entire size of the output to 4 meg
-      max_total_size = 4 * MEGABYTES
-      if output.bytesize > max_total_size
-        new_output = output.byteslice(0, max_total_size)
-        new_output << "\n\nWarning: Terminal has chopped off the rest of the build as it's over the allowed 4 megabyte limit for logs."
-        new_output
-      else
-        output.dup
-      end
-    end
-
-    def force_encoding!(string)
-      string.force_encoding('UTF-8')
-
-      if string.valid_encoding?
-        string
-      else
-        string.force_encoding('ASCII-8BIT').encode!('UTF-8', invalid: :replace, undef: :replace)
-      end
-    end
 
     def render_to_screen(string)
       scanner = StringScanner.new(string)
@@ -146,28 +110,6 @@ module Terminal
 
       # Replace empty lines with a non breaking space.
       string.gsub!(/$^/, "&nbsp;")
-    end
-
-    def replace_unicode_with_emoji!(string)
-      string.gsub!(EMOJI_UNICODE_REGEXP) do |match|
-        Terminal::Cache.cache(:emoji, match) { emoji_image_from_unicode(match) }
-      end
-    end
-
-    # The Emoji API will be transitioning to a nil-based find API, at the
-    # moment it raies exceptions for Emojis that can't be found:
-    # https://github.com/github/gemoji/commit/b1736a387c7c1c2af300506fea5603e2e1fb89d8
-    # Will support both for now.
-    def emoji_image_from_unicode(unicode)
-      emoji = Emoji.find_by_unicode(unicode)
-
-      if emoji && !EMOJI_IGNORE.include?(emoji.name)
-        path = File.join(@options[:emoji_asset_path], emoji.image_filename)
-
-        %(<img alt="#{emoji.name}" title="#{emoji.name}" src="#{path}" class="emoji" width="20" height="20" />)
-      else
-        unicode
-      end
     end
   end
 end
