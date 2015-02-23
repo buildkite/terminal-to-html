@@ -20,13 +20,6 @@ describe Terminal::Renderer do
   end
 
   describe "#render" do
-    it "chops off logs longer than 4 megabytes" do
-      long_string = "x" * 5 * 1024 * 1024
-      last_part_of_long_string = render(long_string).split("").last(1000).join("")
-
-      expect(last_part_of_long_string).to end_with("Warning: Terminal has chopped off the rest of the build as it&#39;s over the allowed 4 megabyte limit for logs.")
-    end
-
     it "closes colors that get opened" do
       raw = "he\033[32mllo"
 
@@ -194,31 +187,6 @@ describe Terminal::Renderer do
       raw = "hi amazing \e[12 nom nom nom friends"
 
       expect(render(raw)).to eql("hi amazing \e[12 nom nom nom friends")
-    end
-
-    it "renders unicode emoji" do
-      raw = "this is great 👍"
-
-      expect(render(raw)).to eql(%{this is great <img alt="+1" title="+1" src="/assets/emojis/unicode/1f44d.png" class="emoji" width="20" height="20" />})
-    end
-
-    it "returns nothing if the unicode emoji can't be found" do
-      expect(Emoji).to receive(:unicodes_index) { {} }
-      raw = "this is great 😎"
-
-      expect(render(raw)).to eql(%{this is great 😎})
-    end
-
-    it "leaves the tick emoji alone (it looks better and is colored)" do
-      raw = "works ✔"
-
-      expect(render(raw)).to eql(%{works ✔})
-    end
-
-    it "leaves the ✖ emoji alone as well" do
-      raw = "broke ✖"
-
-      expect(render(raw)).to eql(%{broke ✖})
     end
 
     it "handles colors with 3 attributes" do

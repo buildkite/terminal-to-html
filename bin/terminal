@@ -6,18 +6,13 @@ $:.unshift(File.join(File.expand_path(File.dirname(__FILE__)), '..', 'lib'))
 require 'terminal'
 require 'optparse'
 
-options = Struct.new(:preview,
-                     :emoji_asset_path).new
+options = Struct.new(:preview).new
 
 option_parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{opts.program_name} [options] <input file>"
 
   opts.on("--preview", "Preview in the browser") do
     options.preview = true
-  end
-
-  opts.on("--emoji-asset-path=PATH", "Path or URL to emoji image files") do |path|
-    options.emoji_asset_path = path
   end
 
   opts.on_tail("-h", "--help", "Show this help documentation") do
@@ -36,7 +31,7 @@ if ($stdin.tty? && ARGV.empty?)
 end
 
 raw = ARGF.read
-rendered = Terminal.render(raw, emoji_asset_path: options[:emoji_asset_path])
+rendered = Terminal.render(raw)
 
 if options[:preview]
   require 'tempfile'
