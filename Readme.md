@@ -9,7 +9,7 @@ It provides a single command, `ansi2html`, that can be used either as a simple w
 Assuming a `$GOPATH/bin` that's globally accessible, run:
 
 ```bash
-go install github.com/buildbox/terminal/cmd/ansi2html
+go install github.com/buildkite/terminal/cmd/ansi2html
 ```
 
 This will give you the `ansi2html` command. It's called `ansi2html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.

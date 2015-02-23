@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/buildbox/terminal"
+	"github.com/buildkite/terminal"
 )
 
 func check(m string, e error) {

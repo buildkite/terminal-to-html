@@ -2,11 +2,11 @@
 Package terminal converts ANSI input to HTML output.
 
 The generated HTML needs to be used with the stylesheet at
-https://raw.githubusercontent.com/buildbox/terminal/master/app/assets/stylesheets/terminal.css
+https://raw.githubusercontent.com/buildkite/terminal/master/app/assets/stylesheets/terminal.css
 and wrapped in a term-container div.
 
 You can call this library from the command line with ansi2html:
-go install github.com/buildbox/terminal/cmd/ansi2html
+go install github.com/buildkite/terminal/cmd/ansi2html
 */
 package terminal
 
