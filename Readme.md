@@ -2,26 +2,26 @@
 
 Terminal is a Go library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
-It provides a single command, `ansi2html`, that can be used either as a simple webservice or via STDIN/STDOUT. It can also be used as a library.
+It provides a single command, `terminal-to-html`, that can be used either as a simple webservice or via STDIN/STDOUT. It can also be used as a library.
 
 ## Installation
 
 Assuming a `$GOPATH/bin` that's globally accessible, run:
 
 ```bash
-go install github.com/buildkite/terminal/cmd/ansi2html
+go install github.com/buildkite/terminal/cmd/terminal-to-html
 ```
 
-This will give you the `ansi2html` command. It's called `ansi2html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
+This will give you the `terminal-to-html` command. It's called `terminal-to-html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
 
 ## Usage
 
 ``` bash
 # STDIN/STDOUT Usage
-cat fixtures/pickachu.sh.raw | ansi2html > out.html
+cat fixtures/pickachu.sh.raw | terminal-to-html > out.html
 
 # Webservice Usage
-ansi2html -http=:6060 &
+terminal-to-html -http=:6060 &
 curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
 ```
 
