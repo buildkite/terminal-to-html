@@ -1,105 +1,41 @@
 ![logo](http://buildkite.github.io/terminal/images/logo.svg)
 
-[![Gem Version](https://badge.fury.io/rb/terminal.png)](https://rubygems.org/gems/terminal)
+Terminal is a Go library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
-Terminal is a Ruby library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
+It provides a single command, `terminal-to-html`, that can be used either as a simple webservice or via STDIN/STDOUT. It can also be used as a library.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'terminal'
-```
-
-And then execute:
+Assuming a `$GOPATH/bin` that's globally accessible, run:
 
 ```bash
-$ bundle
+go install github.com/buildkite/terminal/cmd/terminal-to-html
 ```
 
-Or install it yourself as:
-
-```bash
-gem install terminal
-```
+This will give you the `terminal-to-html` command. It's called `terminal-to-html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
 
 ## Usage
 
-```ruby
-Terminal.render("...")
+``` bash
+# STDIN/STDOUT Usage
+cat fixtures/pickachu.sh.raw | terminal-to-html > out.html
+
+# Webservice Usage
+terminal-to-html -http=:6060 &
+curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
 ```
 
-### Rails Integration
+You'll need to wrap the resulting output inside a `.term-container` HTML entity and use the stylesheet in `assets/terminal.css`
 
-You can use Terminal directly within your Ruby on Rails application. First require the gem
-in your Gemfile:
+## Benchmarking
 
-```ruby
-gem "terminal"
-```
+Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: this best represents the kind of use cases the original code was developed against. As a guide, this test was 80ms per iteration on an 2013 Retina MBP, and was 2500 ms per iteration in the original pure Ruby implementation.
 
-Then in your `app/assets/application.css` file:
+## TODO
 
-```css
-/* require "terminal" */
-```
-
-Now in your views:
-
-```
-<div class="term-container"><%= Terminal.render(output) %></div>
-```
-
-### Command Line
-
-Terminal ships with a command line utility. For example, you can pipe `rspec` output to it:
-
-```bash
-rspec --color --tty | terminal
-```
-
-Or use output saved earlier:
-
-```bash
-rspec --tty --color > output.txt
-terminal output.txt
-```
-
-With `rspec`, you'll need to use the `--tty` and `--color` options to force it to output colors.
-
-We also provide a utility to preview the rendered version in a web browser. Simply append `--preview` to the command,
-and when the render has finished, it will open in your web browser with a before/after show.
-
-```bash
-rspec --color --tty | terminal --preview
-```
-
-![preview mode](http://buildkite.github.io/terminal/images/preview.png)
-
-### With the Buildkite API
-
-You can use the `job_url` returned by the [Builds API](https://buildkite.com/docs/api/builds) to pipe a job's log directly into terminal, for example:
-
-```bash
-JOB_LOG_URL="https://api.buildkite.com/v1/accounts/[account]/projects/[project]/builds/[build]/jobs/[job]/log.txt?api_key=[api-key]"
-curl $JOB_LOG_URL | terminal --preview
-```
-
-## Generating Fixtures
-
-To generate a fixture, first create a test case inside the `examples` folder. See the `curl.sh`
-file as an example. You can then generate a `.raw` and `.rendered` file by running:
-
-```bash
-./generate curl.sh
-```
-
-You should then move the `raw` and `rendered` files to the `fixtures` folder.
-
-```bash
-mv examples/*{raw,rendered} spec/fixtures
-```
+ * UTF8 enforcement
+ * Emoji
+ * "Demo" functionality that wraps output in the stylesheet
 
 ## Contributing
 
