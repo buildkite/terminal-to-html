@@ -4,6 +4,8 @@ Terminal is a Go library for converting arbitrary shell output (with ANSI) into 
 
 It provides a single command, `terminal-to-html`, that can be used to convert terminal output via STDIN, as well as via a simple web server.
 
+[![Build status](https://badge.buildkite.com/d52c056a977b489d9ab4822eb91d1c080e4e27c2.svg)](https://buildkite.com/buildkite/terminal)
+
 ## Usage
 
 Piping in terminal output via the command line:
