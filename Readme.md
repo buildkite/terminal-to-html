@@ -2,9 +2,24 @@
 
 Terminal is a Go library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
-It provides a single command, `terminal-to-html`, that can be used either as a simple webservice or via STDIN/STDOUT. It can also be used as a library.
+It provides a single command, `terminal-to-html`, that can be used to convert terminal output via STDIN, as well as via a simple web server.
+
+## Usage
+
+``` bash
+cat fixtures/pickachu.sh.raw | terminal-to-html > out.html
+
+terminal-to-html -http=:6060 &
+curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
+```
+
+For coloring you can use the sample [terminal.css](/assets/terminal.css) stylesheet and wrap the output in an element with class `term-container` (e.g. `<div class="term-container"><!-- terminal output --></div>`).
 
 ## Installation
+
+TODO
+
+## Manual Installation
 
 Assuming a `$GOPATH/bin` that's globally accessible, run:
 
@@ -14,28 +29,15 @@ go install github.com/buildkite/terminal/cmd/terminal-to-html
 
 This will give you the `terminal-to-html` command. It's called `terminal-to-html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
 
-## Usage
 
-``` bash
-# STDIN/STDOUT Usage
-cat fixtures/pickachu.sh.raw | terminal-to-html > out.html
 
-# Webservice Usage
-terminal-to-html -http=:6060 &
-curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
-```
+## Developing
 
-You'll need to wrap the resulting output inside a `.term-container` HTML entity and use the stylesheet in `assets/terminal.css`
+TODO
 
 ## Benchmarking
 
-Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: this best represents the kind of use cases the original code was developed against. As a guide, this test was 80ms per iteration on an 2013 Retina MBP, and was 2500 ms per iteration in the original pure Ruby implementation.
-
-## TODO
-
- * UTF8 enforcement
- * Emoji
- * "Demo" functionality that wraps output in the stylesheet
+Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: this best represents the kind of use cases the original code was developed against.
 
 ## Contributing
 
@@ -47,7 +49,7 @@ Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: t
 
 ## Licence
 
-> Copyright (c) 2015 Keith Pitt, Tim Lucas, Buildkite Pty Ltd
+> Copyright (c) 2015 Keith Pitt, Tim Lucas, Michael Pearson
 >
 > MIT License
 >
