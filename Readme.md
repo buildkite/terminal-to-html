@@ -6,9 +6,15 @@ It provides a single command, `terminal-to-html`, that can be used to convert te
 
 ## Usage
 
+Piping in terminal output via the command line:
+
 ``` bash
 cat fixtures/pickachu.sh.raw | terminal-to-html > out.html
+```
 
+Posting terminal content via HTTP:
+
+```
 terminal-to-html -http=:6060 &
 curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
 ```
