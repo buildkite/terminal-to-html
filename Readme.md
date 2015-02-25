@@ -14,7 +14,7 @@ cat fixtures/pickachu.sh.raw | terminal-to-html > out.html
 
 Posting terminal content via HTTP:
 
-```
+```bash
 terminal-to-html -http=:6060 &
 curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
 ```
@@ -32,10 +32,6 @@ Assuming a `$GOPATH/bin` that's globally accessible, run:
 ```bash
 go install github.com/buildkite/terminal/cmd/terminal-to-html
 ```
-
-This will give you the `terminal-to-html` command. It's called `terminal-to-html` and not `terminal` as installing something called `terminal` globally might confuse people looking for an actual terminal.
-
-
 
 ## Developing
 
