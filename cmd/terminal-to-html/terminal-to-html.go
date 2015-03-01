@@ -12,6 +12,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+var AppHelpTemplate = `{{.Name}} - {{.Usage}}
+
+STDIN/STDOUT USAGE:
+  cat input.raw | {{.Name}} [arguments...] > out.html
+
+WEBSERVICE USAGE:
+  {{.Name}} --http :6060 &
+  curl --data-binary "@input.raw" http://localhost:6060/terminal > out.html
+
+OPTIONS:
+  {{range .Flags}}{{.}}
+  {{end}}
+`
+
 func check(m string, e error) {
 	if e != nil {
 		log.Fatalf("%s: %v", m, e)
@@ -43,9 +57,12 @@ func stdin() {
 }
 
 func main() {
+	cli.AppHelpTemplate = AppHelpTemplate
+
 	app := cli.NewApp()
+
 	app.Name = "terminal-to-html"
-	app.Usage = "input ANSI on STDIN, output HTML to STDOUT"
+	app.Usage = "turn ANSI in to HTML"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "http",
@@ -61,5 +78,4 @@ func main() {
 		}
 	}
 	app.Run(os.Args)
-
 }
