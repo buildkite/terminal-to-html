@@ -9,14 +9,17 @@ mkdir -p $BUILD_DIR
 function build-binary {
   local os=${1}
   local arch=${2}
-  local binary_path="$BUILD_DIR/terminal-$os-$arch"
-  GOOS=$os GOARCH=$arch go build -o $binary_path cmd/terminal-to-html/terminal-to-html.go
+  local binary=${3}
+  local binary_path="$BUILD_DIR/${binary}"
+  GOOS=$os GOARCH=$arch godep go build -o $binary_path github.com/buildkite/terminal/cmd/terminal-to-html
   chmod +x $binary_path
   echo $binary_path
 }
 
-echo "Built: " $(build-binary "linux" "amd64")
-echo "Built: " $(build-binary "linux" "386")
-echo "Built: " $(build-binary "linux" "arm")
-echo "Built: " $(build-binary "darwin" "386")
-echo "Built: " $(build-binary "darwin" "amd64")
+echo "Built: " $(build-binary "linux" "amd64" "terminal-linux-amd64")
+echo "Built: " $(build-binary "linux" "386" "terminal-linux-386")
+echo "Built: " $(build-binary "linux" "arm" "terminal-linux-arm")
+echo "Built: " $(build-binary "darwin" "386" "terminal-mac-386")
+echo "Built: " $(build-binary "darwin" "amd64" "terminal-mac-amd64")
+echo "Built: " $(build-binary "windows" "386" "terminal-windows-386.exe")
+echo "Built: " $(build-binary "windows" "amd64" "terminal-windows-amd64.exe")

@@ -32,12 +32,16 @@ TODO
 Assuming a `$GOPATH/bin` that's globally accessible, run:
 
 ```bash
-go install github.com/buildkite/terminal/cmd/terminal-to-html
+$ go install github.com/buildkite/terminal/cmd/terminal-to-html
 ```
 
 ## Developing
 
-TODO
+To get a bash prompt with all the go cross-compilation tools set up for you already:
+
+```
+$ docker build -t terminal . && docker run -it --rm -v $(pwd):/go/src/github.com/buildkite/terminal terminal bash
+```
 
 ## Benchmarking
 
