@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+
+BUILD_DIR=pkg
+
+mkdir -p $BUILD_DIR
+
+function build-binary {
+  local os=${1}
+  local arch=${2}
+  local binary_path="$BUILD_DIR/terminal-$os-$arch"
+  GOOS=$os GOARCH=$arch go build -o $binary_path cmd/terminal-to-html/terminal-to-html.go
+  chmod +x $binary_path
+  echo $binary_path
+}
+
+echo "Built: " $(build-binary "linux" "amd64")
+echo "Built: " $(build-binary "linux" "386")
+echo "Built: " $(build-binary "linux" "arm")
+echo "Built: " $(build-binary "darwin" "386")
+echo "Built: " $(build-binary "darwin" "amd64")
