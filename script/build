@@ -17,7 +17,7 @@ function build-binary {
 
   local binary_path="$binary_dir/terminal-to-html${extension}"
 
-  GOOS=$os GOARCH=$arch godep go build -v -o $binary_path github.com/buildkite/terminal/cmd/terminal-to-html
+  GOOS=$os GOARCH=$arch godep go build -o $binary_path github.com/buildkite/terminal/cmd/terminal-to-html
 
   chmod +x $binary_path
   echo $binary_path
@@ -28,7 +28,7 @@ function package-gz {
 }
 
 function package-zip {
-  zip "$(dirname $1).zip" $(dirname $1)
+  zip -r "$(dirname $1).zip" $(dirname $1)
 }
 
 package-gz $(build-binary "linux" "amd64" "linux-amd64")
