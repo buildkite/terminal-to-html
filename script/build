@@ -1,25 +1,42 @@
 #!/usr/bin/env bash
 
-set -e
+set -eux
 
-BUILD_DIR=pkg
-
-mkdir -p $BUILD_DIR
+mkdir -p pkg
+cd pkg
+rm -r * || true
 
 function build-binary {
   local os=${1}
   local arch=${2}
   local binary=${3}
-  local binary_path="$BUILD_DIR/${binary}"
+  local extension=${4:-}
+
+  local binary_dir="terminal-to-html-build-$TERMINAL_VERSION-${binary}"
+  mkdir -p $binary_dir
+
+  local binary_path="$binary_dir/terminal-to-html${extension}"
+
   GOOS=$os GOARCH=$arch godep go build -o $binary_path github.com/buildkite/terminal/cmd/terminal-to-html
+
   chmod +x $binary_path
   echo $binary_path
 }
 
-echo "Built: " $(build-binary "linux" "amd64" "terminal-linux-amd64")
-echo "Built: " $(build-binary "linux" "386" "terminal-linux-386")
-echo "Built: " $(build-binary "linux" "arm" "terminal-linux-arm")
-echo "Built: " $(build-binary "darwin" "386" "terminal-mac-386")
-echo "Built: " $(build-binary "darwin" "amd64" "terminal-mac-amd64")
-echo "Built: " $(build-binary "windows" "386" "terminal-windows-386.exe")
-echo "Built: " $(build-binary "windows" "amd64" "terminal-windows-amd64.exe")
+function package-gz {
+  tar -pczf "$(dirname $1).tar.gz" $(dirname $1)
+}
+
+function package-zip {
+  zip "$(dirname $1).zip" $(dirname $1)
+}
+
+package-gz $(build-binary "linux" "amd64" "linux-amd64")
+package-gz $(build-binary "linux" "386" "linux-intel")
+package-gz $(build-binary "linux" "arm" "linux-arm")
+
+package-zip $(build-binary "darwin" "386" "ox-intel")
+package-zip $(build-binary "darwin" "amd64" "osx-amd64")
+
+package-zip $(build-binary "windows" "386" "windows-intel" ".exe")
+package-zip $(build-binary "windows" "amd64" "windows-amd64" ".exe")
