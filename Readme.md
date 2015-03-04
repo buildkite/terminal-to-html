@@ -25,7 +25,7 @@ For coloring you can use the sample [terminal.css](/assets/terminal.css) stylesh
 
 ## Installation
 
-TODO
+Download the release for your platform from [https://github.com/buildkite/terminal/releases](https://github.com/buildkite/terminal/releases)
 
 ## Manual Installation
 
