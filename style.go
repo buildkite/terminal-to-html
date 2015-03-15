@@ -8,14 +8,18 @@ type style struct {
 	fgColor     string
 	bgColor     string
 	otherColors []string
-	asString    string
+	classes     string
 }
 
-// String representation of the current style, used for
-// comparing two styles. TODO: Remove.
-func (s *style) string() string {
-	if s.asString != "" || s.isEmpty() {
-		return s.asString
+// True if both styles are equal (or are the same object)
+func (s *style) isEqual(o *style) bool {
+	return s == o || s.asClasses() == o.asClasses()
+}
+
+// CSS classes that make up the style
+func (s *style) asClasses() string {
+	if s.classes != "" || s.isEmpty() {
+		return s.classes
 	}
 
 	var styles []string
@@ -26,8 +30,8 @@ func (s *style) string() string {
 		styles = append(styles, s.bgColor)
 	}
 	styles = append(styles, s.otherColors...)
-	s.asString = strings.Join(styles, " ")
-	return s.asString
+	s.classes = strings.Join(styles, " ")
+	return s.classes
 }
 
 // True if style is empty

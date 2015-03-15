@@ -8,5 +8,5 @@ type node struct {
 }
 
 func (n *node) hasSameStyle(o node) bool {
-	return n == &o || n.style.string() == o.style.string()
+	return n.style.isEqual(o.style)
 }

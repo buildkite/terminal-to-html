@@ -11,7 +11,7 @@ type outputBuffer struct {
 
 func (b *outputBuffer) appendNodeStyle(n node) {
 	b.buf.Write([]byte(`<span class="`))
-	b.buf.Write([]byte(n.style.string()))
+	b.buf.Write([]byte(n.style.asClasses()))
 	b.buf.Write([]byte(`">`))
 }
 
