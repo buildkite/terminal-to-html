@@ -12,13 +12,6 @@ package terminal
 
 import "bytes"
 
-type screen struct {
-	x      int
-	y      int
-	screen [][]node
-	style  *style
-}
-
 // Render converts ANSI to HTML and returns the result.
 func Render(input []byte) []byte {
 	screen := screen{}

@@ -11,8 +11,10 @@ type style struct {
 	asString    string
 }
 
+// String representation of the current style, used for
+// comparing two styles. TODO: Remove.
 func (s *style) string() string {
-	if s.asString != "" || s.empty() {
+	if s.asString != "" || s.isEmpty() {
 		return s.asString
 	}
 
@@ -28,10 +30,12 @@ func (s *style) string() string {
 	return s.asString
 }
 
-func (s *style) empty() bool {
+// True if style is empty
+func (s *style) isEmpty() bool {
 	return s.fgColor == "" && s.bgColor == "" && len(s.otherColors) == 0
 }
 
+// Remove a particular 'other' colour from our style's colour list
 func (s *style) removeOther(r string) {
 	// Must be a better way ..
 	var removed []string
@@ -44,6 +48,8 @@ func (s *style) removeOther(r string) {
 	s.otherColors = removed
 }
 
+// Add colours to an existing style, potentially returning
+// a new style.
 func (s *style) color(colors []string) *style {
 	if len(colors) == 0 {
 		return s

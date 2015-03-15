@@ -31,13 +31,13 @@ func (s *screen) output() []byte {
 		var lineBuf outputBuffer
 
 		for idx, node := range line {
-			if idx == 0 && !node.style.empty() {
+			if idx == 0 && !node.style.isEmpty() {
 				lineBuf.appendNodeStyle(node)
 				openStyles++
 			} else if idx > 0 {
 				previous := line[idx-1]
 				if !node.hasSameStyle(previous) {
-					if node.style.empty() {
+					if node.style.isEmpty() {
 						lineBuf.closeStyle()
 						openStyles--
 					} else {
@@ -59,6 +59,7 @@ func (s *screen) output() []byte {
 	return []byte(strings.Join(lines, "\n"))
 }
 
+// Append a character to our outputbuffer, escaping HTML bits as necessary.
 func (b *outputBuffer) appendChar(char rune) {
 	switch char {
 	case '&':
