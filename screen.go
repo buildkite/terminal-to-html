@@ -3,6 +3,7 @@ package terminal
 import (
 	"math"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -24,13 +25,6 @@ type escapeCode struct {
 
 const screenEndOfLine = -1
 const screenStartOfLine = 0
-
-var emptyNode = node{' ', &emptyStyle}
-
-type node struct {
-	blob  rune
-	style *style
-}
 
 // Clear part (or all) of a line on the screen
 func (s *screen) clear(y int, xStart int, xEnd int) {
@@ -222,4 +216,40 @@ func (s *screen) render(input []byte) {
 			}
 		}
 	}
+}
+
+func (s *screen) output() []byte {
+	var lines []string
+
+	for _, line := range s.screen {
+		var openStyles int
+		var lineBuf outputBuffer
+
+		for idx, node := range line {
+			if idx == 0 && !node.style.isEmpty() {
+				lineBuf.appendNodeStyle(node)
+				openStyles++
+			} else if idx > 0 {
+				previous := line[idx-1]
+				if !node.hasSameStyle(previous) {
+					if node.style.isEmpty() {
+						lineBuf.closeStyle()
+						openStyles--
+					} else {
+						lineBuf.appendNodeStyle(node)
+						openStyles++
+					}
+				}
+			}
+			lineBuf.appendChar(node.blob)
+		}
+		for i := 0; i < openStyles; i++ {
+			lineBuf.closeStyle()
+		}
+		asString := strings.TrimRight(lineBuf.buf.String(), " \t")
+
+		lines = append(lines, asString)
+	}
+
+	return []byte(strings.Join(lines, "\n"))
 }

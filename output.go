@@ -1,13 +1,6 @@
 package terminal
 
-import (
-	"bytes"
-	"strings"
-)
-
-func (n *node) hasSameStyle(o node) bool {
-	return n == &o || n.style.string() == o.style.string()
-}
+import "bytes"
 
 type outputBuffer struct {
 	buf bytes.Buffer
@@ -21,42 +14,6 @@ func (b *outputBuffer) appendNodeStyle(n node) {
 
 func (b *outputBuffer) closeStyle() {
 	b.buf.Write([]byte("</span>"))
-}
-
-func (s *screen) output() []byte {
-	var lines []string
-
-	for _, line := range s.screen {
-		var openStyles int
-		var lineBuf outputBuffer
-
-		for idx, node := range line {
-			if idx == 0 && !node.style.isEmpty() {
-				lineBuf.appendNodeStyle(node)
-				openStyles++
-			} else if idx > 0 {
-				previous := line[idx-1]
-				if !node.hasSameStyle(previous) {
-					if node.style.isEmpty() {
-						lineBuf.closeStyle()
-						openStyles--
-					} else {
-						lineBuf.appendNodeStyle(node)
-						openStyles++
-					}
-				}
-			}
-			lineBuf.appendChar(node.blob)
-		}
-		for i := 0; i < openStyles; i++ {
-			lineBuf.closeStyle()
-		}
-		asString := strings.TrimRight(lineBuf.buf.String(), " \t")
-
-		lines = append(lines, asString)
-	}
-
-	return []byte(strings.Join(lines, "\n"))
 }
 
 // Append a character to our outputbuffer, escaping HTML bits as necessary.
