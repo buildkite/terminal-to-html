@@ -218,37 +218,11 @@ func (s *screen) render(input []byte) {
 	}
 }
 
-func (s *screen) output() []byte {
+func (s *screen) asHTML() []byte {
 	var lines []string
 
 	for _, line := range s.screen {
-		var openStyles int
-		var lineBuf outputBuffer
-
-		for idx, node := range line {
-			if idx == 0 && !node.style.isEmpty() {
-				lineBuf.appendNodeStyle(node)
-				openStyles++
-			} else if idx > 0 {
-				previous := line[idx-1]
-				if !node.hasSameStyle(previous) {
-					if node.style.isEmpty() {
-						lineBuf.closeStyle()
-						openStyles--
-					} else {
-						lineBuf.appendNodeStyle(node)
-						openStyles++
-					}
-				}
-			}
-			lineBuf.appendChar(node.blob)
-		}
-		for i := 0; i < openStyles; i++ {
-			lineBuf.closeStyle()
-		}
-		asString := strings.TrimRight(lineBuf.buf.String(), " \t")
-
-		lines = append(lines, asString)
+		lines = append(lines, outputLineAsHTML(line))
 	}
 
 	return []byte(strings.Join(lines, "\n"))

@@ -16,6 +16,6 @@ import "bytes"
 func Render(input []byte) []byte {
 	screen := screen{}
 	screen.render(input)
-	output := bytes.Replace(screen.output(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
+	output := bytes.Replace(screen.asHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
 	return output
 }

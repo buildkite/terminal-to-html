@@ -1,6 +1,9 @@
 package terminal
 
-import "bytes"
+import (
+	"bytes"
+	"strings"
+)
 
 type outputBuffer struct {
 	buf bytes.Buffer
@@ -34,4 +37,32 @@ func (b *outputBuffer) appendChar(char rune) {
 	default:
 		b.buf.WriteRune(char)
 	}
+}
+
+func outputLineAsHTML(line []node) string {
+	var openStyles int
+	var lineBuf outputBuffer
+
+	for idx, node := range line {
+		if idx == 0 && !node.style.isEmpty() {
+			lineBuf.appendNodeStyle(node)
+			openStyles++
+		} else if idx > 0 {
+			previous := line[idx-1]
+			if !node.hasSameStyle(previous) {
+				if node.style.isEmpty() {
+					lineBuf.closeStyle()
+					openStyles--
+				} else {
+					lineBuf.appendNodeStyle(node)
+					openStyles++
+				}
+			}
+		}
+		lineBuf.appendChar(node.blob)
+	}
+	for i := 0; i < openStyles; i++ {
+		lineBuf.closeStyle()
+	}
+	return strings.TrimRight(lineBuf.buf.String(), " \t")
 }

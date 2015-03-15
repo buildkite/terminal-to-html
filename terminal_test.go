@@ -220,7 +220,7 @@ func TestScreenWriteToXY(t *testing.T) {
 	s.y = 2
 	s.write('c')
 
-	output := string(s.output())
+	output := string(s.asHTML())
 	expected := "a\n b\n  c"
 	if output != expected {
 		t.Errorf("got %q, wanted %q", output, expected)
