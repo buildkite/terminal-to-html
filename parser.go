@@ -5,12 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-// Stateful container object for capturing escape codes
-type escapeCode struct {
-	nextInstruction []rune
-	instructions    []string
-}
-
 const (
 	MODE_NORMAL     = iota
 	MODE_PRE_ESCAPE = iota
@@ -19,19 +13,22 @@ const (
 
 // Stateful ANSI parser
 type parser struct {
-	mode            int
-	escape          escapeCode
-	screen          *screen
-	cursor          int
-	escapeStartedAt int
+	mode                 int
+	screen               *screen
+	ansi                 []byte
+	cursor               int
+	escapeStartedAt      int
+	instructions         []string
+	instructionStartedAt int
 }
 
-func (p *parser) parse(ansi []byte) {
+func parseANSIToScreen(s *screen, ansi []byte) {
+	p := parser{mode: MODE_NORMAL, ansi: ansi, screen: s}
 	p.mode = MODE_NORMAL
-	length := len(ansi)
+	length := len(p.ansi)
 	for p.cursor = 0; p.cursor < length; {
-		char, i := utf8.DecodeRune(ansi[p.cursor:])
-		p.cursor += i
+		char, charLen := utf8.DecodeRune(p.ansi[p.cursor:])
+
 		switch p.mode {
 		case MODE_ESCAPE:
 			// We're inside an escape code - figure out its code and its instructions.
@@ -43,6 +40,8 @@ func (p *parser) parse(ansi []byte) {
 			// Outside of an escape sequence entirely, normal input
 			p.parseNormal(char)
 		}
+
+		p.cursor += charLen
 	}
 }
 
@@ -50,12 +49,13 @@ func (p *parser) parseEscape(char rune) {
 	char = unicode.ToUpper(char)
 	switch char {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-		p.escape.nextInstruction = append(p.escape.nextInstruction, char)
+		// Part of an instruction
 	case ';':
-		p.escape.endOfInstruction()
+		p.endOfInstruction()
+		p.instructionStartedAt = p.cursor + utf8.RuneLen(';')
 	case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
-		p.escape.endOfInstruction()
-		p.screen.applyEscape(char, p.escape.instructions)
+		p.endOfInstruction()
+		p.screen.applyEscape(char, p.instructions)
 		p.mode = MODE_NORMAL
 	default:
 		// unrecognized character, abort the escapeCode
@@ -85,7 +85,8 @@ func (p *parser) parseNormal(char rune) {
 
 func (p *parser) parsePreEscape(char rune) {
 	if char == '[' {
-		p.escape = escapeCode{}
+		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
+		p.instructions = make([]string, 0, 1)
 		p.mode = MODE_ESCAPE
 	} else {
 		// Not an escape code, false alarm
@@ -95,15 +96,7 @@ func (p *parser) parsePreEscape(char rune) {
 }
 
 // Reset our instruction buffer & add to our instruction list
-func (e *escapeCode) endOfInstruction() {
-	e.instructions = append(e.instructions, string(e.nextInstruction))
-	e.nextInstruction = []rune{}
-}
-
-// First instruction for this escape code, if we have one.
-func (e *escapeCode) firstInstruction() string {
-	if len(e.instructions) == 0 {
-		return ""
-	}
-	return e.instructions[0]
+func (p *parser) endOfInstruction() {
+	instruction := string(p.ansi[p.instructionStartedAt:p.cursor])
+	p.instructions = append(p.instructions, instruction)
 }

@@ -149,8 +149,7 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 func (s *screen) parse(ansi []byte) {
 	s.style = &emptyStyle
 
-	p := parser{screen: s}
-	p.parse(ansi)
+	parseANSIToScreen(s, ansi)
 }
 
 func (s *screen) asHTML() []byte {
