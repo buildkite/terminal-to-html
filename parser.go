@@ -10,8 +10,9 @@ type escapeCode struct {
 }
 
 const (
-	MODE_NORMAL = iota
-	MODE_ESCAPE = iota
+	MODE_NORMAL     = iota
+	MODE_PRE_ESCAPE = iota
+	MODE_ESCAPE     = iota
 )
 
 // Stateful ANSI parser
@@ -26,8 +27,13 @@ func (p *parser) parse(ansi []byte) {
 	for _, char := range string(ansi) {
 		switch p.mode {
 		case MODE_ESCAPE:
+			// We're inside an escape code - figure out its code and its instructions.
 			p.parseEscape(char)
+		case MODE_PRE_ESCAPE:
+			// We've received an escape character but aren't inside an escape sequence yet
+			p.parsePreEscape(char)
 		case MODE_NORMAL:
+			// Outside of an escape sequence entirely, normal input
 			p.parseNormal(char)
 		}
 	}
@@ -35,14 +41,6 @@ func (p *parser) parse(ansi []byte) {
 
 func (p *parser) parseEscape(char rune) {
 	p.escape.buffer = append(p.escape.buffer, char)
-
-	if len(p.escape.buffer) == 2 {
-		// Expect our second character to be [, abort otherwise
-		if char != '[' {
-			p.abortEscape()
-		}
-		return
-	}
 
 	char = unicode.ToUpper(char)
 	switch char {
@@ -56,14 +54,10 @@ func (p *parser) parseEscape(char rune) {
 		p.mode = MODE_NORMAL
 	default:
 		// unrecognized character, abort the escapeCode
-		p.abortEscape()
+		p.screen.appendMany([]rune{'\x1b', '['})
+		p.screen.appendMany(p.escape.buffer)
+		p.mode = MODE_NORMAL
 	}
-}
-
-// Abort an escape code, blat what we have back to the screen
-func (p *parser) abortEscape() {
-	p.screen.appendMany(p.escape.buffer)
-	p.mode = MODE_NORMAL
 }
 
 func (p *parser) parseNormal(char rune) {
@@ -78,10 +72,21 @@ func (p *parser) parseNormal(char rune) {
 			p.screen.x--
 		}
 	case '\x1b':
-		p.escape = escapeCode{buffer: []rune{char}}
-		p.mode = MODE_ESCAPE
+		p.mode = MODE_PRE_ESCAPE
 	default:
 		p.screen.append(char)
+	}
+}
+
+func (p *parser) parsePreEscape(char rune) {
+	if char == '[' {
+		p.escape = escapeCode{}
+		p.mode = MODE_ESCAPE
+	} else {
+		// Not an escape code, false alarm
+		p.screen.append('\x1b')
+		p.parseNormal(char)
+		p.mode = MODE_NORMAL
 	}
 }
 
