@@ -4,7 +4,6 @@ import (
 	"math"
 	"strconv"
 	"strings"
-	"unicode"
 )
 
 // A terminal 'screen'. Current cursor position, cursor style, and characters
@@ -13,14 +12,6 @@ type screen struct {
 	y      int
 	screen [][]node
 	style  *style
-}
-
-// Stateful container object for capturing escape codes
-type escapeCode struct {
-	instructions    []string
-	buffer          []rune
-	nextInstruction []rune
-	code            rune
 }
 
 const screenEndOfLine = -1
@@ -123,14 +114,19 @@ func (s *screen) color(i []string) {
 }
 
 // Apply an escape sequence to the screen
-func (s *screen) applyEscape(e escapeCode) {
-	switch e.code {
+func (s *screen) applyEscape(code rune, instructions []string) {
+	if len(instructions) == 0 {
+		// Ensure we always have a first instruction
+		instructions = []string{""}
+	}
+
+	switch code {
 	case 'M':
-		s.color(e.instructions)
+		s.color(instructions)
 	case 'G':
 		s.x = 0
 	case 'K':
-		switch e.firstInstruction() {
+		switch instructions[0] {
 		case "0", "":
 			s.clear(s.y, s.x, screenEndOfLine)
 		case "1":
@@ -139,83 +135,21 @@ func (s *screen) applyEscape(e escapeCode) {
 			s.clear(s.y, screenStartOfLine, screenEndOfLine)
 		}
 	case 'A':
-		s.up(e.firstInstruction())
+		s.up(instructions[0])
 	case 'B':
-		s.down(e.firstInstruction())
+		s.down(instructions[0])
 	case 'C':
-		s.forward(e.firstInstruction())
+		s.forward(instructions[0])
 	case 'D':
-		s.backward(e.firstInstruction())
+		s.backward(instructions[0])
 	}
 }
 
-// Reset our instruction buffer & add to our instruction list
-func (e *escapeCode) endOfInstruction() {
-	e.instructions = append(e.instructions, string(e.nextInstruction))
-	e.nextInstruction = []rune{}
-}
-
-// First instruction for this escape code, if we have one.
-func (e *escapeCode) firstInstruction() string {
-	if len(e.instructions) == 0 {
-		return ""
-	}
-	return e.instructions[0]
-}
-
-// Accept ANSI input and turn in to a series of nodes on our screen.
-func (s *screen) render(input []byte) {
+// Parse ANSI input, populate our screen buffer with nodes
+func (s *screen) parse(ansi []byte) {
 	s.style = &emptyStyle
-	insideEscapeCode := false
-	var escape escapeCode
 
-	// TODO: Ugh.
-	for _, char := range string(input) {
-		if insideEscapeCode {
-			escape.buffer = append(escape.buffer, char)
-			if len(escape.buffer) == 2 {
-				if char != '[' {
-					// Not really an escape code, abort
-					s.appendMany(escape.buffer)
-					insideEscapeCode = false
-				}
-			} else {
-				char = unicode.ToUpper(char)
-				switch char {
-				case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-					escape.nextInstruction = append(escape.nextInstruction, char)
-				case ';':
-					escape.endOfInstruction()
-				case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
-					escape.code = char
-					escape.endOfInstruction()
-					s.applyEscape(escape)
-					insideEscapeCode = false
-				default:
-					// abort the escapeCode
-					s.appendMany(escape.buffer)
-					insideEscapeCode = false
-				}
-			}
-		} else {
-			switch char {
-			case '\n':
-				s.x = 0
-				s.y++
-			case '\r':
-				s.x = 0
-			case '\b':
-				if s.x > 0 {
-					s.x--
-				}
-			case '\x1b':
-				escape = escapeCode{buffer: []rune{char}}
-				insideEscapeCode = true
-			default:
-				s.append(char)
-			}
-		}
-	}
+	parseANSIToScreen(s, ansi)
 }
 
 func (s *screen) asHTML() []byte {
@@ -226,4 +160,19 @@ func (s *screen) asHTML() []byte {
 	}
 
 	return []byte(strings.Join(lines, "\n"))
+}
+
+func (s *screen) newLine() {
+	s.x = 0
+	s.y++
+}
+
+func (s *screen) carriageReturn() {
+	s.x = 0
+}
+
+func (s *screen) backspace() {
+	if s.x > 0 {
+		s.x--
+	}
 }
