@@ -114,14 +114,19 @@ func (s *screen) color(i []string) {
 }
 
 // Apply an escape sequence to the screen
-func (s *screen) applyEscape(e escapeCode) {
-	switch e.code {
+func (s *screen) applyEscape(code rune, instructions []string) {
+	if len(instructions) == 0 {
+		// Ensure we always have a first instruction
+		instructions = []string{""}
+	}
+
+	switch code {
 	case 'M':
-		s.color(e.instructions)
+		s.color(instructions)
 	case 'G':
 		s.x = 0
 	case 'K':
-		switch e.firstInstruction() {
+		switch instructions[0] {
 		case "0", "":
 			s.clear(s.y, s.x, screenEndOfLine)
 		case "1":
@@ -130,13 +135,13 @@ func (s *screen) applyEscape(e escapeCode) {
 			s.clear(s.y, screenStartOfLine, screenEndOfLine)
 		}
 	case 'A':
-		s.up(e.firstInstruction())
+		s.up(instructions[0])
 	case 'B':
-		s.down(e.firstInstruction())
+		s.down(instructions[0])
 	case 'C':
-		s.forward(e.firstInstruction())
+		s.forward(instructions[0])
 	case 'D':
-		s.backward(e.firstInstruction())
+		s.backward(instructions[0])
 	}
 }
 
@@ -144,7 +149,7 @@ func (s *screen) applyEscape(e escapeCode) {
 func (s *screen) parse(ansi []byte) {
 	s.style = &emptyStyle
 
-	p := newParser(s)
+	p := parser{screen: s}
 	p.parse(ansi)
 }
 

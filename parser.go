@@ -21,14 +21,8 @@ type parser struct {
 	screen *screen
 }
 
-func newParser(s *screen) parser {
-	return parser{
-		mode:   MODE_NORMAL,
-		screen: s,
-	}
-}
-
 func (p *parser) parse(ansi []byte) {
+	p.mode = MODE_NORMAL
 	for _, char := range string(ansi) {
 		switch p.mode {
 		case MODE_ESCAPE:
@@ -57,7 +51,7 @@ func (p *parser) parseEscape(char rune) {
 		case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
 			p.escape.code = char
 			p.escape.endOfInstruction()
-			p.screen.applyEscape(p.escape)
+			p.screen.applyEscape(char, p.escape.instructions)
 			p.mode = MODE_NORMAL
 		default:
 			// abort the escapeCode
