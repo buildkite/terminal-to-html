@@ -163,58 +163,84 @@ func (e *escapeCode) firstInstruction() string {
 	return e.instructions[0]
 }
 
-// Accept ANSI input and turn in to a series of nodes on our screen.
-func (s *screen) render(input []byte) {
-	s.style = &emptyStyle
-	insideEscapeCode := false
-	var escape escapeCode
+const (
+	MODE_NORMAL = iota
+	MODE_ESCAPE = iota
+)
 
-	// TODO: Ugh.
-	for _, char := range string(input) {
-		if insideEscapeCode {
-			escape.buffer = append(escape.buffer, char)
-			if len(escape.buffer) == 2 {
-				if char != '[' {
-					// Not really an escape code, abort
-					s.appendMany(escape.buffer)
-					insideEscapeCode = false
-				}
-			} else {
-				char = unicode.ToUpper(char)
-				switch char {
-				case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-					escape.nextInstruction = append(escape.nextInstruction, char)
-				case ';':
-					escape.endOfInstruction()
-				case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
-					escape.code = char
-					escape.endOfInstruction()
-					s.applyEscape(escape)
-					insideEscapeCode = false
-				default:
-					// abort the escapeCode
-					s.appendMany(escape.buffer)
-					insideEscapeCode = false
-				}
-			}
-		} else {
-			switch char {
-			case '\n':
-				s.x = 0
-				s.y++
-			case '\r':
-				s.x = 0
-			case '\b':
-				if s.x > 0 {
-					s.x--
-				}
-			case '\x1b':
-				escape = escapeCode{buffer: []rune{char}}
-				insideEscapeCode = true
-			default:
-				s.append(char)
-			}
+type parser struct {
+	mode   int
+	escape escapeCode
+	screen *screen
+}
+
+func newParser(s *screen) parser {
+	return parser{
+		mode:   MODE_NORMAL,
+		screen: s,
+	}
+}
+
+// Parse ANSI input, populate our screen buffer with nodes
+func (s *screen) parse(ansi []byte) {
+	s.style = &emptyStyle
+
+	p := newParser(s)
+
+	for _, char := range string(ansi) {
+		switch p.mode {
+		case MODE_ESCAPE:
+			p.parseEscape(char)
+		case MODE_NORMAL:
+			p.parseNormal(char)
 		}
+	}
+}
+
+func (p *parser) parseEscape(char rune) {
+	p.escape.buffer = append(p.escape.buffer, char)
+	if len(p.escape.buffer) == 2 {
+		if char != '[' {
+			// Not really an escape code, abort
+			p.screen.appendMany(p.escape.buffer)
+			p.mode = MODE_NORMAL
+		}
+	} else {
+		char = unicode.ToUpper(char)
+		switch char {
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			p.escape.nextInstruction = append(p.escape.nextInstruction, char)
+		case ';':
+			p.escape.endOfInstruction()
+		case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
+			p.escape.code = char
+			p.escape.endOfInstruction()
+			p.screen.applyEscape(p.escape)
+			p.mode = MODE_NORMAL
+		default:
+			// abort the escapeCode
+			p.screen.appendMany(p.escape.buffer)
+			p.mode = MODE_NORMAL
+		}
+	}
+}
+
+func (p *parser) parseNormal(char rune) {
+	switch char {
+	case '\n':
+		p.screen.x = 0
+		p.screen.y++
+	case '\r':
+		p.screen.x = 0
+	case '\b':
+		if p.screen.x > 0 {
+			p.screen.x--
+		}
+	case '\x1b':
+		p.escape = escapeCode{buffer: []rune{char}}
+		p.mode = MODE_ESCAPE
+	default:
+		p.screen.append(char)
 	}
 }
 

@@ -15,7 +15,7 @@ import "bytes"
 // Render converts ANSI to HTML and returns the result.
 func Render(input []byte) []byte {
 	screen := screen{}
-	screen.render(input)
+	screen.parse(input)
 	output := bytes.Replace(screen.asHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
 	return output
 }
