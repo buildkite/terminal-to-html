@@ -161,3 +161,18 @@ func (s *screen) asHTML() []byte {
 
 	return []byte(strings.Join(lines, "\n"))
 }
+
+func (s *screen) newLine() {
+	s.x = 0
+	s.y++
+}
+
+func (s *screen) carriageReturn() {
+	s.x = 0
+}
+
+func (s *screen) backspace() {
+	if s.x > 0 {
+		s.x--
+	}
+}

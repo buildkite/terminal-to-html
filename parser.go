@@ -51,10 +51,10 @@ func (p *parser) parseEscape(char rune) {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		// Part of an instruction
 	case ';':
-		p.endOfInstruction()
+		p.addInstruction()
 		p.instructionStartedAt = p.cursor + utf8.RuneLen(';')
 	case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
-		p.endOfInstruction()
+		p.addInstruction()
 		p.screen.applyEscape(char, p.instructions)
 		p.mode = MODE_NORMAL
 	default:
@@ -67,14 +67,11 @@ func (p *parser) parseEscape(char rune) {
 func (p *parser) parseNormal(char rune) {
 	switch char {
 	case '\n':
-		p.screen.x = 0
-		p.screen.y++
+		p.screen.newLine()
 	case '\r':
-		p.screen.x = 0
+		p.screen.carriageReturn()
 	case '\b':
-		if p.screen.x > 0 {
-			p.screen.x--
-		}
+		p.screen.backspace()
 	case '\x1b':
 		p.escapeStartedAt = p.cursor
 		p.mode = MODE_PRE_ESCAPE
@@ -96,8 +93,7 @@ func (p *parser) parsePreEscape(char rune) {
 	}
 }
 
-// Reset our instruction buffer & add to our instruction list
-func (p *parser) endOfInstruction() {
+func (p *parser) addInstruction() {
 	instruction := string(p.ansi[p.instructionStartedAt:p.cursor])
 	p.instructions = append(p.instructions, instruction)
 }
