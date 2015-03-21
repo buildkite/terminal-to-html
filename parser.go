@@ -1,12 +1,14 @@
 package terminal
 
-import "unicode"
+import (
+	"unicode"
+	"unicode/utf8"
+)
 
 // Stateful container object for capturing escape codes
 type escapeCode struct {
 	nextInstruction []rune
 	instructions    []string
-	buffer          []rune
 }
 
 const (
@@ -17,14 +19,19 @@ const (
 
 // Stateful ANSI parser
 type parser struct {
-	mode   int
-	escape escapeCode
-	screen *screen
+	mode            int
+	escape          escapeCode
+	screen          *screen
+	cursor          int
+	escapeStartedAt int
 }
 
 func (p *parser) parse(ansi []byte) {
 	p.mode = MODE_NORMAL
-	for _, char := range string(ansi) {
+	length := len(ansi)
+	for p.cursor = 0; p.cursor < length; {
+		char, i := utf8.DecodeRune(ansi[p.cursor:])
+		p.cursor += i
 		switch p.mode {
 		case MODE_ESCAPE:
 			// We're inside an escape code - figure out its code and its instructions.
@@ -40,8 +47,6 @@ func (p *parser) parse(ansi []byte) {
 }
 
 func (p *parser) parseEscape(char rune) {
-	p.escape.buffer = append(p.escape.buffer, char)
-
 	char = unicode.ToUpper(char)
 	switch char {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
@@ -54,8 +59,7 @@ func (p *parser) parseEscape(char rune) {
 		p.mode = MODE_NORMAL
 	default:
 		// unrecognized character, abort the escapeCode
-		p.screen.appendMany([]rune{'\x1b', '['})
-		p.screen.appendMany(p.escape.buffer)
+		p.cursor = p.escapeStartedAt
 		p.mode = MODE_NORMAL
 	}
 }
@@ -72,6 +76,7 @@ func (p *parser) parseNormal(char rune) {
 			p.screen.x--
 		}
 	case '\x1b':
+		p.escapeStartedAt = p.cursor
 		p.mode = MODE_PRE_ESCAPE
 	default:
 		p.screen.append(char)
@@ -84,8 +89,7 @@ func (p *parser) parsePreEscape(char rune) {
 		p.mode = MODE_ESCAPE
 	} else {
 		// Not an escape code, false alarm
-		p.screen.append('\x1b')
-		p.parseNormal(char)
+		p.cursor = p.escapeStartedAt
 		p.mode = MODE_NORMAL
 	}
 }

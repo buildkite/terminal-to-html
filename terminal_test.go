@@ -142,7 +142,7 @@ var rendererTestCases = []struct {
 	}, {
 		`escapes HTML in color codes`,
 		"hello \x1b[\"hellomfriend",
-		"hello \x1b[&quot;hellomfriend",
+		"hello [&quot;hellomfriend",
 	}, {
 		`handles background colors`,
 		"\x1b[30;42m\x1b[2KOK (244 tests, 558 assertions)",
@@ -152,9 +152,9 @@ var rendererTestCases = []struct {
 		"\x1b[38;5;169mhello\x1b[0m \x1b[38;5;179mgoodbye",
 		"<span class=\"term-fgx169\">hello</span> <span class=\"term-fgx179\">goodbye</span>",
 	}, {
-		`ignores broken escape characters`,
+		`ignores broken escape characters, stripping the escape rune itself`,
 		"hi amazing \x1b[12 nom nom nom friends",
-		"hi amazing \x1b[12 nom nom nom friends",
+		"hi amazing [12 nom nom nom friends",
 	}, {
 		`handles colors with 3 attributes`,
 		"\x1b[0;10;4m\x1b[1m\x1b[34mgood news\x1b[0;10m\n\neveryone",
