@@ -84,11 +84,12 @@ func (p *parser) parseNormal(char rune) {
 }
 
 func (p *parser) parsePreEscape(char rune) {
-	if char == '[' {
+	switch char {
+	case '[':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.instructions = make([]string, 0, 1)
 		p.mode = MODE_ESCAPE
-	} else {
+	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
 		p.mode = MODE_NORMAL
