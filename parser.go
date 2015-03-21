@@ -4,10 +4,9 @@ import "unicode"
 
 // Stateful container object for capturing escape codes
 type escapeCode struct {
+	nextInstruction []rune
 	instructions    []string
 	buffer          []rune
-	nextInstruction []rune
-	code            rune
 }
 
 const (
@@ -15,6 +14,7 @@ const (
 	MODE_ESCAPE = iota
 )
 
+// Stateful ANSI parser
 type parser struct {
 	mode   int
 	escape escapeCode
@@ -35,30 +35,35 @@ func (p *parser) parse(ansi []byte) {
 
 func (p *parser) parseEscape(char rune) {
 	p.escape.buffer = append(p.escape.buffer, char)
+
 	if len(p.escape.buffer) == 2 {
+		// Expect our second character to be [, abort otherwise
 		if char != '[' {
-			// Not really an escape code, abort
-			p.screen.appendMany(p.escape.buffer)
-			p.mode = MODE_NORMAL
+			p.abortEscape()
 		}
-	} else {
-		char = unicode.ToUpper(char)
-		switch char {
-		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			p.escape.nextInstruction = append(p.escape.nextInstruction, char)
-		case ';':
-			p.escape.endOfInstruction()
-		case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
-			p.escape.code = char
-			p.escape.endOfInstruction()
-			p.screen.applyEscape(char, p.escape.instructions)
-			p.mode = MODE_NORMAL
-		default:
-			// abort the escapeCode
-			p.screen.appendMany(p.escape.buffer)
-			p.mode = MODE_NORMAL
-		}
+		return
 	}
+
+	char = unicode.ToUpper(char)
+	switch char {
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		p.escape.nextInstruction = append(p.escape.nextInstruction, char)
+	case ';':
+		p.escape.endOfInstruction()
+	case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
+		p.escape.endOfInstruction()
+		p.screen.applyEscape(char, p.escape.instructions)
+		p.mode = MODE_NORMAL
+	default:
+		// unrecognized character, abort the escapeCode
+		p.abortEscape()
+	}
+}
+
+// Abort an escape code, blat what we have back to the screen
+func (p *parser) abortEscape() {
+	p.screen.appendMany(p.escape.buffer)
+	p.mode = MODE_NORMAL
 }
 
 func (p *parser) parseNormal(char rune) {
