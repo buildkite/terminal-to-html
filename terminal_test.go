@@ -186,9 +186,9 @@ var rendererTestCases = []struct {
 		"\x1b[2mbegin\x1b[22m\r\nend",
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
-		`renders simple iTerm2 images`, // http://iterm2.com/images.html
-		"\x1b]1337;File=name=1.gif;inline=1:" + Base64Image,
-		"\n" + `<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">` + "\n",
+		`renders simple iTerm2 images on their own line`, // http://iterm2.com/images.html
+		"\x1b]1337;File=name=1.gif;inline=1:" + Base64Image + "\ahello",
+		"\n" + `<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">` + "\nhello",
 	},
 }
 
