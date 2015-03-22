@@ -196,7 +196,7 @@ var rendererTestCases = []struct {
 	}, {
 		`prints on error on malformed iTerm2 image codes`,
 		"\x1b]1337;;;;\a",
-		"*** Error parsing iTerm2 image escape sequence: Expected sequence to start with 1337;File=, got &quot;1337;;;;&quot; instead",
+		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File=, got &quot;1337;;;;&quot; instead",
 	},
 }
 

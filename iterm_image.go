@@ -3,6 +3,7 @@ package terminal
 import (
 	"encoding/base64"
 	"fmt"
+	"mime"
 	"strings"
 )
 
@@ -28,20 +29,20 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 		if len(sequence) > prefixLen {
 			sequence = sequence[:prefixLen] // Don't blow out our error output
 		}
-		return nil, fmt.Errorf("Expected sequence to start with 1337;File=, got %q instead", sequence)
+		return nil, fmt.Errorf("expected sequence to start with 1337;File=, got %q instead", sequence)
 	}
 	sequence = sequence[prefixLen:]
 
 	parts := strings.Split(sequence, ":")
 	if len(parts) != 2 {
-		return nil, fmt.Errorf("Expected sequence to have one arguments part and one content part, got %d parts", len(parts))
+		return nil, fmt.Errorf("expected sequence to have one arguments part and one content part, got %d part(s)", len(parts))
 	}
 	arguments := parts[0]
 	content := parts[1]
 
 	_, err := base64.StdEncoding.DecodeString(content)
 	if err != nil {
-		return nil, fmt.Errorf("Expected content part to be valid Base64")
+		return nil, fmt.Errorf("expected content part to be valid Base64")
 	}
 
 	img := &itermImage{content: content}
@@ -65,6 +66,9 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 	if img.alt == "" {
 		return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
 	}
+	if img.content_type == "" {
+		return nil, fmt.Errorf("can't determine content type for %q", img.alt)
+	}
 
 	if !imageInline {
 		// in iTerm2, if you don't specify inline=1, the image is merely downloaded
@@ -75,5 +79,9 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 }
 
 func contentTypeForFile(filename string) string {
-	return "image/gif"
+	dot := strings.LastIndex(filename, ".")
+	if dot == -1 {
+		return ""
+	}
+	return mime.TypeByExtension(filename[dot:])
 }
