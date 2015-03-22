@@ -190,7 +190,7 @@ var rendererTestCases = []struct {
 		"hi\x1b]1337;File=name=1.gif;inline=1:" + Base64Image + "\ahello",
 		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">` + "\nhello",
 	}, {
-		`does not start a new line for iterm images if we're already at the start of a line`, // http://iterm2.com/images.html
+		`does not start a new line for iterm images if we're already at the start of a line`,
 		"\x1b]1337;File=name=1.gif;inline=1:" + Base64Image + "\a",
 		`<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">`,
 	}, {

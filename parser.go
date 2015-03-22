@@ -94,10 +94,14 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 
 	imageInline := false
 
+	prefixLen := len("1337;File=")
 	if !strings.HasPrefix(sequence, "1337;File=") {
+		if len(sequence) > prefixLen {
+			sequence = sequence[:prefixLen] // Don't blow out our error output
+		}
 		return nil, fmt.Errorf("Expected sequence to start with 1337;File=, got %q instead", sequence)
 	}
-	sequence = sequence[10:]
+	sequence = sequence[prefixLen:]
 
 	parts := strings.Split(sequence, ":")
 	if len(parts) != 2 {
