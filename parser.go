@@ -53,9 +53,15 @@ func (p *parser) handleItermEscape(char rune) {
 	if char != '\a' {
 		return
 	}
+	p.mode = MODE_NORMAL
 
 	// Bell received, stop parsing our potential image
 	itermImage, err := parseItermImageSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
+
+	if itermImage == nil && err == nil {
+		// No image & no error, nothing to render
+		return
+	}
 
 	// Images (or the error encountered) should appear on their own line
 	if p.screen.x != 0 {
@@ -71,7 +77,6 @@ func (p *parser) handleItermEscape(char rune) {
 	}
 	p.screen.newLine()
 
-	p.mode = MODE_NORMAL
 }
 
 func (p *parser) handleEscape(char rune) {
