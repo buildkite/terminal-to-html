@@ -16,7 +16,17 @@ type itermImage struct {
 }
 
 func (i *itermImage) asHTML() string {
-	return fmt.Sprintf(`<img alt=%q src="data:%s;base64,%s">`, i.alt, i.content_type, i.content)
+	parts := []string{
+		fmt.Sprintf(`alt="%s"`, i.alt),
+		fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content),
+	}
+	if i.width != "" {
+		parts = append(parts, fmt.Sprintf(`width="%s"`, i.width))
+	}
+	if i.height != "" {
+		parts = append(parts, fmt.Sprintf(`height="%s"`, i.height))
+	}
+	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
 
 func parseItermImageSequence(sequence string) (*itermImage, error) {
@@ -39,11 +49,24 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 	}
 	arguments := parts[0]
 	content := parts[1]
+	if len(content) == 0 {
+		return nil, fmt.Errorf("image content missing")
+	}
 
 	_, err := base64.StdEncoding.DecodeString(content)
 	if err != nil {
 		return nil, fmt.Errorf("expected content part to be valid Base64")
 	}
+
+	stripper := func(r rune) rune {
+		switch r {
+		case '<', '>', '\'', '"':
+			return -1
+		default:
+			return r
+		}
+	}
+	arguments = strings.Map(stripper, arguments)
 
 	img := &itermImage{content: content}
 	argsSplit := strings.Split(arguments, ";")
@@ -60,6 +83,10 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 			img.content_type = contentTypeForFile(val)
 		case "inline":
 			imageInline = val == "1"
+		case "width":
+			img.width = val
+		case "height":
+			img.height = val
 		}
 	}
 

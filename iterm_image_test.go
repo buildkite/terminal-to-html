@@ -38,6 +38,10 @@ var errorCases = []struct {
 		`can't determine content type`,
 		"1337;File=name=foo.baz:AA==",
 		`can't determine content type for "foo.baz"`,
+	}, {
+		`no image content`,
+		"1337;File=name=foo.jpg:",
+		`image content missing`,
 	},
 }
 
@@ -58,6 +62,14 @@ var validCases = []struct {
 		`adapts content type based on image name`,
 		"1337;File=name=foo.jpg;inline=1:AA==",
 		&itermImage{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg"},
+	}, {
+		`handles width & height`,
+		"1337;File=name=foo.jpg;width=100%;height=50px;inline=1:AA==",
+		&itermImage{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "100%", height: "50px"},
+	}, {
+		`protects against XSS in image name, width & height by stripping brackets & quotes`,
+		`1337;File=name=foo<.gif;width="100%;height='50px>;inline=1:AA==`,
+		&itermImage{alt: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px"},
 	},
 }
 
