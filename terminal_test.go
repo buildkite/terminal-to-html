@@ -187,8 +187,16 @@ var rendererTestCases = []struct {
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
 		`renders simple iTerm2 images on their own line`, // http://iterm2.com/images.html
-		"\x1b]1337;File=name=1.gif;inline=1:" + Base64Image + "\ahello",
-		"\n" + `<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">` + "\nhello",
+		"hi\x1b]1337;File=name=1.gif;inline=1:" + Base64Image + "\ahello",
+		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">` + "\nhello",
+	}, {
+		`does not start a new line for iterm images if we're already at the start of a line`, // http://iterm2.com/images.html
+		"\x1b]1337;File=name=1.gif;inline=1:" + Base64Image + "\a",
+		`<img alt="1.gif" src="data:image/gif;base64,` + Base64Image + `">`,
+	}, {
+		`prints on error on malformed iTerm2 image codes`,
+		"\x1b]1337;;;;\a",
+		"*** Error parsing iTerm2 image escape sequence: Expected sequence to start with 1337;File=, got &quot;1337;;;;&quot; instead",
 	},
 }
 

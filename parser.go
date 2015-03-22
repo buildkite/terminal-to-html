@@ -61,7 +61,9 @@ func (p *parser) parseItermEscape(char rune) {
 	itermImage, err := parseItermImageSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
 
 	// Images (or the error encountered) should appear on their own line
-	p.screen.newLine()
+	if p.screen.x != 0 {
+		p.screen.newLine()
+	}
 	p.screen.clear(p.screen.y, screenStartOfLine, screenEndOfLine)
 
 	if err != nil {
@@ -93,7 +95,7 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 	imageInline := false
 
 	if !strings.HasPrefix(sequence, "1337;File=") {
-		return nil, fmt.Errorf("Expected sequence to start with 1337;File=, got %q instead", sequence[:10])
+		return nil, fmt.Errorf("Expected sequence to start with 1337;File=, got %q instead", sequence)
 	}
 	sequence = sequence[10:]
 
