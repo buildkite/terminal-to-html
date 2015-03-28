@@ -84,9 +84,9 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 		case "inline":
 			imageInline = val == "1"
 		case "width":
-			img.width = val
+			img.width = parseImageDimension(val)
 		case "height":
-			img.height = val
+			img.height = parseImageDimension(val)
 		}
 	}
 
@@ -111,4 +111,13 @@ func contentTypeForFile(filename string) string {
 		return ""
 	}
 	return mime.TypeByExtension(filename[dot:])
+}
+
+func parseImageDimension(s string) string {
+	s = strings.ToLower(s)
+	if !strings.HasSuffix(s, "px") && !strings.HasSuffix(s, "%") {
+		return s + "em"
+	} else {
+		return s
+	}
 }
