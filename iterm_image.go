@@ -32,45 +32,16 @@ func (i *itermImage) asHTML() string {
 func parseItermImageSequence(sequence string) (*itermImage, error) {
 	// Expect 1337;File=name=1.gif;inline=1:BASE64
 
+	arguments, content, err := splitAndVerifyImageSequence(sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	arguments = strings.Map(htmlStripper, arguments)
 	imageInline := false
 
-	prefixLen := len("1337;File=")
-	if !strings.HasPrefix(sequence, "1337;File=") {
-		if len(sequence) > prefixLen {
-			sequence = sequence[:prefixLen] // Don't blow out our error output
-		}
-		return nil, fmt.Errorf("expected sequence to start with 1337;File=, got %q instead", sequence)
-	}
-	sequence = sequence[prefixLen:]
-
-	parts := strings.Split(sequence, ":")
-	if len(parts) != 2 {
-		return nil, fmt.Errorf("expected sequence to have one arguments part and one content part, got %d part(s)", len(parts))
-	}
-	arguments := parts[0]
-	content := parts[1]
-	if len(content) == 0 {
-		return nil, fmt.Errorf("image content missing")
-	}
-
-	_, err := base64.StdEncoding.DecodeString(content)
-	if err != nil {
-		return nil, fmt.Errorf("expected content part to be valid Base64")
-	}
-
-	stripper := func(r rune) rune {
-		switch r {
-		case '<', '>', '\'', '"':
-			return -1
-		default:
-			return r
-		}
-	}
-	arguments = strings.Map(stripper, arguments)
-
 	img := &itermImage{content: content}
-	argsSplit := strings.Split(arguments, ";")
-	for _, arg := range argsSplit {
+	for _, arg := range strings.Split(arguments, ";") {
 		argParts := strings.SplitN(arg, "=", 2)
 		if len(argParts) != 2 {
 			continue
@@ -120,4 +91,42 @@ func parseImageDimension(s string) string {
 	} else {
 		return s
 	}
+}
+
+func htmlStripper(r rune) rune {
+	switch r {
+	case '<', '>', '\'', '"':
+		return -1
+	default:
+		return r
+	}
+}
+
+func splitAndVerifyImageSequence(s string) (arguments string, content string, err error) {
+	prefixLen := len("1337;File=")
+	if !strings.HasPrefix(s, "1337;File=") {
+		if len(s) > prefixLen {
+			s = s[:prefixLen] // Don't blow out our error output
+		}
+		return "", "", fmt.Errorf("expected sequence to start with 1337;File=, got %q instead", s)
+	}
+	s = s[prefixLen:]
+
+	parts := strings.Split(s, ":")
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("expected sequence to have one arguments part and one content part, got %d part(s)", len(parts))
+	}
+
+	arguments = parts[0]
+	content = parts[1]
+	if len(content) == 0 {
+		return "", "", fmt.Errorf("image content missing")
+	}
+
+	_, err = base64.StdEncoding.DecodeString(content)
+	if err != nil {
+		return "", "", fmt.Errorf("expected content part to be valid Base64")
+	}
+
+	return
 }
