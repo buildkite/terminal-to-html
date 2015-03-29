@@ -11,7 +11,6 @@ import (
 
 	"github.com/buildkite/terminal"
 	"github.com/codegangsta/cli"
-	_ "github.com/jteeuwen/go-bindata"
 )
 
 var AppHelpTemplate = `{{.Name}} - {{.Usage}}
