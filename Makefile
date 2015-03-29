@@ -15,7 +15,7 @@ clean:
 	rm -rf pkg
 
 cmd/terminal-to-html/_bindata.go: assets/terminal.css
-	go-bindata -o cmd/terminal-to-html/_bindata.go -nomemcopy assets
+	go-bindata -o cmd/terminal-to-html/bindata.go -nomemcopy assets
 
 terminal-to-html: $(DEPS)
 	godep go build -o terminal-to-html cmd/terminal-to-html/*
