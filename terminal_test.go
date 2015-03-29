@@ -14,8 +14,6 @@ var TestFiles = []string{
 	"npm.sh",
 }
 
-const Base64Image = "R0lGODlhAQABAHAAACH5BAUKAAAALAAAAAABAAEAAAICRAEAOw=="
-
 func loadFixture(base string, ext string) []byte {
 	filename := fmt.Sprintf("fixtures/%s.%s", base, ext)
 	data, err := ioutil.ReadFile(filename)
