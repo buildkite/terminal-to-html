@@ -31,14 +31,16 @@ OPTIONS:
 var PreviewMode = false
 
 var PreviewTemplate = `
+	<!DOCTYPE html>
 	<html>
-	<head>
-		<title>terminal-to-html Preview</title>
-		<style>STYLESHEET</style>
-	</head>
-	<body>
-		<div class="term-container">CONTENT</div>
-	</body>
+		<head>
+			<title>terminal-to-html Preview</title>
+			<style>STYLESHEET</style>
+		</head>
+		<body>
+			<div class="term-container">CONTENT</div>
+		</body>
+	</html>
 `
 
 func check(m string, e error) {
@@ -48,12 +50,10 @@ func check(m string, e error) {
 }
 
 func wrapPreview(s []byte) []byte {
-	if !PreviewMode {
-		return s
+	if PreviewMode {
+		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
+		s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
 	}
-
-	s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
-	s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
 	return s
 }
 
@@ -96,7 +96,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:  "preview",
-			Usage: "Wrap output suitable for previewing directly in the browser",
+			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
 	}
 	app.Action = func(c *cli.Context) {
