@@ -183,6 +183,22 @@ var rendererTestCases = []struct {
 		`ends decreased intensity with \x1b[22`,
 		"\x1b[2mbegin\x1b[22m\r\nend",
 		"<span class=\"term-fg2\">begin</span>\nend",
+	}, {
+		`renders simple iTerm2 images on their own line`, // http://iterm2.com/images.html
+		"hi\x1b]1337;File=name=1.gif;inline=1:AA==\ahello",
+		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,AA==">` + "\nhello",
+	}, {
+		`does not start a new line for iterm images if we're already at the start of a line`,
+		"\x1b]1337;File=name=1.gif;inline=1:AA==\a",
+		`<img alt="1.gif" src="data:image/gif;base64,AA==">`,
+	}, {
+		`prints on error on malformed iTerm2 image codes`,
+		"\x1b]1337;;;;\a",
+		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File=, got &quot;1337;;;;&quot; instead",
+	}, {
+		`correctly handles images that we decide not to render`,
+		"hi\x1b]1337;File=name=1.gif;inline=0:AA==\ahello",
+		"hihello",
 	},
 }
 

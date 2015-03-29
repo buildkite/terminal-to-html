@@ -108,6 +108,14 @@ func (s *screen) appendMany(data []rune) {
 	}
 }
 
+func (s *screen) appendImage(i *itermImage) {
+	s.growScreenHeight()
+	line := s.growLineWidth(s.screen[s.y])
+
+	line[s.x] = node{style: s.style, image: i}
+	s.screen[s.y] = line
+}
+
 // Apply color instruction codes to the screen's current style
 func (s *screen) color(i []string) {
 	s.style = s.style.color(i)

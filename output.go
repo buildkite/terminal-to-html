@@ -59,7 +59,11 @@ func outputLineAsHTML(line []node) string {
 				}
 			}
 		}
-		lineBuf.appendChar(node.blob)
+		if node.image != nil {
+			lineBuf.buf.WriteString(node.image.asHTML())
+		} else {
+			lineBuf.appendChar(node.blob)
+		}
 	}
 	for i := 0; i < openStyles; i++ {
 		lineBuf.closeStyle()

@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	MODE_NORMAL     = iota
-	MODE_PRE_ESCAPE = iota
-	MODE_ESCAPE     = iota
+	MODE_NORMAL       = iota
+	MODE_PRE_ESCAPE   = iota
+	MODE_ESCAPE       = iota
+	MODE_ITERM_ESCAPE = iota
 )
 
 // Stateful ANSI parser
@@ -32,20 +33,53 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 		switch p.mode {
 		case MODE_ESCAPE:
 			// We're inside an escape code - figure out its code and its instructions.
-			p.parseEscape(char)
+			p.handleEscape(char)
 		case MODE_PRE_ESCAPE:
 			// We've received an escape character but aren't inside an escape sequence yet
-			p.parsePreEscape(char)
+			p.handlePreEscape(char)
+		case MODE_ITERM_ESCAPE:
+			// We're inside an iTerm escape sequence, capture until we hit a bell character
+			p.handleItermEscape(char)
 		case MODE_NORMAL:
 			// Outside of an escape sequence entirely, normal input
-			p.parseNormal(char)
+			p.handleNormal(char)
 		}
 
 		p.cursor += charLen
 	}
 }
 
-func (p *parser) parseEscape(char rune) {
+func (p *parser) handleItermEscape(char rune) {
+	if char != '\a' {
+		return
+	}
+	p.mode = MODE_NORMAL
+
+	// Bell received, stop parsing our potential image
+	itermImage, err := parseItermImageSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
+
+	if itermImage == nil && err == nil {
+		// No image & no error, nothing to render
+		return
+	}
+
+	// Images (or the error encountered) should appear on their own line
+	if p.screen.x != 0 {
+		p.screen.newLine()
+	}
+	p.screen.clear(p.screen.y, screenStartOfLine, screenEndOfLine)
+
+	if err != nil {
+		p.screen.appendMany([]rune("*** Error parsing iTerm2 image escape sequence: "))
+		p.screen.appendMany([]rune(err.Error()))
+	} else {
+		p.screen.appendImage(itermImage)
+	}
+	p.screen.newLine()
+
+}
+
+func (p *parser) handleEscape(char rune) {
 	char = unicode.ToUpper(char)
 	switch char {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
@@ -64,7 +98,7 @@ func (p *parser) parseEscape(char rune) {
 	}
 }
 
-func (p *parser) parseNormal(char rune) {
+func (p *parser) handleNormal(char rune) {
 	switch char {
 	case '\n':
 		p.screen.newLine()
@@ -80,12 +114,15 @@ func (p *parser) parseNormal(char rune) {
 	}
 }
 
-func (p *parser) parsePreEscape(char rune) {
+func (p *parser) handlePreEscape(char rune) {
 	switch char {
 	case '[':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.instructions = make([]string, 0, 1)
 		p.mode = MODE_ESCAPE
+	case ']':
+		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
+		p.mode = MODE_ITERM_ESCAPE
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
