@@ -74,6 +74,10 @@ var validCases = []struct {
 		`converts width & height without percent or px to em`,
 		"1337;File=name=foo.jpg;width=1;height=5;inline=1:AA==",
 		&itermImage{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "1em", height: "5em"},
+	}, {
+		`malfored arguments are silently ignored`,
+		"1337;File=name=foo.gif;inline=1;sdfsdfs;====ddd;herp=derps:AA==",
+		&itermImage{alt: "foo.gif", content: "AA==", content_type: "image/gif"},
 	},
 }
 
