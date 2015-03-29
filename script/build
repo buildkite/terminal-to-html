@@ -7,19 +7,22 @@ cd pkg
 rm -r * || true
 
 function build-binary {
+  cd ..
   local os=${1}
   local arch=${2}
   local binary=${3}
   local extension=${4:-}
 
   local binary_dir="terminal-to-html-build-$TERMINAL_VERSION-${binary}"
-  mkdir -p $binary_dir
+  mkdir -p pkg/$binary_dir
 
   local binary_path="$binary_dir/terminal-to-html${extension}"
 
-  GOOS=$os GOARCH=$arch godep go build -o $binary_path github.com/buildkite/terminal/cmd/terminal-to-html
+  GOOS=$os GOARCH=$arch make terminal-to-html
+  mv terminal-to-html pkg/$binary_path
 
   chmod +x $binary_path
+  cd pkg
   echo $binary_path
 }
 
