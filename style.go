@@ -7,13 +7,13 @@ var emptyStyle = style{}
 type style struct {
 	fgColor     string
 	bgColor     string
-	otherColors []string
+	otherColors string
 	classes     string
 }
 
 // True if both styles are equal (or are the same object)
 func (s *style) isEqual(o *style) bool {
-	return s == o || s.asClasses() == o.asClasses()
+	return s == o || (s.fgColor == o.fgColor && s.bgColor == o.bgColor && s.otherColors == s.otherColors)
 }
 
 // CSS classes that make up the style
@@ -29,27 +29,28 @@ func (s *style) asClasses() string {
 	if s.bgColor != "" {
 		styles = append(styles, s.bgColor)
 	}
-	styles = append(styles, s.otherColors...)
-	s.classes = strings.Join(styles, " ")
+	if s.otherColors != "" {
+		styles = append(styles, s.otherColors)
+	}
+	s.classes = strings.TrimSpace(strings.Join(styles, " "))
 	return s.classes
 }
 
 // True if style is empty
 func (s *style) isEmpty() bool {
-	return s.fgColor == "" && s.bgColor == "" && len(s.otherColors) == 0
+	return s.fgColor == "" && s.bgColor == "" && s.otherColors == ""
 }
 
 // Remove a particular 'other' colour from our style's colour list
 func (s *style) removeOther(r string) {
-	// Must be a better way ..
-	var removed []string
+	s.otherColors = strings.Replace(s.otherColors, r+" ", "", -1)
+}
 
-	for _, s := range s.otherColors {
-		if s != r {
-			removed = append(removed, s)
-		}
+func (s *style) addOther(r string) {
+	r = r + " "
+	if strings.Index(s.otherColors, r) == -1 {
+		s.otherColors = s.otherColors + r
 	}
-	s.otherColors = removed
 }
 
 // Add colours to an existing style, potentially returning
@@ -118,7 +119,7 @@ func (s *style) color(colors []string) *style {
 			s.fgColor = "term-bgi" + cc
 			// 1-9 random other styles
 		case "1", "2", "3", "4", "5", "6", "7", "8", "9":
-			s.otherColors = append(s.otherColors, "term-fg"+cc)
+			s.addOther("term-fg" + cc)
 		}
 	}
 	return s
