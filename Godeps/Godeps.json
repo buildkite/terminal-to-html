@@ -9,6 +9,11 @@
 			"ImportPath": "github.com/codegangsta/cli",
 			"Comment": "1.2.0-74-g50c77ec",
 			"Rev": "50c77ecec0068c9aef9d90ae0fd0fdf410041da3"
+		},
+		{
+			"ImportPath": "github.com/jteeuwen/go-bindata",
+			"Comment": "v3.0.7-21-g7362d4b",
+			"Rev": "7362d4b6b2ce6a7d3c28b523a6e40629f4d81116"
 		}
 	]
 }
