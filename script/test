@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
 echo "Deprecated, running `make test` for you instead"
-set -e
 make test

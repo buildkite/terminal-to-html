@@ -1,8 +1,9 @@
-.PHONY: clean bench test
+SRC=*.go cmd/terminal-to-html/*.go
+BINARY=terminal-to-html
+BUILDCMD=godep go build -o $@ cmd/terminal-to-html/*
+VERSION=0.0.1
 
-DEPS=*.go cmd/terminal-to-html/*.go
-
-all: test terminal-to-html
+all: test $(BINARY)
 
 bench:
 	godep go test -bench . -benchmem
@@ -11,13 +12,35 @@ test:
 	godep go test
 
 clean:
-	rm -f terminal-to-html
-	rm -rf pkg
+	rm -f $(BINARY)
+	rm -rf dist bin
 
 cmd/terminal-to-html/_bindata.go: assets/terminal.css
 	go-bindata -o cmd/terminal-to-html/bindata.go -nomemcopy assets
 
-terminal-to-html: $(DEPS)
-	godep go build -o terminal-to-html cmd/terminal-to-html/*
+$(BINARY): $(SRC)
+	$(BUILDCMD)
 
+# Cross-compiling
 
+GZ_ARCH     := linux-amd64 linux-386 linux-arm darwin-386 darwin-amd64
+ZIP_ARCH    := windows-386 windows-amd64
+GZ_TARGETS  := $(foreach tar,$(GZ_ARCH), dist/$(BINARY)-$(VERSION)-$(tar).gz)
+ZIP_TARGETS := $(foreach tar,$(ZIP_ARCH), dist/$(BINARY)-$(VERSION)-$(tar).zip)
+
+dist: $(GZ_TARGETS) $(ZIP_TARGETS)
+
+dist/%.gz: bin/%
+	@[ -d dist ] || mkdir dist
+	gzip -c $< > $@
+
+dist/%.zip: bin/%
+	@[ -d dist ] || mkdir dist
+	@rm -f $@ || true
+	zip $@ $<
+
+bin/$(BINARY)-$(VERSION)-%: $(SRC)
+	@[ -d bin ] || mkdir bin
+	GOOS=$(firstword $(subst -, , $*)) GOARCH=$(lastword $(subst -, , $*)) $(BUILDCMD)
+
+.PHONY: clean bench test dist
