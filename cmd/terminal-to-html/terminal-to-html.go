@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -26,17 +27,40 @@ OPTIONS:
   {{end}}
 `
 
+var PreviewMode = false
+
+var PreviewTemplate = `
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>terminal-to-html Preview</title>
+			<style>STYLESHEET</style>
+		</head>
+		<body>
+			<div class="term-container">CONTENT</div>
+		</body>
+	</html>
+`
+
 func check(m string, e error) {
 	if e != nil {
 		log.Fatalf("%s: %v", m, e)
 	}
 }
 
+func wrapPreview(s []byte) []byte {
+	if PreviewMode {
+		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
+		s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
+	}
+	return s
+}
+
 func webservice(listen string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		input, err := ioutil.ReadAll(r.Body)
 		check("could not read from HTTP stream", err)
-		w.Write(terminal.Render(input))
+		w.Write(wrapPreview(terminal.Render(input)))
 	})
 
 	log.Printf("Listening on %s", listen)
@@ -53,7 +77,7 @@ func stdin() {
 		input, err = ioutil.ReadAll(os.Stdin)
 		check("could not read stdin", err)
 	}
-	fmt.Printf("%s", terminal.Render(input))
+	fmt.Printf("%s", wrapPreview(terminal.Render(input)))
 }
 
 func main() {
@@ -69,8 +93,13 @@ func main() {
 			Value: "",
 			Usage: "HTTP service mode (eg --http :6060), endpoint is /terminal",
 		},
+		cli.BoolFlag{
+			Name:  "preview",
+			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
+		},
 	}
 	app.Action = func(c *cli.Context) {
+		PreviewMode = c.Bool("preview")
 		if c.String("http") != "" {
 			webservice(c.String("http"))
 		} else {

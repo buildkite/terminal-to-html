@@ -1,42 +1,4 @@
 #!/usr/bin/env bash
 
-set -eu
-
-mkdir -p pkg
-cd pkg
-rm -r * || true
-
-function build-binary {
-  local os=${1}
-  local arch=${2}
-  local binary=${3}
-  local extension=${4:-}
-
-  local binary_dir="terminal-to-html-build-$TERMINAL_VERSION-${binary}"
-  mkdir -p $binary_dir
-
-  local binary_path="$binary_dir/terminal-to-html${extension}"
-
-  GOOS=$os GOARCH=$arch godep go build -o $binary_path github.com/buildkite/terminal/cmd/terminal-to-html
-
-  chmod +x $binary_path
-  echo $binary_path
-}
-
-function package-gz {
-  tar -pczf "$(dirname $1).tar.gz" $(dirname $1)
-}
-
-function package-zip {
-  zip -r "$(dirname $1).zip" $(dirname $1)
-}
-
-package-gz $(build-binary "linux" "amd64" "linux-amd64")
-package-gz $(build-binary "linux" "386" "linux-intel")
-package-gz $(build-binary "linux" "arm" "linux-arm")
-
-package-zip $(build-binary "darwin" "386" "ox-intel")
-package-zip $(build-binary "darwin" "amd64" "osx-amd64")
-
-package-zip $(build-binary "windows" "386" "windows-intel" ".exe")
-package-zip $(build-binary "windows" "amd64" "windows-amd64" ".exe")
+echo "Deprecated, running 'make dist' for you instead"
+make dist

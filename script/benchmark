@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
-set -e
-
-go test -bench . -benchmem
+echo "Deprecated, running 'make bench' for you instead"
+make bench
