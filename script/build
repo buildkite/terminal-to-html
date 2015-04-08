@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "Deprecated, running 'make dist' for you instead"
+make dist

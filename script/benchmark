@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "Deprecated, running 'make bench' for you instead"
+make bench
