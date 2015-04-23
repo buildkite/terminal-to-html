@@ -194,19 +194,20 @@ var rendererTestCases = []struct {
 	}, {
 		`prints on error on malformed iTerm2 image codes`,
 		"\x1b]1337;;;;\a",
-		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File=, got &quot;1337;;;;&quot; instead",
+		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File= or 1338;, got &quot;1337;;;;&quot; instead",
 	}, {
 		`correctly handles images that we decide not to render`,
 		"hi\x1b]1337;File=name=1.gif;inline=0:AA==\ahello",
 		"hihello",
 	}, {
-		`renders non-embedded images with an asset path provided at startup time`,
-		"1338;path=foo.gif\a",
+		`renders non-iTerm images with an asset path provided at startup time`,
+		"\x1b]1338;path=foo.gif\a",
 		`<img alt="foo.gif" src="/assets/foo.gif">`,
 	},
 }
 
 func TestRendererAgainstCases(t *testing.T) {
+	AssetPath = "/assets"
 	for _, c := range rendererTestCases {
 		output := string(Render([]byte(c.input)))
 		if output != c.expected {

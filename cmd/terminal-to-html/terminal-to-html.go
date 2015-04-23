@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/buildkite/terminal"
 	"github.com/codegangsta/cli"
@@ -97,9 +98,15 @@ func main() {
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
+		cli.StringFlag{
+			Name:  "assets",
+			Value: "",
+			Usage: `URL prefix for non-iTerm images, eg "/assets"`,
+		},
 	}
 	app.Action = func(c *cli.Context) {
 		PreviewMode = c.Bool("preview")
+		terminal.AssetPath = strings.TrimRight(c.String("assets"), "/")
 		if c.String("http") != "" {
 			webservice(c.String("http"))
 		} else {

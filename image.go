@@ -7,20 +7,32 @@ import (
 	"strings"
 )
 
+var AssetPath = ""
+
 type image struct {
 	filename     string
 	content_type string
 	content      string
 	height       string
 	width        string
-	embedded     bool
+	iTerm        bool
 }
 
 func (i *image) asHTML() string {
-	parts := []string{
-		fmt.Sprintf(`alt="%s"`, i.filename),
-		fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content),
+	parts := []string{fmt.Sprintf(`alt="%s"`, i.filename)}
+
+	if i.iTerm {
+		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content))
+	} else {
+		path := i.filename
+		if AssetPath != "" {
+			// We dont' use path.Join here as the sep will always be /
+			path = AssetPath + "/" + path
+		}
+
+		parts = append(parts, fmt.Sprintf(`src="%s"`, path))
 	}
+
 	if i.width != "" {
 		parts = append(parts, fmt.Sprintf(`width="%s"`, i.width))
 	}
@@ -41,7 +53,8 @@ func parseImageSequence(sequence string) (*image, error) {
 	arguments = strings.Map(htmlStripper, arguments)
 	imageInline := false
 
-	img := &image{content: content}
+	img := &image{content: content, iTerm: content != ""}
+
 	for _, arg := range strings.Split(arguments, ";") {
 		argParts := strings.SplitN(arg, "=", 2)
 		if len(argParts) != 2 {
@@ -53,6 +66,8 @@ func parseImageSequence(sequence string) (*image, error) {
 		case "name":
 			img.filename = val
 			img.content_type = contentTypeForFile(val)
+		case "path":
+			img.filename = val
 		case "inline":
 			imageInline = val == "1"
 		case "width":
@@ -62,14 +77,20 @@ func parseImageSequence(sequence string) (*image, error) {
 		}
 	}
 
-	if img.filename == "" {
-		return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
-	}
-	if img.content_type == "" {
-		return nil, fmt.Errorf("can't determine content type for %q", img.filename)
+	if img.iTerm {
+		if img.filename == "" {
+			return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
+		}
+		if img.content_type == "" {
+			return nil, fmt.Errorf("can't determine content type for %q", img.filename)
+		}
+	} else {
+		if img.filename == "" {
+			return nil, fmt.Errorf("path= argument not supplied")
+		}
 	}
 
-	if !imageInline {
+	if img.iTerm && !imageInline {
 		// in iTerm2, if you don't specify inline=1, the image is merely downloaded
 		// and not displayed.
 		img = nil
@@ -104,12 +125,17 @@ func htmlStripper(r rune) rune {
 }
 
 func splitAndVerifyImageSequence(s string) (arguments string, content string, err error) {
+	if strings.HasPrefix(s, "1338;") {
+		// non-iTerm image, don't need to extract content
+		return s[len("1338;"):], "", nil
+	}
+
 	prefixLen := len("1337;File=")
 	if !strings.HasPrefix(s, "1337;File=") {
 		if len(s) > prefixLen {
 			s = s[:prefixLen] // Don't blow out our error output
 		}
-		return "", "", fmt.Errorf("expected sequence to start with 1337;File=, got %q instead", s)
+		return "", "", fmt.Errorf("expected sequence to start with 1337;File= or 1338;, got %q instead", s)
 	}
 	s = s[prefixLen:]
 
