@@ -184,7 +184,7 @@ var rendererTestCases = []struct {
 		"\x1b[2mbegin\x1b[22m\r\nend",
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
-		`renders simple iTerm2 images on their own line`, // http://iterm2.com/images.html
+		`renders simple images on their own line`, // http://iterm2.com/images.html
 		"hi\x1b]1337;File=name=1.gif;inline=1:AA==\ahello",
 		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,AA==">` + "\nhello",
 	}, {
@@ -199,6 +199,10 @@ var rendererTestCases = []struct {
 		`correctly handles images that we decide not to render`,
 		"hi\x1b]1337;File=name=1.gif;inline=0:AA==\ahello",
 		"hihello",
+	}, {
+		`renders non-embedded images with an asset path provided at startup time`,
+		"1338;path=foo.gif\a",
+		`<img alt="foo.gif" src="/assets/foo.gif">`,
 	},
 }
 

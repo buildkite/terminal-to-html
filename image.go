@@ -8,16 +8,17 @@ import (
 )
 
 type image struct {
-	alt          string
+	filename     string
 	content_type string
 	content      string
 	height       string
 	width        string
+	embedded     bool
 }
 
 func (i *image) asHTML() string {
 	parts := []string{
-		fmt.Sprintf(`alt="%s"`, i.alt),
+		fmt.Sprintf(`alt="%s"`, i.filename),
 		fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content),
 	}
 	if i.width != "" {
@@ -50,7 +51,7 @@ func parseImageSequence(sequence string) (*image, error) {
 		val := argParts[1]
 		switch strings.ToLower(key) {
 		case "name":
-			img.alt = val
+			img.filename = val
 			img.content_type = contentTypeForFile(val)
 		case "inline":
 			imageInline = val == "1"
@@ -61,11 +62,11 @@ func parseImageSequence(sequence string) (*image, error) {
 		}
 	}
 
-	if img.alt == "" {
+	if img.filename == "" {
 		return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
 	}
 	if img.content_type == "" {
-		return nil, fmt.Errorf("can't determine content type for %q", img.alt)
+		return nil, fmt.Errorf("can't determine content type for %q", img.filename)
 	}
 
 	if !imageInline {
