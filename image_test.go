@@ -48,12 +48,12 @@ var errorCases = []struct {
 var validCases = []struct {
 	name     string
 	input    string
-	expected *itermImage
+	expected *image
 }{
 	{
 		`image with name, content & inline`,
 		"1337;File=name=foo.gif;inline=1:AA==",
-		&itermImage{alt: "foo.gif", content: "AA==", content_type: "image/gif"},
+		&image{alt: "foo.gif", content: "AA==", content_type: "image/gif"},
 	}, {
 		`image without inline=1 does not render`,
 		"1337;File=name=foo.gif:AA==",
@@ -61,29 +61,29 @@ var validCases = []struct {
 	}, {
 		`adapts content type based on image name`,
 		"1337;File=name=foo.jpg;inline=1:AA==",
-		&itermImage{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg"},
+		&image{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg"},
 	}, {
 		`handles width & height`,
 		"1337;File=name=foo.jpg;width=100%;height=50px;inline=1:AA==",
-		&itermImage{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "100%", height: "50px"},
+		&image{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "100%", height: "50px"},
 	}, {
 		`protects against XSS in image name, width & height by stripping brackets & quotes`,
 		`1337;File=name=foo<.gif;width="100%;height='50px>;inline=1:AA==`,
-		&itermImage{alt: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px"},
+		&image{alt: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px"},
 	}, {
 		`converts width & height without percent or px to em`,
 		"1337;File=name=foo.jpg;width=1;height=5;inline=1:AA==",
-		&itermImage{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "1em", height: "5em"},
+		&image{alt: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "1em", height: "5em"},
 	}, {
 		`malfored arguments are silently ignored`,
 		"1337;File=name=foo.gif;inline=1;sdfsdfs;====ddd;herp=derps:AA==",
-		&itermImage{alt: "foo.gif", content: "AA==", content_type: "image/gif"},
+		&image{alt: "foo.gif", content: "AA==", content_type: "image/gif"},
 	},
 }
 
 func TestErrorCases(t *testing.T) {
 	for _, c := range errorCases {
-		img, err := parseItermImageSequence(c.input)
+		img, err := parseImageSequence(c.input)
 		if img != nil {
 			t.Errorf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, img)
 		} else if err.Error() != c.expected {
@@ -94,7 +94,7 @@ func TestErrorCases(t *testing.T) {
 
 func TestImageCases(t *testing.T) {
 	for _, c := range validCases {
-		img, err := parseItermImageSequence(c.input)
+		img, err := parseImageSequence(c.input)
 		if err != nil {
 			t.Errorf("%s\ninput\t\t%q\nexpected no error, received %s", c.name, c.input, err.Error())
 		} else if !reflect.DeepEqual(img, c.expected) {

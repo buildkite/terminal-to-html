@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type itermImage struct {
+type image struct {
 	alt          string
 	content_type string
 	content      string
@@ -15,7 +15,7 @@ type itermImage struct {
 	width        string
 }
 
-func (i *itermImage) asHTML() string {
+func (i *image) asHTML() string {
 	parts := []string{
 		fmt.Sprintf(`alt="%s"`, i.alt),
 		fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content),
@@ -29,7 +29,7 @@ func (i *itermImage) asHTML() string {
 	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
 
-func parseItermImageSequence(sequence string) (*itermImage, error) {
+func parseImageSequence(sequence string) (*image, error) {
 	// Expect 1337;File=name=1.gif;inline=1:BASE64
 
 	arguments, content, err := splitAndVerifyImageSequence(sequence)
@@ -40,7 +40,7 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 	arguments = strings.Map(htmlStripper, arguments)
 	imageInline := false
 
-	img := &itermImage{content: content}
+	img := &image{content: content}
 	for _, arg := range strings.Split(arguments, ";") {
 		argParts := strings.SplitN(arg, "=", 2)
 		if len(argParts) != 2 {
