@@ -200,9 +200,17 @@ var rendererTestCases = []struct {
 		"hi\x1b]1337;File=name=1.gif;inline=0:AA==\ahello",
 		"hihello",
 	}, {
-		`renders non-iTerm images with an asset path provided at startup time`,
+		`renders external image with relative to an asset path`,
 		"\x1b]1338;path=foo.gif\a",
 		`<img alt="foo.gif" src="/assets/foo.gif">`,
+	}, {
+		`renders external images with a host-relative path`,
+		"\x1b]1338;path=/local/foo.gif\a",
+		`<img alt="/local/foo.gif" src="/local/foo.gif">`,
+	}, {
+		`renders external images with a full URI`,
+		"\x1b]1338;path=http://foo.com/foobar.gif\a",
+		`<img alt="http://foo.com/foobar.gif" src="http://foo.com/foobar.gif">`,
 	},
 }
 

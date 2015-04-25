@@ -31,7 +31,7 @@ Terminal also provides a way to refer to images served by your webserver rather 
 
 `1338;path=my/image/path.gif;width=100%;height=50px`
 
-Specify `-assets=/path` on command invocation to prefix all image tags with `/path`.
+Specify `-assets=/path` on the command line to prefix all relative image paths with `/path/`.
 
 ## Installation
 

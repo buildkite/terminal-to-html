@@ -25,7 +25,15 @@ func (i *image) asHTML() string {
 		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content))
 	} else {
 		path := i.filename
-		if AssetPath != "" {
+
+		lower := strings.ToLower(i.filename)
+
+		switch {
+		case AssetPath == "":
+		case strings.HasPrefix(path, "/"):
+		case strings.HasPrefix(lower, "https://"):
+		case strings.HasPrefix(lower, "http://"):
+		default:
 			// We dont' use path.Join here as the sep will always be /
 			path = AssetPath + "/" + path
 		}
