@@ -23,9 +23,11 @@ curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > o
 
 For coloring you can use the sample [terminal.css](/assets/terminal.css) stylesheet and wrap the output in an element with class `term-container` (e.g. `<div class="term-container"><!-- terminal output --></div>`).
 
-### Image support
+### iTerm2 Image support
 
 Terminal has basic support for [iTerm2 inline images](http://iterm2.com/images.html). Only control sequences with `inline=1` will be rendered and `preserveAspectRatio` is not supported.
+
+#### URL-based images
 
 Terminal also provides a way to refer to images served by your webserver rather than transmitted via ANSI. The format is similar to iTerm2 inline images:
 
