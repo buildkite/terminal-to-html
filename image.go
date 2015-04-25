@@ -51,11 +51,14 @@ func parseImageSequence(sequence string) (*image, error) {
 	}
 
 	arguments = strings.Map(htmlStripper, arguments)
+	arguments = strings.Replace(arguments, `\;`, "\x00", -1)
+
 	imageInline := false
 
 	img := &image{content: content, iTerm: content != ""}
 
 	for _, arg := range strings.Split(arguments, ";") {
+		arg = strings.Replace(arg, "\x00", ";", -1) // reconstitute escaped semicolons
 		argParts := strings.SplitN(arg, "=", 2)
 		if len(argParts) != 2 {
 			continue

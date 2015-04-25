@@ -87,6 +87,10 @@ var validCases = []struct {
 		"1338;path=tmp/foo.gif",
 		&image{filename: "tmp/foo.gif"},
 	}, {
+		`1338: image with filename containing an escaped ;`,
+		"1338;path=tmp/foo\\;bar.gif",
+		&image{filename: "tmp/foo;bar.gif"},
+	}, {
 		`1338: image with filename, width & height`,
 		"1338;path=foo.gif;width=50px;height=50px",
 		&image{filename: "foo.gif", width: "50px", height: "50px"},
