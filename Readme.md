@@ -31,11 +31,9 @@ Terminal has basic support for [iTerm2 inline images](http://iterm2.com/images.h
 
 Terminal also provides a way to refer to images served by your webserver rather than transmitted via ANSI. The format is similar to iTerm2 inline images:
 
-`1338;path=my/image/path.gif;width=100%;height=50px`
+`1338;url=http://imgur.com/foo.gif;width=100%;height=50px`
 
-You can use the provided `externalimg.sh` to produce this escape sequence.
-
-Specify `-assets=/path` on the command line to prefix all relative image paths with `/path/`.
+You can use the provided `image.sh` to produce this escape sequence.
 
 ## Installation
 

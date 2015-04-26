@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-var AssetPath = ""
-
 type image struct {
 	filename     string
 	content_type string
@@ -24,21 +22,7 @@ func (i *image) asHTML() string {
 	if i.iTerm {
 		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content))
 	} else {
-		path := i.filename
-
-		lower := strings.ToLower(i.filename)
-
-		switch {
-		case AssetPath == "":
-		case strings.HasPrefix(path, "/"):
-		case strings.HasPrefix(lower, "https://"):
-		case strings.HasPrefix(lower, "http://"):
-		default:
-			// We dont' use path.Join here as the sep will always be /
-			path = AssetPath + "/" + path
-		}
-
-		parts = append(parts, fmt.Sprintf(`src="%s"`, path))
+		parts = append(parts, fmt.Sprintf(`src="%s"`, i.filename))
 	}
 
 	if i.width != "" {
@@ -77,7 +61,7 @@ func parseImageSequence(sequence string) (*image, error) {
 		case "name":
 			img.filename = val
 			img.content_type = contentTypeForFile(val)
-		case "path":
+		case "url":
 			img.filename = val
 		case "inline":
 			imageInline = val == "1"
@@ -97,7 +81,7 @@ func parseImageSequence(sequence string) (*image, error) {
 		}
 	} else {
 		if img.filename == "" {
-			return nil, fmt.Errorf("path= argument not supplied")
+			return nil, fmt.Errorf("url= argument not supplied")
 		}
 	}
 

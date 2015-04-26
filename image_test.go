@@ -43,9 +43,9 @@ var errorCases = []struct {
 		"1337;File=name=foo.jpg:",
 		`image content missing`,
 	}, {
-		`1338: path missing`,
+		`1338: url missing`,
 		"1338;",
-		`path= argument not supplied`,
+		`url= argument not supplied`,
 	},
 }
 
@@ -84,15 +84,15 @@ var validCases = []struct {
 		&image{filename: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
 	}, {
 		`1338: image with filename`,
-		"1338;path=tmp/foo.gif",
+		"1338;url=tmp/foo.gif",
 		&image{filename: "tmp/foo.gif"},
 	}, {
 		`1338: image with filename containing an escaped ;`,
-		"1338;path=tmp/foo\\;bar.gif",
+		"1338;url=tmp/foo\\;bar.gif",
 		&image{filename: "tmp/foo;bar.gif"},
 	}, {
 		`1338: image with filename, width & height`,
-		"1338;path=foo.gif;width=50px;height=50px",
+		"1338;url=foo.gif;width=50px;height=50px",
 		&image{filename: "foo.gif", width: "50px", height: "50px"},
 	},
 }

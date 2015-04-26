@@ -200,22 +200,13 @@ var rendererTestCases = []struct {
 		"hi\x1b]1337;File=name=1.gif;inline=0:AA==\ahello",
 		"hihello",
 	}, {
-		`renders external image with relative to an asset path`,
-		"\x1b]1338;path=foo.gif\a",
-		`<img alt="foo.gif" src="/assets/foo.gif">`,
-	}, {
-		`renders external images with a host-relative path`,
-		"\x1b]1338;path=/local/foo.gif\a",
-		`<img alt="/local/foo.gif" src="/local/foo.gif">`,
-	}, {
-		`renders external images with a full URI`,
-		"\x1b]1338;path=http://foo.com/foobar.gif\a",
+		`renders external images`,
+		"\x1b]1338;url=http://foo.com/foobar.gif\a",
 		`<img alt="http://foo.com/foobar.gif" src="http://foo.com/foobar.gif">`,
 	},
 }
 
 func TestRendererAgainstCases(t *testing.T) {
-	AssetPath = "/assets"
 	for _, c := range rendererTestCases {
 		output := string(Render([]byte(c.input)))
 		if output != c.expected {
