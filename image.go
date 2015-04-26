@@ -9,6 +9,7 @@ import (
 
 type image struct {
 	filename     string
+	alt          string
 	content_type string
 	content      string
 	height       string
@@ -17,7 +18,12 @@ type image struct {
 }
 
 func (i *image) asHTML() string {
-	parts := []string{fmt.Sprintf(`alt="%s"`, i.filename)}
+	alt := i.alt
+	if alt == "" {
+		alt = i.filename
+	}
+
+	parts := []string{fmt.Sprintf(`alt="%s"`, alt)}
 
 	if i.iTerm {
 		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content))
@@ -69,6 +75,8 @@ func parseImageSequence(sequence string) (*image, error) {
 			img.width = parseImageDimension(val)
 		case "height":
 			img.height = parseImageDimension(val)
+		case "alt":
+			img.alt = val
 		}
 	}
 

@@ -91,9 +91,9 @@ var validCases = []struct {
 		"1338;url=tmp/foo\\;bar.gif",
 		&image{filename: "tmp/foo;bar.gif"},
 	}, {
-		`1338: image with filename, width & height`,
-		"1338;url=foo.gif;width=50px;height=50px",
-		&image{filename: "foo.gif", width: "50px", height: "50px"},
+		`1338: image with filename, width, height & alt tag`,
+		"1338;url=foo.gif;width=50px;height=50px;alt=foo gif",
+		&image{filename: "foo.gif", width: "50px", height: "50px", alt: "foo gif"},
 	},
 }
 

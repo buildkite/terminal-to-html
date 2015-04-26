@@ -201,8 +201,8 @@ var rendererTestCases = []struct {
 		"hihello",
 	}, {
 		`renders external images`,
-		"\x1b]1338;url=http://foo.com/foobar.gif\a",
-		`<img alt="http://foo.com/foobar.gif" src="http://foo.com/foobar.gif">`,
+		"\x1b]1338;url=http://foo.com/foobar.gif;alt=foo bar\a",
+		`<img alt="foo bar" src="http://foo.com/foobar.gif">`,
 	},
 }
 
