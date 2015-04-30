@@ -1,6 +1,4 @@
 require 'pty'
-require 'rubygems'
-require 'terminal'
 
 output = ""
 read_io, write_io, pid = nil
@@ -35,7 +33,12 @@ read_io.close
 Process.waitpid(pid)
 
 examples = output.split("---").map do |example|
-  rendered = Terminal.render(example.chomp.strip)
+  rendered = IO.popen(['terminal-to-html'], 'r+') do |p|
+    p.write(example.chomp.strip)
+    p.close_write
+    p.read
+  end
+
   %(<section class="example">
       <div class="code before">
         <pre>#{example.strip}</pre>
