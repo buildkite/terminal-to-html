@@ -29,7 +29,7 @@ Terminal has basic support for [iTerm2 inline images](http://iterm2.com/images.h
 
 #### URL-based images
 
-Terminal also provides a way to refer to images from the internet rather than transmitted via ANSI. The format is similar to iTerm2 inline images:
+Terminal also provides a way to refer to images from the internet rather than transmitted via ANSI. The format is similar to iTerm2 inline images but uses the escape code `1338`:
 
 `1338;url=http://imgur.com/foo.gif;width=100%;height=50px;alt=My Image`
 
@@ -37,15 +37,13 @@ You can use the provided `image.sh` to produce this escape sequence.
 
 ## Installation
 
-Download the release for your platform from [https://github.com/buildkite/terminal/releases](https://github.com/buildkite/terminal/releases)
-
-## Manual Installation
-
-Assuming a `$GOPATH/bin` that's globally accessible, run:
+If you have Go installed you can simply run the following command to install the `terminal-to-html` command into `$GOPATH/bin`:
 
 ```bash
 $ go install github.com/buildkite/terminal/cmd/terminal-to-html
 ```
+
+You can also just download the standalone binary from [https://github.com/buildkite/terminal/releases](https://github.com/buildkite/terminal/releases)
 
 ## Developing
 
@@ -61,7 +59,7 @@ Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: t
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/terminal/fork )
+1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
