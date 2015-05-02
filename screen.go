@@ -108,7 +108,7 @@ func (s *screen) appendMany(data []rune) {
 	}
 }
 
-func (s *screen) appendImage(i *itermImage) {
+func (s *screen) appendImage(i *image) {
 	s.growScreenHeight()
 	line := s.growLineWidth(s.screen[s.y])
 

@@ -7,19 +7,30 @@ import (
 	"strings"
 )
 
-type itermImage struct {
+type image struct {
+	filename     string
 	alt          string
 	content_type string
 	content      string
 	height       string
 	width        string
+	iTerm        bool
 }
 
-func (i *itermImage) asHTML() string {
-	parts := []string{
-		fmt.Sprintf(`alt="%s"`, i.alt),
-		fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content),
+func (i *image) asHTML() string {
+	alt := i.alt
+	if alt == "" {
+		alt = i.filename
 	}
+
+	parts := []string{fmt.Sprintf(`alt="%s"`, alt)}
+
+	if i.iTerm {
+		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content))
+	} else {
+		parts = append(parts, fmt.Sprintf(`src="%s"`, i.filename))
+	}
+
 	if i.width != "" {
 		parts = append(parts, fmt.Sprintf(`width="%s"`, i.width))
 	}
@@ -29,7 +40,7 @@ func (i *itermImage) asHTML() string {
 	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
 
-func parseItermImageSequence(sequence string) (*itermImage, error) {
+func parseImageSequence(sequence string) (*image, error) {
 	// Expect 1337;File=name=1.gif;inline=1:BASE64
 
 	arguments, content, err := splitAndVerifyImageSequence(sequence)
@@ -38,10 +49,14 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 	}
 
 	arguments = strings.Map(htmlStripper, arguments)
+	arguments = strings.Replace(arguments, `\;`, "\x00", -1)
+
 	imageInline := false
 
-	img := &itermImage{content: content}
+	img := &image{content: content, iTerm: content != ""}
+
 	for _, arg := range strings.Split(arguments, ";") {
+		arg = strings.Replace(arg, "\x00", ";", -1) // reconstitute escaped semicolons
 		argParts := strings.SplitN(arg, "=", 2)
 		if len(argParts) != 2 {
 			continue
@@ -50,25 +65,35 @@ func parseItermImageSequence(sequence string) (*itermImage, error) {
 		val := argParts[1]
 		switch strings.ToLower(key) {
 		case "name":
-			img.alt = val
+			img.filename = val
 			img.content_type = contentTypeForFile(val)
+		case "url":
+			img.filename = val
 		case "inline":
 			imageInline = val == "1"
 		case "width":
 			img.width = parseImageDimension(val)
 		case "height":
 			img.height = parseImageDimension(val)
+		case "alt":
+			img.alt = val
 		}
 	}
 
-	if img.alt == "" {
-		return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
-	}
-	if img.content_type == "" {
-		return nil, fmt.Errorf("can't determine content type for %q", img.alt)
+	if img.iTerm {
+		if img.filename == "" {
+			return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
+		}
+		if img.content_type == "" {
+			return nil, fmt.Errorf("can't determine content type for %q", img.filename)
+		}
+	} else {
+		if img.filename == "" {
+			return nil, fmt.Errorf("url= argument not supplied")
+		}
 	}
 
-	if !imageInline {
+	if img.iTerm && !imageInline {
 		// in iTerm2, if you don't specify inline=1, the image is merely downloaded
 		// and not displayed.
 		img = nil
@@ -103,12 +128,17 @@ func htmlStripper(r rune) rune {
 }
 
 func splitAndVerifyImageSequence(s string) (arguments string, content string, err error) {
+	if strings.HasPrefix(s, "1338;") {
+		// non-iTerm image, don't need to extract content
+		return s[len("1338;"):], "", nil
+	}
+
 	prefixLen := len("1337;File=")
 	if !strings.HasPrefix(s, "1337;File=") {
 		if len(s) > prefixLen {
 			s = s[:prefixLen] // Don't blow out our error output
 		}
-		return "", "", fmt.Errorf("expected sequence to start with 1337;File=, got %q instead", s)
+		return "", "", fmt.Errorf("expected sequence to start with 1337;File= or 1338;, got %q instead", s)
 	}
 	s = s[prefixLen:]
 

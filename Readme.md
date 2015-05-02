@@ -27,6 +27,14 @@ For coloring you can use the sample [terminal.css](/assets/terminal.css) stylesh
 
 Terminal has basic support for [iTerm2 inline images](http://iterm2.com/images.html). Only control sequences with `inline=1` will be rendered and `preserveAspectRatio` is not supported.
 
+#### URL-based images
+
+Terminal also provides a way to refer to images from the internet rather than transmitted via ANSI. The format is similar to iTerm2 inline images:
+
+`1338;url=http://imgur.com/foo.gif;width=100%;height=50px;alt=My Image`
+
+You can use the provided `image.sh` to produce this escape sequence.
+
 ## Installation
 
 Download the release for your platform from [https://github.com/buildkite/terminal/releases](https://github.com/buildkite/terminal/releases)

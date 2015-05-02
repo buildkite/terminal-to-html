@@ -184,7 +184,7 @@ var rendererTestCases = []struct {
 		"\x1b[2mbegin\x1b[22m\r\nend",
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
-		`renders simple iTerm2 images on their own line`, // http://iterm2.com/images.html
+		`renders simple images on their own line`, // http://iterm2.com/images.html
 		"hi\x1b]1337;File=name=1.gif;inline=1:AA==\ahello",
 		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,AA==">` + "\nhello",
 	}, {
@@ -194,11 +194,15 @@ var rendererTestCases = []struct {
 	}, {
 		`prints on error on malformed iTerm2 image codes`,
 		"\x1b]1337;;;;\a",
-		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File=, got &quot;1337;;;;&quot; instead",
+		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File= or 1338;, got &quot;1337;;;;&quot; instead",
 	}, {
 		`correctly handles images that we decide not to render`,
 		"hi\x1b]1337;File=name=1.gif;inline=0:AA==\ahello",
 		"hihello",
+	}, {
+		`renders external images`,
+		"\x1b]1338;url=http://foo.com/foobar.gif;alt=foo bar\a",
+		`<img alt="foo bar" src="http://foo.com/foobar.gif">`,
 	},
 }
 
