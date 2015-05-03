@@ -86,6 +86,7 @@ func main() {
 	app := cli.NewApp()
 
 	app.Name = "terminal-to-html"
+	app.Version = terminal.Version()
 	app.Usage = "turn ANSI in to HTML"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

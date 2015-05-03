@@ -1,7 +1,7 @@
 SRC=*.go cmd/terminal-to-html/*.go
 BINARY=terminal-to-html
 BUILDCMD=godep go build -o $@ cmd/terminal-to-html/*
-VERSION=3.0.0
+VERSION=$(shell cat version.go  | grep baseVersion | head -n1 | cut -d \" -f 2)
 
 all: test $(BINARY)
 
