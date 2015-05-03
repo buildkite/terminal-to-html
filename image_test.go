@@ -76,7 +76,7 @@ var validCases = []struct {
 		&image{filename: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
 	}, {
 		`1337: protects against XSS in image name, width & height by stripping brackets & quotes`,
-		`1337;File=name=Zm9vLmdpZg==;width="100%;height='50px>;inline=1:AA==`,
+		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%;height='50px>;inline=1:AA==`,
 		&image{filename: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
 	}, {
 		`1337: converts width & height without percent or px to em`,

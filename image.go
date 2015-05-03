@@ -69,7 +69,7 @@ func parseImageSequence(sequence string) (*image, error) {
 			if err != nil {
 				return nil, fmt.Errorf("name= value of %q is not valid base64", val)
 			}
-			img.filename = string(nameBytes)
+			img.filename = strings.Map(htmlStripper, string(nameBytes))
 			img.content_type = contentTypeForFile(img.filename)
 		case "url":
 			img.filename = val
