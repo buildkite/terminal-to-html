@@ -35,8 +35,12 @@ var errorCases = []struct {
 		"1337;File=foobar:AA==",
 		`name= argument not supplied, required to determine content type`,
 	}, {
-		`1337: can't determine content type`,
+		`1337: invalid base64 encoding`,
 		"1337;File=name=foo.baz:AA==",
+		`name= value of "foo.baz" is not valid base64`,
+	}, {
+		`1337: can't determine content type`,
+		"1337;File=name=" + base64Encode("foo.baz") + ":AA==",
 		`can't determine content type for "foo.baz"`,
 	}, {
 		`1337: no image content`,
@@ -56,31 +60,31 @@ var validCases = []struct {
 }{
 	{
 		`1337: image with name, content & inline`,
-		"1337;File=name=foo.gif;inline=1:AA==",
+		`1337;File=name=` + base64Encode("foo.gif") + `;inline=1:AA==`,
 		&image{filename: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
 	}, {
 		`1337: image without inline=1 does not render`,
-		"1337;File=name=foo.gif:AA==",
+		`1337;File=name=` + base64Encode("foo.gif") + `:AA==`,
 		nil,
 	}, {
 		`1337: adapts content type based on image name`,
-		"1337;File=name=foo.jpg;inline=1:AA==",
+		`1337;File=name=` + base64Encode("foo.jpg") + `;inline=1:AA==`,
 		&image{filename: "foo.jpg", content: "AA==", content_type: "image/jpeg", iTerm: true},
 	}, {
 		`1337: handles width & height`,
-		"1337;File=name=foo.jpg;width=100%;height=50px;inline=1:AA==",
+		`1337;File=name=` + base64Encode("foo.jpg") + `;width=100%;height=50px;inline=1:AA==`,
 		&image{filename: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "100%", height: "50px", iTerm: true},
 	}, {
 		`1337: protects against XSS in image name, width & height by stripping brackets & quotes`,
-		`1337;File=name=foo<.gif;width="100%;height='50px>;inline=1:AA==`,
+		`1337;File=name=` + base64Encode("foo.gif") + `;width="100%;height='50px>;inline=1:AA==`,
 		&image{filename: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
 	}, {
 		`1337: converts width & height without percent or px to em`,
-		"1337;File=name=foo.jpg;width=1;height=5;inline=1:AA==",
+		`1337;File=name=` + base64Encode("foo.jpg") + `;width=1;height=5;inline=1:AA==`,
 		&image{filename: "foo.jpg", content: "AA==", content_type: "image/jpeg", width: "1em", height: "5em", iTerm: true},
 	}, {
 		`1337: malfored arguments are silently ignored`,
-		"1337;File=name=foo.gif;inline=1;sdfsdfs;====ddd;herp=derps:AA==",
+		`1337;File=name=` + base64Encode("foo.gif") + `;inline=1;sdfsdfs;====ddd;herp=derps:AA==`,
 		&image{filename: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
 	}, {
 		`1338: image with filename`,

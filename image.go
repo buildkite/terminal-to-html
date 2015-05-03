@@ -65,8 +65,12 @@ func parseImageSequence(sequence string) (*image, error) {
 		val := argParts[1]
 		switch strings.ToLower(key) {
 		case "name":
-			img.filename = val
-			img.content_type = contentTypeForFile(val)
+			nameBytes, err := base64.StdEncoding.DecodeString(val)
+			if err != nil {
+				return nil, fmt.Errorf("name= value of %q is not valid base64", val)
+			}
+			img.filename = string(nameBytes)
+			img.content_type = contentTypeForFile(string(nameBytes))
 		case "url":
 			img.filename = val
 		case "inline":
