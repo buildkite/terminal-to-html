@@ -1,10 +1,10 @@
 package terminal
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"testing"
-	"encoding/base64"
 )
 
 var TestFiles = []string{
@@ -190,11 +190,11 @@ var rendererTestCases = []struct {
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
 		`renders simple images on their own line`, // http://iterm2.com/images.html
-		"hi\x1b]1337;File=name=" + base64Encode("1.gif") + ";inline=1:AA==\ahello",
+		"hi\x1b]1337;File=name=MS5naWY=;inline=1:AA==\ahello",
 		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,AA==">` + "\nhello",
 	}, {
 		`does not start a new line for iterm images if we're already at the start of a line`,
-		"\x1b]1337;File=name=" + base64Encode("1.gif") + ";inline=1:AA==\a",
+		"\x1b]1337;File=name=MS5naWY=;inline=1:AA==\a",
 		`<img alt="1.gif" src="data:image/gif;base64,AA==">`,
 	}, {
 		`prints on error on malformed iTerm2 image codes`,
@@ -202,7 +202,7 @@ var rendererTestCases = []struct {
 		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File= or 1338;, got &quot;1337;;;;&quot; instead",
 	}, {
 		`correctly handles images that we decide not to render`,
-		"hi\x1b]1337;File=name=" + base64Encode("1.gif") + ";inline=0:AA==\ahello",
+		"hi\x1b]1337;File=name=MS5naWY=;inline=0:AA==\ahello",
 		"hihello",
 	}, {
 		`renders external images`,
