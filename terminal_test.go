@@ -190,7 +190,7 @@ var rendererTestCases = []struct {
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
 		`renders simple images on their own line`, // http://iterm2.com/images.html
-		"hi\x1b]1337;File=" + base64Encode("name=1.gif") + ";inline=1:AA==\ahello",
+		"hi\x1b]1337;File=name=" + base64Encode("1.gif") + ";inline=1:AA==\ahello",
 		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,AA==">` + "\nhello",
 	}, {
 		`does not start a new line for iterm images if we're already at the start of a line`,

@@ -3,12 +3,7 @@ package terminal
 import (
 	"reflect"
 	"testing"
-	"encoding/base64"
 )
-
-func base64Encode(stringToEncode string) string {
-	return base64.StdEncoding.EncodeToString([]byte(stringToEncode))
-}
 
 var errorCases = []struct {
 	name     string
