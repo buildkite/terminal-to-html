@@ -33,18 +33,21 @@ read_io.close
 Process.waitpid(pid)
 
 examples = output.split("---").map do |example|
+  klass, *lines = example.chomp.strip.split("\r\n")
+  example = lines.join("\r\n")
+
   rendered = IO.popen(['terminal-to-html'], 'r+') do |p|
-    p.write(example.chomp.strip)
+    p.write(example)
     p.close_write
     p.read
   end
 
-  %(<section class="example">
+  %(<section class="example #{klass}">
       <div class="code before">
-        <pre>#{example.strip}</pre>
+        <pre>#{example.chomp.strip}</pre>
       </div>
       <div class="code after">
-        <pre>#{rendered.strip}</pre>
+        <pre>#{rendered.chomp.strip}</pre>
       </div>
     </section>)
 end.join("\n")
