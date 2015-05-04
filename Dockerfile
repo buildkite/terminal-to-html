@@ -1,6 +1,7 @@
 FROM golang:cross
 
 # buildkite-agent for artifact management
+RUN apt-get install -y apt-transport-https
 RUN echo deb https://apt.buildkite.com/buildkite-agent unstable main > /etc/apt/sources.list.d/buildkite-agent.list
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 32A37959C2FA5C3C99EFBC32A79206696452D198
 
@@ -8,7 +9,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 32A37959C2
 RUN apt-get update
 
 # Install buildkite-agent
-RUN apt-get install -y apt-transport-https buildkite-agent
+RUN apt-get install -y buildkite-agent
 
 # For dealing with Go deps
 RUN go get github.com/tools/godep
