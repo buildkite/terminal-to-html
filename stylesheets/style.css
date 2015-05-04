@@ -176,7 +176,7 @@ footer a:hover .bb {
 }
 
 footer .heart {
-  animation: love 3s forwards linear infinite;
+  animation: love 10s forwards linear infinite;
 }
 
 @keyframes love {
