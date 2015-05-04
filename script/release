@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+rm dist/*
+
+buildkite-agent artifact download "dist/*" dist
+
+version=$(buildkite-agent meta-data get version)
+
+github-release "v$version" dist/* \
+  --commit "$BUILDKITE_COMMIT" \
+  --tag "v$version" \
+  --github-repository "buildkite/terminal"

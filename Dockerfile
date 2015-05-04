@@ -6,6 +6,9 @@ RUN apt-get update
 # For dealing with Go deps
 RUN go get github.com/tools/godep
 
+# For creating Github releases
+RUN go get github.com/buildkite/github-release
+
 # Zip for win and osx releases
 RUN apt-get install -y zip
 

@@ -21,6 +21,9 @@ cmd/terminal-to-html/_bindata.go: assets/terminal.css
 $(BINARY): $(SRC)
 	$(BUILDCMD)
 
+version:
+	@echo $(VERSION)
+
 # Cross-compiling
 
 GZ_ARCH     := linux-amd64 linux-386 linux-arm darwin-386 darwin-amd64
@@ -43,4 +46,4 @@ bin/$(BINARY)-$(VERSION)-%: $(SRC)
 	@[ -d bin ] || mkdir bin
 	GOOS=$(firstword $(subst -, , $*)) GOARCH=$(lastword $(subst -, , $*)) $(BUILDCMD)
 
-.PHONY: clean bench test dist
+.PHONY: clean bench test dist version

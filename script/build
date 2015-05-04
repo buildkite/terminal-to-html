@@ -1,4 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-echo "Deprecated, running 'make dist' for you instead"
+set -eu
+
+buildkite-agent meta-data set version $(make version)
+
 make dist
+
+buildkite-agent artifact upload "dist/*"
