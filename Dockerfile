@@ -8,7 +8,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 32A37959C2
 RUN apt-get update
 
 # Install buildkite-agent
-RUN apt-get install -y buildkite-agent
+RUN apt-get install -y apt-transport-https buildkite-agent
 
 # For dealing with Go deps
 RUN go get github.com/tools/godep
