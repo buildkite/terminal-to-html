@@ -175,7 +175,7 @@ footer a:hover .bb {
   color: rgb(120,120,120);
 }
 
-footer a:hover .heart {
+footer .heart {
   animation: love 3s forwards linear infinite;
 }
 
@@ -188,7 +188,6 @@ footer a:hover .heart {
   83.3% { color: rgb(255, 255, 0); }
   to    { color: rgb(255, 0, 0);   }
 }
-
 
 .term-container {
   background: #171717;
