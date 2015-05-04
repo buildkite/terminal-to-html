@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta content='width=device-width, initial-scale=1.0' name='viewport'>
+  <title>Terminal - Inline Images</title>
+  <link href="stylesheets/style.css" media="all" rel="stylesheet" type="text/css">
+  <script src="javascript/prefixfree.min.js"></script>
+</head>
+  <body>
+    <header>
+      <h1><a href="https://buildkite.github.io/terminal"><img alt="Terminal" src="images/logo.svg"></a></h2>
+    </header>
+
+    <section class="code intro">
+      <p><a href="https://buildkite.github.io/terminal">Terminal</a> has support for two formats for embedding images in shell output: a URL-based format (escape code <span class="term-fgi90">1338</span>) and the iTerm inline image format (escape code <span class="term-fgi90">1337</span>).</p>
+    </section>
+
+    <section class="code">
+      <h2>URL-based Inline Images</h2>
+      <p>Terminal supports embedding images by pointing to the URLs source, rather than just embedded via base64 encoding. In Terminal’s case the images are rendered to &lt;img&gt; tags.</p>
+      <p>There are four properties: <code class="term-fgi90">url</code>, <code class="term-fgi90">alt</code>, <code class="term-fgi90">width</code> and <code class="term-fgi90">height</code>; all case insensitive.</code>
+      <hr>
+      <p><pre><code><span class="term-fgi90">Bash function that prints the correctly formatted image output</span>
+function print_image_ref { printf '\033]1338;url='"$1"';alt='"$2"'\a\n'; }
+<span class="term-fgi90">You can use it like so:</span>
+print_image_ref "http://media.giphy.com/media/wzCVIrkDwNAuk/giphy.gif" "OMG"
+<span class="term-fgi90">The result!</span>
+<img src="https://media.giphy.com/media/wzCVIrkDwNAuk/giphy.gif" alt="OMG"></code></pre>
+      </p>
+      <hr>
+      <p>There is no limit or filter on the URLs allowed, it is up to the client to interpret or sanitize them as necessary. For example <a href="https://buildkite.com/">Buildkite</a> lets you refer to build artifacts using the custom URL scheme <span class="term-fgi90">artifact://</span> and disallows relative (protocol-less) URLs.</p>
+      <p>The <span class="term-fgi90">height</span> and <span class="term-fgi90">height</span> properties can be defined as <span class="term-fgi90">px</span> or <span class="term-fgi90">%</span> values, for example <span class="term-fgi90">width=50px</span> or <span class="term-fgi90">width=100%</span>.</p>
+      <p>The <span class="term-fgi90">alt</span> property should be specified for every image, and describes the content of the image.</p>
+    </section>
+
+    <section class="code">
+      <h2>Embedded Inline Images</h2>
+      <p>The support for embedded images follows <a href="http://iterm2.com/images.html">iTerm’s inline image format</a>. This format allows you to embed an image using base64 encoding.</p>
+      <p>Terminal requires you to specify <span class="term-fgi90">inline=1</span> and a <span class="term-fgi90">name</span>. The <span class="term-fgi90">preserveAspectRatio</span> property is not supported and will be ignored.</p>
+    </section>
+
+    <footer>
+      <p>Made with &#x2764; by <a href="https://buildkite.com/">Buildkite</a> &amp; <a href="https://github.com/buildkite/terminal/graphs/contributors">friends</a></p>
+    </footer>
+  </body>
+</html>

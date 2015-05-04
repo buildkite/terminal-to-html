@@ -18,7 +18,7 @@ a {
 header a {
   border-bottom: none;
 }
-header a img {
+header img {
   width: 100%;
 }
 
@@ -34,14 +34,24 @@ section {
   padding: 30px;
 }
 
+.code hr {
+  border: none;
+  border-top: 2px solid #222;
+  margin: 15px 0;
+}
+
 .code p {
   margin: 0;
+}
+
+.code p + p {
+  margin-top: 15px;
 }
 
 .code pre {
   margin: 0;
   padding: 0;
-  word-break: break-word;
+  word-break: break-all;
   white-space: pre-wrap;
   overflow-wrap: break-word;
   max-height: 60em;
@@ -63,13 +73,13 @@ section {
   font-size: 12px;
   margin: 0;
 }
-.example .code.before::before, .example .code.after::before {
+.example .code.before::before, .example .code.after::before, .code h2 {
   display: block;
   color: rgb(120,120,120);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   margin-bottom: 1.5em;
 }
 .example .code.before::before {
@@ -89,8 +99,13 @@ section {
 }
 
 @media only screen and (max-width: 30em) {
-  .code, .example .code {
+  .code {
+    font-size: 15px;
+  }
+  .example .code {
     font-size: 12px;
+  }
+  .code, .example .code {
     padding: 0;
     border-radius: 0;
     margin-left: -15px;
