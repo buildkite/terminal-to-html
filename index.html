@@ -22,20 +22,20 @@
         <pre>[90m$[0m curl -o /tmp/file.txt https://example.com/file.txt
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0100 36982  100 36982    0     0  18657      0  0:00:01  0:00:01 --:--:-- 18649</pre>
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0100 36982  100 36982    0     0  15968      0  0:00:02  0:00:02 --:--:-- 15974</pre>
       </div>
       <div class="code after">
         <pre><span class="term-fgi90">$</span> curl -o &#47;tmp&#47;file.txt https:&#47;&#47;example.com&#47;file.txt
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100 36982  100 36982    0     0  18657      0  0:00:01  0:00:01 --:--:-- 18649</pre>
+100 36982  100 36982    0     0  15968      0  0:00:02  0:00:02 --:--:-- 15974</pre>
       </div>
     </section>
 <section class="example specs">
       <div class="code before">
         <pre>[90m$[0m rspec -c specs.rb
 
-Randomized with seed 59658
+Randomized with seed 58515
 [32m.[0m[32m.[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m
 
 Failures:
@@ -49,19 +49,19 @@ Failures:
      [31m  (compared using eql?)[0m
      [36m# ./specs.rb:18:in `block (2 levels) in <top (required)>'[0m
 
-Finished in 0.00154 seconds (files took 0.12595 seconds to load)
+Finished in 0.00138 seconds (files took 0.11502 seconds to load)
 [31m6 examples, 1 failure[0m
 
 Failed examples:
 
 [31mrspec ./specs.rb:17[0m [36m# this test should fail[0m
 
-Randomized with seed 59658</pre>
+Randomized with seed 58515</pre>
       </div>
       <div class="code after">
         <pre><span class="term-fgi90">$</span> rspec -c specs.rb
 &nbsp;
-Randomized with seed 59658
+Randomized with seed 58515
 <span class="term-fg32">..<span class="term-fg31">F<span class="term-fg32">...</span></span></span>
 &nbsp;
 Failures:
@@ -75,14 +75,14 @@ Failures:
      <span class="term-fg31">  (compared using eql?)</span>
      <span class="term-fg36"># .&#47;specs.rb:18:in `block (2 levels) in &lt;top (required)&gt;&#39;</span>
 &nbsp;
-Finished in 0.00154 seconds (files took 0.12595 seconds to load)
+Finished in 0.00138 seconds (files took 0.11502 seconds to load)
 <span class="term-fg31">6 examples, 1 failure</span>
 &nbsp;
 Failed examples:
 &nbsp;
 <span class="term-fg31">rspec .&#47;specs.rb:17</span> <span class="term-fg36"># this test should fail</span>
 &nbsp;
-Randomized with seed 59658</pre>
+Randomized with seed 58515</pre>
       </div>
     </section>
 <section class="example image">
@@ -172,7 +172,7 @@ open "<a href="https://github.com/buildkite/terminal/releases">https://github.co
 </pre></section>
 
     <section class="code getting-started">
-      <p>Head to the <a href="https://github.com/buildkite/terminal">GitHub repo</a> to grab the code, read the docs, and contribute. Or learn more about <a href="inline-images.html">the supported inline image formats</a>.</span>
+      <p>Head to the <a href="https://github.com/buildkite/terminal">GitHub repo</a> to grab the code, read the docs, and contribute. Or learn more about <a href="inline-images">the supported inline image formats</a>.</span>
     </section>
 
     <footer>
