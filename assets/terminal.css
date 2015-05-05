@@ -11,6 +11,10 @@
   white-space: pre-wrap;
 }
 
+.term-container img {
+  max-width: 100%;
+}
+
 .term-fg1 { } /* don't bold beccause it looks weird */
 .term-fg3 { font-style: italic; } /* italic */
 .term-fg4 { text-decoration: underline; } /* underline */
