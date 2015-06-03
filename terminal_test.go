@@ -50,6 +50,10 @@ var rendererTestCases = []struct {
 		"he\x1b[32m\x1b[33m\bllo",
 		"h<span class=\"term-fg33\">llo</span>",
 	}, {
+		`handles \x1b[m (no parameter) as a reset`,
+		"\x1b[36mthis has a color\x1b[mthis is normal now\r\n",
+		"<span class=\"term-fg36\">this has a color</span>this is normal now",
+	}, {
 		`treats \x1b[39m as a reset`,
 		"\x1b[36mthis has a color\x1b[39mthis is normal now\r\n",
 		"<span class=\"term-fg36\">this has a color</span>this is normal now",
