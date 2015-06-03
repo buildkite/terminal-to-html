@@ -132,5 +132,7 @@ func (p *parser) handlePreEscape(char rune) {
 
 func (p *parser) addInstruction() {
 	instruction := string(p.ansi[p.instructionStartedAt:p.cursor])
-	p.instructions = append(p.instructions, instruction)
+	if instruction != "" {
+		p.instructions = append(p.instructions, instruction)
+	}
 }

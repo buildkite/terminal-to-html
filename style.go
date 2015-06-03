@@ -56,11 +56,7 @@ func (s *style) addOther(r string) {
 // Add colours to an existing style, potentially returning
 // a new style.
 func (s *style) color(colors []string) *style {
-	if len(colors) == 0 {
-		return s
-	}
-
-	if len(colors) == 1 && colors[0] == "0" {
+	if len(colors) == 1 && (colors[0] == "0" || colors[0] == "") {
 		// Shortcut for full style reset
 		return &emptyStyle
 	}
