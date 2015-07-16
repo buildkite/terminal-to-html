@@ -1,0 +1,28 @@
+[
+  {
+    "type": "script",
+    "name": ":bomb: Test",
+    "command": "make test"
+  },
+  {
+    "type": "script",
+    "name": ":neckbeard: Benchmark",
+    "command": "make bench"
+  },
+  {
+    "type": "waiter"
+  },
+  {
+    "type": "script",
+    "name": ":hammer: Build",
+    "command": "script/build"
+  },
+  {
+    "type": "manual"
+  },
+  {
+    "type": "script",
+    "name": ":octocat: Release",
+    "command": "script/release"
+  }
+]
