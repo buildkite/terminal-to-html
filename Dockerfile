@@ -5,7 +5,7 @@ RUN apt-get update
 
 # buildkite-agent for artifact management
 RUN apt-get install -y apt-transport-https
-RUN echo deb https://apt.buildkite.com/buildkite-agent unstable main > /etc/apt/sources.list.d/buildkite-agent.list
+RUN echo deb https://apt.buildkite.com/buildkite-agent stable main > /etc/apt/sources.list.d/buildkite-agent.list
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 32A37959C2FA5C3C99EFBC32A79206696452D198
 RUN apt-get update
 
@@ -17,6 +17,12 @@ RUN go get github.com/tools/godep
 
 # For creating Github releases
 RUN go get github.com/buildkite/github-release
+
+# For building packages
+RUN apt-get install build-essential dh-make
+
+# For packaging and pushing to packagecloud
+RUN apt-get install ruby && gem install fpm-cookery package_cloud
 
 # Zip for win and osx releases
 RUN apt-get install -y zip

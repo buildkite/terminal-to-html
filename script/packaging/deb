@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu
+
+echo "+++ :package: Building Ubuntu package"
+
+export RELEASE_VERSION=$(buildkite-agent meta-data get version)
+
+echo "+++ :packagecloud: Publishing to Packagecloud"
+
+package_cloud push buildkite/terminal/
