@@ -98,6 +98,14 @@ var validCases = []struct {
 		`1338: image with filename, width, height & alt tag`,
 		"1338;url=foo.gif;width=50px;height=50px;alt=foo gif",
 		&element{url: "foo.gif", width: "50px", height: "50px", alt: "foo gif", elementType: ELEMENT_IMAGE},
+	}, {
+		`1339: link with url only`,
+		"1339;url=foo.gif",
+		&element{url: "foo.gif", elementType: ELEMENT_LINK},
+	}, {
+		`1339: link with url and content`,
+		"1339;url=foo.gif;content=bar",
+		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
 	},
 }
 

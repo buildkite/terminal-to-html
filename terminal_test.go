@@ -216,6 +216,10 @@ var rendererTestCases = []struct {
 		`renders links, and renders them inline on other content`,
 		"a link to \x1b]1339;url=http://google.com;content=google\a.",
 		`a link to <a href="http://google.com">google</a>.`,
+	}, {
+		`uses URL as link content if missing`,
+		"\x1b]1339;url=http://google.com\a",
+		`<a href="http://google.com">http://google.com</a>`,
 	},
 }
 
