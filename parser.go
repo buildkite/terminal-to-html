@@ -63,11 +63,15 @@ func (p *parser) handleItermEscape(char rune) {
 		return
 	}
 
-	// Images (or the error encountered) should appear on their own line
-	if p.screen.x != 0 {
-		p.screen.newLine()
+	ownLine := image == nil || !image.link
+
+	if ownLine {
+		// Images (or the error encountered) should appear on their own line
+		if p.screen.x != 0 {
+			p.screen.newLine()
+		}
+		p.screen.clear(p.screen.y, screenStartOfLine, screenEndOfLine)
 	}
-	p.screen.clear(p.screen.y, screenStartOfLine, screenEndOfLine)
 
 	if err != nil {
 		p.screen.appendMany([]rune("*** Error parsing iTerm2 image escape sequence: "))
@@ -75,7 +79,10 @@ func (p *parser) handleItermEscape(char rune) {
 	} else {
 		p.screen.appendImage(image)
 	}
-	p.screen.newLine()
+
+	if ownLine {
+		p.screen.newLine()
+	}
 
 }
 

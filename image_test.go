@@ -13,11 +13,11 @@ var errorCases = []struct {
 	{
 		`sequence does not begin with 1337;File= or 1338;`,
 		"foobar",
-		`expected sequence to start with 1337;File= or 1338;, got "foobar" instead`,
+		`expected sequence to start with 1337;File=, 1338; or 1339;, got "foobar" instead`,
 	}, {
 		`sequence beginning error is cropped`,
 		"123456789012345678901234567890123456789012345678901234567890",
-		`expected sequence to start with 1337;File= or 1338;, got "1234567890" instead`,
+		`expected sequence to start with 1337;File=, 1338; or 1339;, got "1234567890" instead`,
 	}, {
 		`1337: sequence does not have a content part and a arguments part`,
 		"1337;File=foobar",

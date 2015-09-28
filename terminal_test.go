@@ -203,7 +203,7 @@ var rendererTestCases = []struct {
 	}, {
 		`prints on error on malformed iTerm2 image codes`,
 		"\x1b]1337;;;;\a",
-		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File= or 1338;, got &quot;1337;;;;&quot; instead",
+		"*** Error parsing iTerm2 image escape sequence: expected sequence to start with 1337;File=, 1338; or 1339;, got &quot;1337;;;;&quot; instead",
 	}, {
 		`correctly handles images that we decide not to render`,
 		"hi\x1b]1337;File=name=MS5naWY=;inline=0:AA==\ahello",
@@ -212,6 +212,10 @@ var rendererTestCases = []struct {
 		`renders external images`,
 		"\x1b]1338;url=http://foo.com/foobar.gif;alt=foo bar\a",
 		`<img alt="foo bar" src="http://foo.com/foobar.gif">`,
+	}, {
+		`renders links, and renders them inline on other content`,
+		"a link to \x1b]1339;url=http://google.com;content=google\a.",
+		`a link to <a href="http://google.com">google</a>.`,
 	},
 }
 

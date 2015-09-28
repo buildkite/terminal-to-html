@@ -15,9 +15,18 @@ type image struct {
 	height       string
 	width        string
 	iTerm        bool
+	link         bool
 }
 
 func (i *image) asHTML() string {
+	if i.link {
+		content := i.content
+		if content == "" {
+			content = i.filename
+		}
+		return fmt.Sprintf(`<a href="%s">%s</a>`, i.filename, content)
+	}
+
 	alt := i.alt
 	if alt == "" {
 		alt = i.filename
@@ -53,7 +62,7 @@ func parseImageSequence(sequence string) (*image, error) {
 
 	imageInline := false
 
-	img := &image{content: content, iTerm: content != ""}
+	img := &image{content: content, iTerm: content != "", link: strings.HasPrefix(sequence, "1339;")}
 
 	for _, arg := range strings.Split(arguments, ";") {
 		arg = strings.Replace(arg, "\x00", ";", -1) // reconstitute escaped semicolons
@@ -73,6 +82,8 @@ func parseImageSequence(sequence string) (*image, error) {
 			img.content_type = contentTypeForFile(img.filename)
 		case "url":
 			img.filename = val
+		case "content":
+			img.content = val
 		case "inline":
 			imageInline = val == "1"
 		case "width":
@@ -132,7 +143,7 @@ func htmlStripper(r rune) rune {
 }
 
 func splitAndVerifyImageSequence(s string) (arguments string, content string, err error) {
-	if strings.HasPrefix(s, "1338;") {
+	if strings.HasPrefix(s, "1338;") || strings.HasPrefix(s, "1339;") {
 		// non-iTerm image, don't need to extract content
 		return s[len("1338;"):], "", nil
 	}
@@ -142,7 +153,7 @@ func splitAndVerifyImageSequence(s string) (arguments string, content string, er
 		if len(s) > prefixLen {
 			s = s[:prefixLen] // Don't blow out our error output
 		}
-		return "", "", fmt.Errorf("expected sequence to start with 1337;File= or 1338;, got %q instead", s)
+		return "", "", fmt.Errorf("expected sequence to start with 1337;File=, 1338; or 1339;, got %q instead", s)
 	}
 	s = s[prefixLen:]
 

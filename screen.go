@@ -114,6 +114,7 @@ func (s *screen) appendImage(i *image) {
 
 	line[s.x] = node{style: s.style, image: i}
 	s.screen[s.y] = line
+	s.x++
 }
 
 // Apply color instruction codes to the screen's current style
