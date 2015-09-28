@@ -35,6 +35,15 @@ Terminal also provides a way to refer to images from the internet rather than tr
 
 You can use the provided `image.sh` to produce this escape sequence.
 
+#### Links
+
+Terminal can also render hyperlinks:
+
+`1339;url=https://google.com;content=Google Search`
+
+You can use the provided `link.sh` to produce this escape sequence.
+
+
 ## Installation
 
 If you have Go installed you can simply run the following command to install the `terminal-to-html` command into `$GOPATH/bin`:
