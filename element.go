@@ -8,7 +8,7 @@ import (
 )
 
 type element struct {
-	filename     string
+	url          string
 	alt          string
 	content_type string
 	content      string
@@ -22,14 +22,14 @@ func (i *element) asHTML() string {
 	if i.link {
 		content := i.content
 		if content == "" {
-			content = i.filename
+			content = i.url
 		}
-		return fmt.Sprintf(`<a href="%s">%s</a>`, i.filename, content)
+		return fmt.Sprintf(`<a href="%s">%s</a>`, i.url, content)
 	}
 
 	alt := i.alt
 	if alt == "" {
-		alt = i.filename
+		alt = i.url
 	}
 
 	parts := []string{fmt.Sprintf(`alt="%s"`, alt)}
@@ -37,7 +37,7 @@ func (i *element) asHTML() string {
 	if i.iTerm {
 		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.content_type, i.content))
 	} else {
-		parts = append(parts, fmt.Sprintf(`src="%s"`, i.filename))
+		parts = append(parts, fmt.Sprintf(`src="%s"`, i.url))
 	}
 
 	if i.width != "" {
@@ -78,10 +78,10 @@ func parseElementSequence(sequence string) (*element, error) {
 			if err != nil {
 				return nil, fmt.Errorf("name= value of %q is not valid base64", val)
 			}
-			elem.filename = strings.Map(htmlStripper, string(nameBytes))
-			elem.content_type = contentTypeForFile(elem.filename)
+			elem.url = strings.Map(htmlStripper, string(nameBytes))
+			elem.content_type = contentTypeForFile(elem.url)
 		case "url":
-			elem.filename = val
+			elem.url = val
 		case "content":
 			elem.content = val
 		case "inline":
@@ -96,14 +96,14 @@ func parseElementSequence(sequence string) (*element, error) {
 	}
 
 	if elem.iTerm {
-		if elem.filename == "" {
+		if elem.url == "" {
 			return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
 		}
 		if elem.content_type == "" {
-			return nil, fmt.Errorf("can't determine content type for %q", elem.filename)
+			return nil, fmt.Errorf("can't determine content type for %q", elem.url)
 		}
 	} else {
-		if elem.filename == "" {
+		if elem.url == "" {
 			return nil, fmt.Errorf("url= argument not supplied")
 		}
 	}

@@ -61,7 +61,7 @@ var validCases = []struct {
 	{
 		`1337: image with name, content & inline`,
 		`1337;File=name=Zm9vLmdpZg==;inline=1:AA==`,
-		&element{filename: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
+		&element{url: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
 	}, {
 		`1337: image without inline=1 does not render`,
 		`1337;File=name=Zm9vLmdpZg==:AA==`,
@@ -69,35 +69,35 @@ var validCases = []struct {
 	}, {
 		`1337: adapts content type based on image name`,
 		`1337;File=name=` + base64Encode("foo.jpg") + `;inline=1:AA==`,
-		&element{filename: "foo.jpg", content: "AA==", content_type: "image/jpeg", iTerm: true},
+		&element{url: "foo.jpg", content: "AA==", content_type: "image/jpeg", iTerm: true},
 	}, {
 		`1337: handles width & height`,
 		`1337;File=name=Zm9vLmdpZg==;width=100%;height=50px;inline=1:AA==`,
-		&element{filename: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
+		&element{url: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
 	}, {
 		`1337: protects against XSS in image name, width & height by stripping brackets & quotes`,
 		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%;height='50px>;inline=1:AA==`,
-		&element{filename: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
+		&element{url: "foo.gif", content: "AA==", content_type: "image/gif", width: "100%", height: "50px", iTerm: true},
 	}, {
 		`1337: converts width & height without percent or px to em`,
 		`1337;File=name=Zm9vLmdpZg==;width=1;height=5;inline=1:AA==`,
-		&element{filename: "foo.gif", content: "AA==", content_type: "image/gif", width: "1em", height: "5em", iTerm: true},
+		&element{url: "foo.gif", content: "AA==", content_type: "image/gif", width: "1em", height: "5em", iTerm: true},
 	}, {
 		`1337: malfored arguments are silently ignored`,
 		`1337;File=name=Zm9vLmdpZg==;inline=1;sdfsdfs;====ddd;herp=derps:AA==`,
-		&element{filename: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
+		&element{url: "foo.gif", content: "AA==", content_type: "image/gif", iTerm: true},
 	}, {
 		`1338: image with filename`,
 		"1338;url=tmp/foo.gif",
-		&element{filename: "tmp/foo.gif"},
+		&element{url: "tmp/foo.gif"},
 	}, {
 		`1338: image with filename containing an escaped ;`,
 		"1338;url=tmp/foo\\;bar.gif",
-		&element{filename: "tmp/foo;bar.gif"},
+		&element{url: "tmp/foo;bar.gif"},
 	}, {
 		`1338: image with filename, width, height & alt tag`,
 		"1338;url=foo.gif;width=50px;height=50px;alt=foo gif",
-		&element{filename: "foo.gif", width: "50px", height: "50px", alt: "foo gif"},
+		&element{url: "foo.gif", width: "50px", height: "50px", alt: "foo gif"},
 	},
 }
 
