@@ -108,11 +108,11 @@ func (s *screen) appendMany(data []rune) {
 	}
 }
 
-func (s *screen) appendImage(i *image) {
+func (s *screen) appendElement(i *element) {
 	s.growScreenHeight()
 	line := s.growLineWidth(s.screen[s.y])
 
-	line[s.x] = node{style: s.style, image: i}
+	line[s.x] = node{style: s.style, elem: i}
 	s.screen[s.y] = line
 	s.x++
 }

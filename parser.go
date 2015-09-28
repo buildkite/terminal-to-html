@@ -56,7 +56,7 @@ func (p *parser) handleItermEscape(char rune) {
 	p.mode = MODE_NORMAL
 
 	// Bell received, stop parsing our potential image
-	image, err := parseImageSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
+	image, err := parseElementSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
 
 	if image == nil && err == nil {
 		// No image & no error, nothing to render
@@ -77,7 +77,7 @@ func (p *parser) handleItermEscape(char rune) {
 		p.screen.appendMany([]rune("*** Error parsing iTerm2 image escape sequence: "))
 		p.screen.appendMany([]rune(err.Error()))
 	} else {
-		p.screen.appendImage(image)
+		p.screen.appendElement(image)
 	}
 
 	if ownLine {

@@ -59,8 +59,8 @@ func outputLineAsHTML(line []node) string {
 				}
 			}
 		}
-		if node.image != nil {
-			lineBuf.buf.WriteString(node.image.asHTML())
+		if node.elem != nil {
+			lineBuf.buf.WriteString(node.elem.asHTML())
 		} else {
 			lineBuf.appendChar(node.blob)
 		}

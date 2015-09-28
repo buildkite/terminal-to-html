@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type image struct {
+type element struct {
 	filename     string
 	alt          string
 	content_type string
@@ -18,7 +18,7 @@ type image struct {
 	link         bool
 }
 
-func (i *image) asHTML() string {
+func (i *element) asHTML() string {
 	if i.link {
 		content := i.content
 		if content == "" {
@@ -49,10 +49,10 @@ func (i *image) asHTML() string {
 	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
 
-func parseImageSequence(sequence string) (*image, error) {
+func parseElementSequence(sequence string) (*element, error) {
 	// Expect 1337;File=name=1.gif;inline=1:BASE64
 
-	arguments, content, err := splitAndVerifyImageSequence(sequence)
+	arguments, content, err := splitAndVerifyElementSequence(sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func parseImageSequence(sequence string) (*image, error) {
 
 	imageInline := false
 
-	img := &image{content: content, iTerm: content != "", link: strings.HasPrefix(sequence, "1339;")}
+	elem := &element{content: content, iTerm: content != "", link: strings.HasPrefix(sequence, "1339;")}
 
 	for _, arg := range strings.Split(arguments, ";") {
 		arg = strings.Replace(arg, "\x00", ";", -1) // reconstitute escaped semicolons
@@ -78,42 +78,42 @@ func parseImageSequence(sequence string) (*image, error) {
 			if err != nil {
 				return nil, fmt.Errorf("name= value of %q is not valid base64", val)
 			}
-			img.filename = strings.Map(htmlStripper, string(nameBytes))
-			img.content_type = contentTypeForFile(img.filename)
+			elem.filename = strings.Map(htmlStripper, string(nameBytes))
+			elem.content_type = contentTypeForFile(elem.filename)
 		case "url":
-			img.filename = val
+			elem.filename = val
 		case "content":
-			img.content = val
+			elem.content = val
 		case "inline":
 			imageInline = val == "1"
 		case "width":
-			img.width = parseImageDimension(val)
+			elem.width = parseImageDimension(val)
 		case "height":
-			img.height = parseImageDimension(val)
+			elem.height = parseImageDimension(val)
 		case "alt":
-			img.alt = val
+			elem.alt = val
 		}
 	}
 
-	if img.iTerm {
-		if img.filename == "" {
+	if elem.iTerm {
+		if elem.filename == "" {
 			return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
 		}
-		if img.content_type == "" {
-			return nil, fmt.Errorf("can't determine content type for %q", img.filename)
+		if elem.content_type == "" {
+			return nil, fmt.Errorf("can't determine content type for %q", elem.filename)
 		}
 	} else {
-		if img.filename == "" {
+		if elem.filename == "" {
 			return nil, fmt.Errorf("url= argument not supplied")
 		}
 	}
 
-	if img.iTerm && !imageInline {
+	if elem.iTerm && !imageInline {
 		// in iTerm2, if you don't specify inline=1, the image is merely downloaded
 		// and not displayed.
-		img = nil
+		elem = nil
 	}
-	return img, nil
+	return elem, nil
 }
 
 func contentTypeForFile(filename string) string {
@@ -142,7 +142,7 @@ func htmlStripper(r rune) rune {
 	}
 }
 
-func splitAndVerifyImageSequence(s string) (arguments string, content string, err error) {
+func splitAndVerifyElementSequence(s string) (arguments string, content string, err error) {
 	if strings.HasPrefix(s, "1338;") || strings.HasPrefix(s, "1339;") {
 		// non-iTerm image, don't need to extract content
 		return s[len("1338;"):], "", nil
