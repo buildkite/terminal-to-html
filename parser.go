@@ -63,7 +63,7 @@ func (p *parser) handleItermEscape(char rune) {
 		return
 	}
 
-	ownLine := image == nil || !image.link
+	ownLine := image == nil || image.elementType != ELEMENT_LINK
 
 	if ownLine {
 		// Images (or the error encountered) should appear on their own line
