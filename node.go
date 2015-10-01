@@ -5,7 +5,7 @@ var emptyNode = node{blob: ' ', style: &emptyStyle}
 type node struct {
 	blob  rune
 	style *style
-	image *image
+	elem  *element
 }
 
 func (n *node) hasSameStyle(o node) bool {

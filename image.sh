@@ -7,7 +7,7 @@ if [ $# -eq 0 ]; then
 fi
 
 printf '\033]1338;url='
-printf $1
+echo -n $1
 printf '\a\n'
 
 exit 0
