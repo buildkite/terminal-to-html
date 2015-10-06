@@ -26,10 +26,7 @@ RUN apt-get install -y ruby ruby-dev rpm
 RUN gem install fpm package_cloud
 
 # Install UTF-8 locale for package_cloud
-RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
 
 RUN mkdir -p /go/src/github.com/buildkite/terminal
 ADD . /go/src/github.com/buildkite/terminal
