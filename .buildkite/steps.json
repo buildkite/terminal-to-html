@@ -28,7 +28,7 @@
     "name": ":octocat: Release",
     "command": "script/release",
     "env": { "BUILDKITE_DOCKER_COMPOSE_CONTAINER": "terminal" }
-  }
+  },
   {
     "type": "waiter"
   },
