@@ -25,7 +25,7 @@ for arch in amd64 386 arm; do
   deb_package_path="packages/terminal-to-html-$version-linux-$arch.deb"
   ./script/support/package "$arch_dist_file" "$version" "$arch" "deb" "$deb_package_path"
 
-  for deb_os in ubuntu/trusty ubuntu/utopic ubuntu/vivid ubuntu/wily debian/wheezy debian/jessie debian/stretch debian/buster; do
+  for deb_os in ubuntu/trusty; do
     echo "+++ :packagecloud: Pushing deb for $deb_os"
     package_cloud push "buildkite/terminal/$deb_os" "$deb_package_path"
   done
@@ -35,7 +35,7 @@ for arch in amd64 386 arm; do
   rpm_package_path="packages/terminal-to-html-$version-linux-$arch.rpm"
   ./script/support/package "$arch_dist_file" "$version" "$arch" "rpm" "$rpm_package_path"
 
-  for rpm_os in el/5 el/6 el/7 ol/5 ol/6 ol/7 fedora/20 fedora/21 fedora/22 fedora/23; do
+  for rpm_os in el/7; do
     echo "+++ :packagecloud: Pushing rpm for $rpm_os"
     package_cloud push "buildkite/terminal/$rpm_os" "$rpm_package_path"
   done
