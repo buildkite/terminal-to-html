@@ -2,12 +2,14 @@
   {
     "type": "script",
     "name": ":bomb: Test",
-    "command": "make test"
+    "command": "make test",
+    "env": { "BUILDKITE_DOCKER_COMPOSE_CONTAINER": "terminal" }
   },
   {
     "type": "script",
     "name": ":neckbeard: Benchmark",
-    "command": "make bench"
+    "command": "make bench",
+    "env": { "BUILDKITE_DOCKER_COMPOSE_CONTAINER": "terminal" }
   },
   {
     "type": "waiter"
@@ -15,7 +17,8 @@
   {
     "type": "script",
     "name": ":hammer: Build",
-    "command": "script/build"
+    "command": "script/build",
+    "env": { "BUILDKITE_DOCKER_COMPOSE_CONTAINER": "terminal" }
   },
   {
     "type": "manual"
@@ -23,6 +26,16 @@
   {
     "type": "script",
     "name": ":octocat: Release",
-    "command": "script/release"
+    "command": "script/release",
+    "env": { "BUILDKITE_DOCKER_COMPOSE_CONTAINER": "terminal" }
+  }
+  {
+    "type": "waiter"
+  },
+  {
+    "type": "script",
+    "name": ":packagecloud: Package",
+    "command": "script/package_and_upload",
+    "env": { "BUILDKITE_DOCKER_COMPOSE_CONTAINER": "terminal" }
   }
 ]
