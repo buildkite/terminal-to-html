@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -eu
+
+echo "+++ :package: Downloading dist artifacts"
+
+[ -d dist ] && rm -r dist; mkdir dist
+
+buildkite-agent artifact download "dist/*" dist
+
+echo "+++ :1234: Fetching version number from build meta-data"
+
+version=$(buildkite-agent meta-data get version)
+
+echo "+++ :package: Packaging"
+
+[ -d packages ] && rm -r packages; mkdir packages
+
+for arch in amd64 386 arm; do
+  for package_type in deb rpm; do
+
+    package_path="packages/terminal-to-html-$version-linux-$arch.$package_type"
+
+    echo "+++ :package: Building $package_type for $arch"
+    ./script/support/package "dist/terminal-to-html-$version-linux-$arch.gz" \
+                             "$version" \
+                             "$arch" \
+                             "$package_type" \
+                             "$package_path"
+
+    echo "+++ :packagecloud: Uploading $package_type for $arch"
+    package_cloud push buildkite/terminal "$package_path"
+
+  done
+done

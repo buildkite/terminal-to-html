@@ -21,6 +21,10 @@ RUN go get github.com/buildkite/github-release
 # Zip for win and osx releases
 RUN apt-get install -y zip
 
+# For creating deb and rpm packages
+RUN apt-get install -y ruby ruby-dev rpm
+RUN gem install fpm package_cloud
+
 RUN mkdir -p /go/src/github.com/buildkite/terminal
 ADD . /go/src/github.com/buildkite/terminal
 
