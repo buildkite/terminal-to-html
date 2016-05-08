@@ -13,7 +13,7 @@ type style struct {
 
 // True if both styles are equal (or are the same object)
 func (s *style) isEqual(o *style) bool {
-	return s == o || (s.fgColor == o.fgColor && s.bgColor == o.bgColor && s.otherColors == s.otherColors)
+	return s == o || (s.fgColor == o.fgColor && s.bgColor == o.bgColor && s.otherColors == o.otherColors)
 }
 
 // CSS classes that make up the style
