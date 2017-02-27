@@ -13,6 +13,7 @@ var TestFiles = []string{
 	"homer.sh",
 	"pikachu.sh",
 	"npm.sh",
+	"docker-pull.sh",
 }
 
 func loadFixture(base string, ext string) []byte {
