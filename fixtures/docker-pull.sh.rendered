@@ -1,5 +1,5 @@
-+ docker push 061442450191.dkr.ecr.eu-central-1.amazonaws.com/lol/thingy:9a5a7e9
-The push refers to a repository [061442450191.dkr.ecr.eu-central-1.amazonaws.com/lol/thingy]
++ docker push 061442450191.dkr.ecr.eu-central-1.amazonaws.com&#47;lol&#47;thingy:9a5a7e9
+The push refers to a repository [061442450191.dkr.ecr.eu-central-1.amazonaws.com&#47;lol&#47;thingy]
 07e62ecb726a: Layer already exists
 331743f747fb: Layer already exists
 2543649889c9: Layer already exists
