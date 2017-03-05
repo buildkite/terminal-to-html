@@ -13,6 +13,7 @@ var TestFiles = []string{
 	"homer.sh",
 	"pikachu.sh",
 	"npm.sh",
+	"docker-pull.sh",
 }
 
 func loadFixture(base string, ext string) []byte {
@@ -70,9 +71,9 @@ var rendererTestCases = []struct {
 		"this is\x1b[4Cpoop and stuff",
 		"this is    poop and stuff",
 	}, {
-		`doesn\"t allow you to jump down lines if the line doesn't exist"`,
+		`allows you to jump down further than the bottom of the buffer`,
 		"this is great \x1b[1Bhello",
-		"this is great hello",
+		"this is great\n              hello",
 	}, {
 		`allows you to control the cursor backwards`,
 		"this is good\x1b[4Dpoop and stuff",
