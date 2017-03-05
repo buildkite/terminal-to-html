@@ -25,10 +25,6 @@ func (s *style) isEqual(o *style) bool {
 func (s *style) asClasses() []string {
 	var styles []string
 
-	if s.isEmpty() {
-		return styles
-	}
-
 	if s.fgColor > 0 && s.fgColor < 38 && !s.fgColorX {
 		styles = append(styles, "term-fg"+strconv.Itoa(int(s.fgColor)))
 	}
@@ -84,7 +80,6 @@ func (s *style) color(colors []string) *style {
 	}
 
 	newStyle := style(*s)
-	oldStyle := s
 	s = &newStyle
 
 	if len(colors) > 2 {
@@ -155,11 +150,5 @@ func (s *style) color(colors []string) *style {
 			s.bgColorX = false
 		}
 	}
-	if s.isEmpty() {
-		return &emptyStyle
-	} else if *s == *oldStyle {
-		return oldStyle
-	} else {
-		return s
-	}
+	return s
 }
