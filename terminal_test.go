@@ -16,11 +16,11 @@ var TestFiles = []string{
 	"docker-pull.sh",
 }
 
-func loadFixture(base string, ext string) []byte {
+func loadFixture(t testing.TB, base string, ext string) []byte {
 	filename := fmt.Sprintf("fixtures/%s.%s", base, ext)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Errorf("could not load fixture %s: %v", filename, err)
+		t.Errorf("could not load fixture %s: %v", filename, err)
 	}
 	return data
 }
@@ -239,8 +239,8 @@ func TestRendererAgainstCases(t *testing.T) {
 
 func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
-		raw := loadFixture(base, "raw")
-		expected := string(loadFixture(base, "rendered"))
+		raw := loadFixture(t, base, "raw")
+		expected := string(loadFixture(t, base, "rendered"))
 
 		output := string(Render(raw))
 
@@ -281,6 +281,10 @@ func BenchmarkRendererHomer(b *testing.B) {
 	benchmark("homer.sh", b)
 }
 
+func BenchmarkRendererDockerPull(b *testing.B) {
+	benchmark("docker-pull.sh", b)
+}
+
 func BenchmarkRendererPikachu(b *testing.B) {
 	benchmark("pikachu.sh", b)
 }
@@ -290,7 +294,7 @@ func BenchmarkRendererNpm(b *testing.B) {
 }
 
 func benchmark(filename string, b *testing.B) {
-	raw := loadFixture(filename, "raw")
+	raw := loadFixture(b, filename, "raw")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Render(raw)
