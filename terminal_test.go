@@ -158,6 +158,10 @@ var rendererTestCases = []struct {
 		"\x1b[30;42m\x1b[2KOK (244 tests, 558 assertions)",
 		"<span class=\"term-fg30 term-bg42\">OK (244 tests, 558 assertions)</span>",
 	}, {
+		`does not attempt to incorrectly nest CSS in HTML (https://github.com/buildkite/terminal/issues/36)`,
+		"Some plain text\x1b[0;30;42m yay a green background \x1b[0m\x1b[0;33;49mnow this has no background but is yellow \x1b[0m",
+		"Some plain text<span class=\"term-fg30 term-bg42\"> yay a green background </span><span class=\"term-fg33\">now this has no background but is yellow </span>",
+	}, {
 		`handles xterm colors`,
 		"\x1b[38;5;169mhello\x1b[0m \x1b[38;5;179mgoodbye",
 		"<span class=\"term-fgx169\">hello</span> <span class=\"term-fgx179\">goodbye</span>",
