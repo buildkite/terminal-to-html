@@ -172,7 +172,7 @@ var rendererTestCases = []struct {
 	}, {
 		`handles colors with 3 attributes`,
 		"\x1b[0;10;4m\x1b[1m\x1b[34mgood news\x1b[0;10m\n\neveryone",
-		"<span class=\"term-fg34 term-fg4 term-fg1\">good news</span>\n&nbsp;\neveryone",
+		"<span class=\"term-fg34 term-fg1 term-fg4\">good news</span>\n&nbsp;\neveryone",
 	}, {
 		`ends underlining with \x1b[24`,
 		"\x1b[4mbegin\x1b[24m\r\nend",
