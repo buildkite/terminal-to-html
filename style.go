@@ -1,6 +1,5 @@
 package terminal
 
-import "strings"
 import "strconv"
 
 var emptyStyle = style{}
@@ -23,12 +22,13 @@ func (s *style) isEqual(o *style) bool {
 }
 
 // CSS classes that make up the style
-func (s *style) asClasses() string {
+func (s *style) asClasses() []string {
+	var styles []string
+
 	if s.isEmpty() {
-		return ""
+		return styles
 	}
 
-	var styles []string
 	if s.fgColor > 0 && s.fgColor < 38 && !s.fgColorX {
 		styles = append(styles, "term-fg"+strconv.Itoa(int(s.fgColor)))
 	}
@@ -67,7 +67,7 @@ func (s *style) asClasses() string {
 		styles = append(styles, "term-fg9")
 	}
 
-	return strings.Join(styles, " ")
+	return styles
 }
 
 // True if style is empty
@@ -84,6 +84,7 @@ func (s *style) color(colors []string) *style {
 	}
 
 	newStyle := style(*s)
+	oldStyle := s
 	s = &newStyle
 
 	if len(colors) > 2 {
@@ -134,13 +135,10 @@ func (s *style) color(colors []string) *style {
 		case 21, 22:
 			s.bold = false
 			s.faint = false
-			// Turn off italic
 		case 23:
 			s.italic = false
-			// Turn off underline
 		case 24:
 			s.underline = false
-			// Turn off crossed-out
 		case 29:
 			s.strike = false
 		case 39:
@@ -149,23 +147,19 @@ func (s *style) color(colors []string) *style {
 		case 49:
 			s.bgColor = 0
 			s.bgColorX = false
-			// 30–37, then it's a foreground color
-		case 30, 31, 32, 33, 34, 35, 36, 37:
+		case 30, 31, 32, 33, 34, 35, 36, 37, 90, 91, 92, 93, 94, 95, 96, 97:
 			s.fgColor = uint8(cc)
 			s.fgColorX = false
-			// 40–47, then it's a background color.
-		case 40, 41, 42, 43, 44, 45, 46, 47:
-			s.bgColor = uint8(cc)
-			s.bgColorX = false
-			// 90-97 is like the regular fg color, but high intensity
-		case 90, 91, 92, 93, 94, 95, 96, 97:
-			s.fgColor = uint8(cc)
-			s.fgColorX = false
-			// 100-107 is like the regular bg color, but high intensity
-		case 100, 101, 102, 103, 104, 105, 106, 107:
+		case 40, 41, 42, 43, 44, 45, 46, 47, 100, 101, 102, 103, 104, 105, 106, 107:
 			s.bgColor = uint8(cc)
 			s.bgColorX = false
 		}
 	}
-	return s
+	if s.isEmpty() {
+		return &emptyStyle
+	} else if *s == *oldStyle {
+		return oldStyle
+	} else {
+		return s
+	}
 }
