@@ -4,7 +4,7 @@
   color: white;
   word-break: break-word;
   overflow-wrap: break-word;
-  font-family: Monaco, courier;
+  font-family: Monaco, Consolas, monospace;
   font-size: 12px;
   line-height: 20px;
   padding: 14px 18px;
