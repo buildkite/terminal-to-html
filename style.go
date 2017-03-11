@@ -17,6 +17,14 @@ type style struct {
 	blink     bool
 }
 
+const (
+	COLOR_NORMAL        = iota
+	COLOR_GOT_38_NEED_5 = iota
+	COLOR_GOT_48_NEED_5 = iota
+	COLOR_GOT_38        = iota
+	COLOR_GOT_48        = iota
+)
+
 // True if both styles are equal (or are the same object)
 func (s *style) isEqual(o *style) bool {
 	return s == o || *s == *o
@@ -85,10 +93,7 @@ func (s *style) color(colors []string) *style {
 
 	newStyle := style(*s)
 	s = &newStyle
-
-	receivedXtermFG := false
-	receivedXtermBG := false
-	gotXtermFive := false
+	color_mode := COLOR_NORMAL
 
 	for _, ccs := range colors {
 		// If multiple colors are defined, i.e. \e[30;42m\e then loop through each
@@ -98,32 +103,31 @@ func (s *style) color(colors []string) *style {
 			continue
 		}
 
-		// We've received 38 or 48, but not the subsequent 5
-		if (receivedXtermFG || receivedXtermBG) && !gotXtermFive {
+		// State machine for XTerm colors, eg 38;5;150
+		switch color_mode {
+		case COLOR_GOT_38_NEED_5:
 			if cc == 5 {
-				gotXtermFive = true
-				continue
+				color_mode = COLOR_GOT_38
 			} else {
-				receivedXtermFG = false
-				receivedXtermBG = false
+				color_mode = COLOR_NORMAL
 			}
-		}
-
-		// We've received 38 and five, next is the actual colour
-		if receivedXtermFG && gotXtermFive {
+			continue
+		case COLOR_GOT_48_NEED_5:
+			if cc == 5 {
+				color_mode = COLOR_GOT_48
+			} else {
+				color_mode = COLOR_NORMAL
+			}
+			continue
+		case COLOR_GOT_38:
 			s.fgColor = uint8(cc)
 			s.fgColorX = true
-			receivedXtermFG = false
-			gotXtermFive = false
+			color_mode = COLOR_NORMAL
 			continue
-		}
-
-		// We've received 48 and five, next is the actual colour
-		if receivedXtermBG && gotXtermFive {
+		case COLOR_GOT_48:
 			s.bgColor = uint8(cc)
 			s.bgColorX = true
-			receivedXtermBG = false
-			gotXtermFive = false
+			color_mode = COLOR_NORMAL
 			continue
 		}
 
@@ -158,12 +162,12 @@ func (s *style) color(colors []string) *style {
 		case 29:
 			s.strike = false
 		case 38:
-			receivedXtermFG = true
+			color_mode = COLOR_GOT_38_NEED_5
 		case 39:
 			s.fgColor = 0
 			s.fgColorX = false
 		case 48:
-			receivedXtermBG = true
+			color_mode = COLOR_GOT_48_NEED_5
 		case 49:
 			s.bgColor = 0
 			s.bgColorX = false
