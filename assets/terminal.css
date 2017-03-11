@@ -15,9 +15,19 @@
   max-width: 100%;
 }
 
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
 .term-fg1 { } /* don't bold beccause it looks weird */
 .term-fg3 { font-style: italic; } /* italic */
 .term-fg4 { text-decoration: underline; } /* underline */
+.term-fg5 {
+  animation: blink-animation 1s steps(3, start) infinite;
+}
+
 .term-fg9 { text-decoration: line-through; } /* crossed-out */
 
 .term-fg30 { color: #666; } /* black (but we can't use black, so a diff color) */
