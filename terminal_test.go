@@ -14,6 +14,7 @@ var TestFiles = []string{
 	"pikachu.sh",
 	"npm.sh",
 	"docker-pull.sh",
+	"weather.sh",
 }
 
 func loadFixture(t testing.TB, base string, ext string) []byte {
