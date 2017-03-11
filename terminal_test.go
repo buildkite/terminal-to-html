@@ -163,8 +163,12 @@ var rendererTestCases = []struct {
 		"Some plain text<span class=\"term-fg30 term-bg42\"> yay a green background </span><span class=\"term-fg33\">now this has no background but is yellow </span>",
 	}, {
 		`handles xterm colors`,
-		"\x1b[38;5;169mhello\x1b[0m \x1b[38;5;179mgoodbye",
-		"<span class=\"term-fgx169\">hello</span> <span class=\"term-fgx179\">goodbye</span>",
+		"\x1b[38;5;169;48;5;50mhello\x1b[0m \x1b[38;5;179mgoodbye",
+		"<span class=\"term-fgx169 term-bgx50\">hello</span> <span class=\"term-fgx179\">goodbye</span>",
+	}, {
+		`handles non-xterm codes on the same line as xterm colors`,
+		"\x1b[38;5;228;5;1mblinking and bold\x1b",
+		`<span class="term-fgx228 term-fg1 term-fg5">blinking and bold</span>`,
 	}, {
 		`ignores broken escape characters, stripping the escape rune itself`,
 		"hi amazing \x1b[12 nom nom nom friends",
