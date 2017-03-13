@@ -14,7 +14,16 @@ type style struct {
 	italic    bool
 	underline bool
 	strike    bool
+	blink     bool
 }
+
+const (
+	COLOR_NORMAL        = iota
+	COLOR_GOT_38_NEED_5 = iota
+	COLOR_GOT_48_NEED_5 = iota
+	COLOR_GOT_38        = iota
+	COLOR_GOT_48        = iota
+)
 
 // True if both styles are equal (or are the same object)
 func (s *style) isEqual(o *style) bool {
@@ -59,6 +68,9 @@ func (s *style) asClasses() []string {
 	if s.underline {
 		styles = append(styles, "term-fg4")
 	}
+	if s.blink {
+		styles = append(styles, "term-fg5")
+	}
 	if s.strike {
 		styles = append(styles, "term-fg9")
 	}
@@ -81,32 +93,41 @@ func (s *style) color(colors []string) *style {
 
 	newStyle := style(*s)
 	s = &newStyle
-
-	if len(colors) > 2 {
-		cc, err := strconv.ParseUint(colors[2], 10, 8)
-		if err != nil {
-			return s
-		}
-		if colors[0] == "38" && colors[1] == "5" {
-			// Extended set foreground x-term color
-			s.fgColor = uint8(cc)
-			s.fgColorX = true
-			return s
-		}
-
-		// Extended set background x-term color
-		if colors[0] == "48" && colors[1] == "5" {
-			s.bgColor = uint8(cc)
-			s.bgColorX = true
-			return s
-		}
-	}
+	color_mode := COLOR_NORMAL
 
 	for _, ccs := range colors {
 		// If multiple colors are defined, i.e. \e[30;42m\e then loop through each
 		// one, and assign it to s.fgColor or s.bgColor
 		cc, err := strconv.ParseUint(ccs, 10, 8)
 		if err != nil {
+			continue
+		}
+
+		// State machine for XTerm colors, eg 38;5;150
+		switch color_mode {
+		case COLOR_GOT_38_NEED_5:
+			if cc == 5 {
+				color_mode = COLOR_GOT_38
+			} else {
+				color_mode = COLOR_NORMAL
+			}
+			continue
+		case COLOR_GOT_48_NEED_5:
+			if cc == 5 {
+				color_mode = COLOR_GOT_48
+			} else {
+				color_mode = COLOR_NORMAL
+			}
+			continue
+		case COLOR_GOT_38:
+			s.fgColor = uint8(cc)
+			s.fgColorX = true
+			color_mode = COLOR_NORMAL
+			continue
+		case COLOR_GOT_48:
+			s.bgColor = uint8(cc)
+			s.bgColorX = true
+			color_mode = COLOR_NORMAL
 			continue
 		}
 
@@ -125,6 +146,8 @@ func (s *style) color(colors []string) *style {
 			s.italic = true
 		case 4:
 			s.underline = true
+		case 5, 6:
+			s.blink = true
 		case 9:
 			s.strike = true
 		case 21, 22:
@@ -134,11 +157,17 @@ func (s *style) color(colors []string) *style {
 			s.italic = false
 		case 24:
 			s.underline = false
+		case 25:
+			s.blink = false
 		case 29:
 			s.strike = false
+		case 38:
+			color_mode = COLOR_GOT_38_NEED_5
 		case 39:
 			s.fgColor = 0
 			s.fgColorX = false
+		case 48:
+			color_mode = COLOR_GOT_48_NEED_5
 		case 49:
 			s.bgColor = 0
 			s.bgColorX = false
