@@ -10,8 +10,13 @@ import (
 type screen struct {
 	x      int
 	y      int
-	screen [][]node
+	screen []screenLine
 	style  *style
+}
+
+type screenLine struct {
+	dirty bool
+	nodes []node
 }
 
 const screenEndOfLine = -1
@@ -24,15 +29,15 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 	}
 
 	if xStart == screenStartOfLine && xEnd == screenEndOfLine {
-		s.screen[y] = make([]node, 0, 80)
+		s.screen[y].nodes = make([]node, 0, 80)
 	} else {
 		line := s.screen[y]
 
 		if xEnd == screenEndOfLine {
-			xEnd = len(line) - 1
+			xEnd = len(line.nodes) - 1
 		}
-		for i := xStart; i <= xEnd && i < len(line); i++ {
-			line[i] = emptyNode
+		for i := xStart; i <= xEnd && i < len(line.nodes); i++ {
+			line.nodes[i] = emptyNode
 		}
 	}
 }
@@ -71,7 +76,8 @@ func (s *screen) backward(i string) {
 // Add rows to our screen if necessary
 func (s *screen) growScreenHeight() {
 	for i := len(s.screen); i <= s.y; i++ {
-		s.screen = append(s.screen, make([]node, 0, 80))
+		s.screen = append(s.screen, screenLine{})
+		s.screen[i].nodes = make([]node, 0, 80)
 	}
 }
 
@@ -87,11 +93,11 @@ func (s *screen) growLineWidth(line []node) []node {
 func (s *screen) write(data rune) {
 	s.growScreenHeight()
 
-	line := s.screen[s.y]
+	line := s.screen[s.y].nodes
 	line = s.growLineWidth(line)
 
 	line[s.x] = node{blob: data, style: s.style}
-	s.screen[s.y] = line
+	s.screen[s.y].nodes = line
 }
 
 // Append a character to the screen
@@ -109,10 +115,10 @@ func (s *screen) appendMany(data []rune) {
 
 func (s *screen) appendElement(i *element) {
 	s.growScreenHeight()
-	line := s.growLineWidth(s.screen[s.y])
+	line := s.growLineWidth(s.screen[s.y].nodes)
 
 	line[s.x] = node{style: s.style, elem: i}
-	s.screen[s.y] = line
+	s.screen[s.y].nodes = line
 	s.x++
 }
 
@@ -164,7 +170,7 @@ func (s *screen) asHTML() []byte {
 	var lines []string
 
 	for _, line := range s.screen {
-		lines = append(lines, outputLineAsHTML(line))
+		lines = append(lines, outputLineAsHTML(line.nodes))
 	}
 
 	return []byte(strings.Join(lines, "\n"))
