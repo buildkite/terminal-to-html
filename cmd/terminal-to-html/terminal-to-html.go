@@ -8,6 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"io"
 
 	"github.com/buildkite/terminal"
 	"github.com/codegangsta/cli"
@@ -28,6 +31,8 @@ OPTIONS:
 `
 
 var PreviewMode = false
+var DebugPoller = 0
+var RateLimit = 0
 
 var PreviewTemplate = `
 	<!DOCTYPE html>
@@ -80,6 +85,46 @@ func stdin() {
 	fmt.Printf("%s", wrapPreview(terminal.Render(input)))
 }
 
+func streamStdin() {
+	streamer := new(terminal.Streamer)
+
+	if len(flag.Arg(0)) > 0 {
+		log.Fatalf("Can't specify debugPoller and an input file, use stdin instead")
+	}
+	poller := time.NewTicker(time.Millisecond * time.Duration(DebugPoller))
+
+	go func() {
+		for _ = range poller.C {
+			output, err := streamer.Dirty()
+			check("Error streaming output", err)
+			for _, line := range output {
+				fmt.Printf("%s\n", line)
+			}
+		}
+	}()
+
+	buf := make([]byte, 100)
+	bytesRead := 0
+	for {
+		n, err := os.Stdin.Read(buf)
+		if err == io.EOF {
+			break
+		}
+		bytesRead += n
+		if bytesRead > RateLimit/10 && RateLimit > 0 {
+			time.Sleep(time.Millisecond * 100)
+		}
+		check("could not read stdin", err)
+		streamer.Write(buf[0:n])
+	}
+	poller.Stop()
+	output, err := streamer.Dirty()
+	check("Error streaming output", err)
+	for _, line := range output {
+		fmt.Printf("%s\n", line)
+	}
+}
+
 func main() {
 	cli.AppHelpTemplate = AppHelpTemplate
 
@@ -98,11 +143,24 @@ func main() {
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
+		cli.IntFlag{
+			Name:  "debugPoller",
+			Usage: "Print streaming updates every N milliseconds",
+		},
+		cli.IntFlag{
+			Name:  "rateLimit",
+			Usage: "Rate limit the STDIN / file reader to N bytes per second",
+		},
 	}
 	app.Action = func(c *cli.Context) {
 		PreviewMode = c.Bool("preview")
+		DebugPoller = c.Int("debugPoller")
+		RateLimit = c.Int("rateLimit")
+
 		if c.String("http") != "" {
 			webservice(c.String("http"))
+		} else if DebugPoller > 0 {
+			streamStdin()
 		} else {
 			stdin()
 		}

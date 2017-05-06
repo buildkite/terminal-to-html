@@ -4,19 +4,25 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // A terminal 'screen'. Current cursor position, cursor style, and characters
 type screen struct {
-	x      int
-	y      int
-	screen []screenLine
-	style  *style
+	x          int
+	y          int
+	screen     []screenLine
+	style      *style
+	dirtyMutex sync.Mutex
 }
 
 type screenLine struct {
 	dirty bool
 	nodes []node
+}
+type dirtyLine struct {
+	Y    int    `json:"y"`
+	HTML string `json:"html"`
 }
 
 const screenEndOfLine = -1
@@ -27,6 +33,7 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 	if len(s.screen) <= y {
 		return
 	}
+	s.screen[y].dirty = true
 
 	if xStart == screenStartOfLine && xEnd == screenEndOfLine {
 		s.screen[y].nodes = make([]node, 0, 80)
@@ -40,6 +47,33 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 			line.nodes[i] = emptyNode
 		}
 	}
+}
+
+func (s *screen) flushDirty() []dirtyLine {
+	lines := make([]dirtyLine, 0, 0)
+
+	s.dirtyMutex.Lock()
+	for y := range s.screen {
+		if s.screen[y].dirty {
+			s.screen[y].dirty = false
+			lines = append(lines, dirtyLine{Y: y, HTML: outputLineAsHTML(s.screen[y].nodes)})
+		}
+	}
+	s.dirtyMutex.Unlock()
+
+	return lines
+}
+
+func (s *screen) flushAll() []dirtyLine {
+	lines := make([]dirtyLine, len(s.screen))
+
+	s.dirtyMutex.Lock()
+	for y := range s.screen {
+		lines[y] = dirtyLine{Y: y, HTML: outputLineAsHTML(s.screen[y].nodes)}
+	}
+	s.dirtyMutex.Unlock()
+
+	return lines
 }
 
 // "Safe" parseint for parsing ANSI instructions
@@ -76,7 +110,7 @@ func (s *screen) backward(i string) {
 // Add rows to our screen if necessary
 func (s *screen) growScreenHeight() {
 	for i := len(s.screen); i <= s.y; i++ {
-		s.screen = append(s.screen, screenLine{})
+		s.screen = append(s.screen, screenLine{dirty: true})
 		s.screen[i].nodes = make([]node, 0, 80)
 	}
 }
@@ -97,6 +131,7 @@ func (s *screen) write(data rune) {
 	line = s.growLineWidth(line)
 
 	line[s.x] = node{blob: data, style: s.style}
+	s.screen[s.y].dirty = true
 	s.screen[s.y].nodes = line
 }
 
@@ -118,6 +153,7 @@ func (s *screen) appendElement(i *element) {
 	line := s.growLineWidth(s.screen[s.y].nodes)
 
 	line[s.x] = node{style: s.style, elem: i}
+	s.screen[s.y].dirty = true
 	s.screen[s.y].nodes = line
 	s.x++
 }
