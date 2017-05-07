@@ -243,9 +243,6 @@ func main() {
 
 		webservice(c.String("http"))
 		<-readDone
-
-		fmt.Println(string(streamer.Render()))
-
 	}
 	app.Run(os.Args)
 }
