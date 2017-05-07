@@ -14,6 +14,7 @@ import (
 
 	"github.com/buildkite/terminal"
 	"github.com/codegangsta/cli"
+	"golang.org/x/net/websocket"
 )
 
 var AppHelpTemplate = `{{.Name}} - {{.Usage}}
@@ -31,8 +32,9 @@ OPTIONS:
 `
 
 var PreviewMode = false
-var DebugPoller = 0
+var Debug = false
 var RateLimit = 0
+var Interval = 0
 
 var PreviewTemplate = `
 	<!DOCTYPE html>
@@ -46,6 +48,9 @@ var PreviewTemplate = `
 		</body>
 	</html>
 `
+
+var streamer = new(terminal.Streamer)
+var readDone = make(chan bool)
 
 func check(m string, e error) {
 	if e != nil {
@@ -61,11 +66,24 @@ func wrapPreview(s []byte) []byte {
 	return s
 }
 
+func terminalWebsocket(ws *websocket.Conn) {
+}
+
 func webservice(listen string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		input, err := ioutil.ReadAll(r.Body)
 		check("could not read from HTTP stream", err)
 		w.Write(wrapPreview(terminal.Render(input)))
+	})
+
+	http.HandleFunc("/assets/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, r.URL.Path[1:])
+	})
+
+	http.Handle("/ws", websocket.Handler(terminalWebsocket))
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "assets/index.html")
 	})
 
 	log.Printf("Listening on %s", listen)
@@ -85,28 +103,36 @@ func stdin() {
 	fmt.Printf("%s", wrapPreview(terminal.Render(input)))
 }
 
-func streamStdin() {
-	streamer := new(terminal.Streamer)
-
-	if len(flag.Arg(0)) > 0 {
-		log.Fatalf("Can't specify debugPoller and an input file, use stdin instead")
+func streamDirty() {
+	output, err := streamer.Dirty()
+	check("Error streaming output", err)
+	for _, line := range output {
+		if Debug {
+			fmt.Printf("%s\n", line)
+		}
 	}
-	poller := time.NewTicker(time.Millisecond * time.Duration(DebugPoller))
+}
+
+func stream() {
+	reader := os.Stdin
+	if len(flag.Arg(0)) > 0 {
+		file, err := os.Open(flag.Arg(0))
+		check(fmt.Sprintf("could not read %s", flag.Arg(0)), err)
+		reader = file
+	}
+
+	poller := time.NewTicker(time.Millisecond * time.Duration(Interval))
 
 	go func() {
 		for _ = range poller.C {
-			output, err := streamer.Dirty()
-			check("Error streaming output", err)
-			for _, line := range output {
-				fmt.Printf("%s\n", line)
-			}
+			streamDirty()
 		}
 	}()
 
 	buf := make([]byte, 100)
 	bytesRead := 0
 	for {
-		n, err := os.Stdin.Read(buf)
+		n, err := reader.Read(buf)
 		if err == io.EOF {
 			break
 		}
@@ -118,11 +144,8 @@ func streamStdin() {
 		streamer.Write(buf[0:n])
 	}
 	poller.Stop()
-	output, err := streamer.Dirty()
-	check("Error streaming output", err)
-	for _, line := range output {
-		fmt.Printf("%s\n", line)
-	}
+	streamDirty()
+	readDone <- true
 }
 
 func main() {
@@ -143,9 +166,13 @@ func main() {
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
+		cli.BoolFlag{
+			Name:  "debug",
+			Usage: "Print updates from the streamer to stdout",
+		},
 		cli.IntFlag{
-			Name:  "debugPoller",
-			Usage: "Print streaming updates every N milliseconds",
+			Name:  "interval",
+			Usage: "Send updates to clients every N milliseconds (default 100)",
 		},
 		cli.IntFlag{
 			Name:  "rateLimit",
@@ -154,16 +181,18 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) {
 		PreviewMode = c.Bool("preview")
-		DebugPoller = c.Int("debugPoller")
+		Debug = c.Bool("debug")
 		RateLimit = c.Int("rateLimit")
+		Interval = c.Int("interval")
+		if Interval == 0 {
+			Interval = 100
+		}
 
+		go stream()
 		if c.String("http") != "" {
 			webservice(c.String("http"))
-		} else if DebugPoller > 0 {
-			streamStdin()
-		} else {
-			stdin()
 		}
+		<-readDone
 	}
 	app.Run(os.Args)
 }
