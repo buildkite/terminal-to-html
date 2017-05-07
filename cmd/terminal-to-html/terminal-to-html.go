@@ -54,7 +54,12 @@ var streamer = new(terminal.Streamer)
 var readDone = make(chan bool)
 
 var wsClientMutex = new(sync.Mutex)
-var wsClients = make([]*websocket.Conn, 0)
+var wsClients = make([]wsClient, 0)
+
+type wsClient struct {
+	ws     *websocket.Conn
+	writer chan terminal.DirtyLine
+}
 
 func check(m string, e error) {
 	if e != nil {
@@ -71,29 +76,37 @@ func wrapPreview(s []byte) []byte {
 }
 
 func terminalWebsocket(ws *websocket.Conn) {
-	writeWS(ws, streamer.Flush(true))
+	data := streamer.Flush(true)
 
+	for _, line := range data {
+		err := websocket.JSON.Send(ws, line)
+		if err != nil {
+			fmt.Printf("Warning: Could not send initial status to websocket: %s", err)
+			return
+		}
+	}
+
+	wsClient := wsClient{ws, make(chan terminal.DirtyLine, 100)}
 	wsClientMutex.Lock()
-	wsClients = append(wsClients, ws)
+	wsClients = append(wsClients, wsClient)
 	wsClientMutex.Unlock()
 
-	for {
-	}
-}
+	defer func() {
+		wsClientMutex.Lock()
+		for i, c := range wsClients {
+			if c == wsClient {
+				wsClients = append(wsClients[:i], wsClients[i+1:]...)
+				break
+			}
+		}
+		wsClientMutex.Unlock()
+	}()
 
-func writeWS(ws *websocket.Conn, data []terminal.DirtyLine) {
-	for _, line := range data {
+	for line := range wsClient.writer {
 		err := websocket.JSON.Send(ws, &line)
 		if err != nil {
 			fmt.Printf("Warning: Could not write to websocket %s", err)
-			wsClientMutex.Lock()
-			for i, conn := range wsClients {
-				if conn == ws {
-					wsClients = append(wsClients[:i], wsClients[i+1:]...)
-					break
-				}
-			}
-			wsClientMutex.Unlock()
+			return
 		}
 	}
 }
@@ -136,18 +149,20 @@ func streamDirty() {
 	output := streamer.Flush(false)
 
 	wsClientMutex.Lock()
-	clients := make([]*websocket.Conn, len(wsClients))
-	copy(clients, wsClients)
-	wsClientMutex.Unlock()
 
-	for _, line := range output {
-		if Debug {
+	if Debug {
+		for _, line := range output {
 			fmt.Printf("%d: %s\n", line.Y, line.HTML)
 		}
 	}
-	for _, client := range clients {
-		writeWS(client, output)
+
+	for _, client := range wsClients {
+		for _, line := range output {
+			client.writer <- line
+		}
 	}
+	wsClientMutex.Unlock()
+
 }
 
 func stream(filename string) {
