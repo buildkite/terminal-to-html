@@ -113,11 +113,11 @@ func streamDirty() {
 	}
 }
 
-func stream() {
+func stream(filename string) {
 	reader := os.Stdin
-	if len(flag.Arg(0)) > 0 {
-		file, err := os.Open(flag.Arg(0))
-		check(fmt.Sprintf("could not read %s", flag.Arg(0)), err)
+	if len(filename) > 0 {
+		file, err := os.Open(filename)
+		check(fmt.Sprintf("could not read %s", filename), err)
 		reader = file
 	}
 
@@ -140,7 +140,7 @@ func stream() {
 		if bytesRead > RateLimit/10 && RateLimit > 0 {
 			time.Sleep(time.Millisecond * 100)
 		}
-		check("could not read stdin", err)
+		check("could not read stdin/reader", err)
 		streamer.Write(buf[0:n])
 	}
 	poller.Stop()
@@ -159,8 +159,8 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "http",
-			Value: "",
-			Usage: "HTTP service mode (eg --http :6060), endpoint is /terminal",
+			Value: ":6060",
+			Usage: "HTTP port number (eg --http :6060)",
 		},
 		cli.BoolFlag{
 			Name:  "preview",
@@ -172,6 +172,7 @@ func main() {
 		},
 		cli.IntFlag{
 			Name:  "interval",
+			Value: 100,
 			Usage: "Send updates to clients every N milliseconds (default 100)",
 		},
 		cli.IntFlag{
@@ -184,14 +185,12 @@ func main() {
 		Debug = c.Bool("debug")
 		RateLimit = c.Int("rateLimit")
 		Interval = c.Int("interval")
-		if Interval == 0 {
-			Interval = 100
-		}
 
-		go stream()
-		if c.String("http") != "" {
-			webservice(c.String("http"))
-		}
+		fmt.Println(c.Args().First())
+		go stream(c.Args().First())
+
+		webservice(c.String("http"))
+
 		<-readDone
 	}
 	app.Run(os.Args)
