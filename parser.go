@@ -57,10 +57,15 @@ type parser struct {
  */
 
 func parseANSIToScreen(s *screen, ansi []byte) {
-	p := parser{mode: MODE_NORMAL, ansi: ansi, screen: s}
-	p.mode = MODE_NORMAL
+	if s.parser == nil {
+		s.parser = &parser{mode: MODE_NORMAL, screen: s}
+	}
+	p := s.parser
+	idx := len(p.ansi)
+	p.ansi = append(p.ansi, ansi...)
 	length := len(p.ansi)
-	for p.cursor = 0; p.cursor < length; {
+
+	for p.cursor = idx; p.cursor < length; {
 		char, charLen := utf8.DecodeRune(p.ansi[p.cursor:])
 
 		switch p.mode {

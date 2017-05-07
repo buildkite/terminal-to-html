@@ -14,13 +14,14 @@ type screen struct {
 	screen     []screenLine
 	style      *style
 	dirtyMutex sync.Mutex
+	parser     *parser
 }
 
 type screenLine struct {
 	dirty bool
 	nodes []node
 }
-type dirtyLine struct {
+type DirtyLine struct {
 	Y    int    `json:"y"`
 	HTML string `json:"html"`
 }
@@ -49,14 +50,14 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 	}
 }
 
-func (s *screen) flushDirty() []dirtyLine {
-	lines := make([]dirtyLine, 0, 0)
+func (s *screen) flushDirty() []DirtyLine {
+	lines := make([]DirtyLine, 0, 0)
 
 	s.dirtyMutex.Lock()
 	for y := range s.screen {
 		if s.screen[y].dirty {
 			s.screen[y].dirty = false
-			lines = append(lines, dirtyLine{Y: y, HTML: outputLineAsHTML(s.screen[y].nodes)})
+			lines = append(lines, DirtyLine{Y: y, HTML: outputLineAsHTML(s.screen[y].nodes)})
 		}
 	}
 	s.dirtyMutex.Unlock()
@@ -64,12 +65,12 @@ func (s *screen) flushDirty() []dirtyLine {
 	return lines
 }
 
-func (s *screen) flushAll() []dirtyLine {
-	lines := make([]dirtyLine, len(s.screen))
+func (s *screen) flushAll() []DirtyLine {
+	lines := make([]DirtyLine, len(s.screen))
 
 	s.dirtyMutex.Lock()
 	for y := range s.screen {
-		lines[y] = dirtyLine{Y: y, HTML: outputLineAsHTML(s.screen[y].nodes)}
+		lines[y] = DirtyLine{Y: y, HTML: outputLineAsHTML(s.screen[y].nodes)}
 	}
 	s.dirtyMutex.Unlock()
 
@@ -197,7 +198,9 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 
 // Parse ANSI input, populate our screen buffer with nodes
 func (s *screen) parse(ansi []byte) {
-	s.style = &emptyStyle
+	if s.style == nil {
+		s.style = &emptyStyle
+	}
 
 	parseANSIToScreen(s, ansi)
 }

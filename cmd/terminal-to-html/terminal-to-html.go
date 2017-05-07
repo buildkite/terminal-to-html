@@ -81,12 +81,19 @@ func terminalWebsocket(ws *websocket.Conn) {
 	}
 }
 
-func writeWS(ws *websocket.Conn, data [][]byte) {
+func writeWS(ws *websocket.Conn, data []terminal.DirtyLine) {
 	for _, line := range data {
-		line = append(line, byte('\n'))
-		n, err := ws.Write(line)
+		err := websocket.JSON.Send(ws, &line)
 		if err != nil {
-			log.Fatalf("Could not write to websocket, wrote %d bytes of %d: %s", n, len(data), err)
+			fmt.Printf("Warning: Could not write to websocket %s", err)
+			wsClientMutex.Lock()
+			for i, conn := range wsClients {
+				if conn == ws {
+					wsClients = append(wsClients[:i], wsClients[i+1:]...)
+					break
+				}
+			}
+			wsClientMutex.Unlock()
 		}
 	}
 }
@@ -129,17 +136,18 @@ func streamDirty() {
 	output := streamer.Flush(false)
 
 	wsClientMutex.Lock()
+	clients := make([]*websocket.Conn, len(wsClients))
+	copy(clients, wsClients)
+	wsClientMutex.Unlock()
 
 	for _, line := range output {
 		if Debug {
-			fmt.Printf("%s\n", line)
+			fmt.Printf("%d: %s\n", line.Y, line.HTML)
 		}
 	}
-	for _, client := range wsClients {
+	for _, client := range clients {
 		writeWS(client, output)
 	}
-
-	wsClientMutex.Unlock()
 }
 
 func stream(filename string) {
@@ -219,8 +227,10 @@ func main() {
 		go stream(c.Args().First())
 
 		webservice(c.String("http"))
-
 		<-readDone
+
+		fmt.Println(string(streamer.Render()))
+
 	}
 	app.Run(os.Args)
 }

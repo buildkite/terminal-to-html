@@ -12,8 +12,6 @@ package terminal
 
 import (
 	"bytes"
-	"encoding/json"
-	"log"
 	"sync"
 )
 
@@ -40,23 +38,15 @@ func (s *Streamer) Render() []byte {
 	return bytes.Replace(s.screen.asHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
 }
 
-func (s *Streamer) Flush(all bool) [][]byte {
+func (s *Streamer) Flush(all bool) []DirtyLine {
 	s.mutex.Lock()
-	var dirtyLines []dirtyLine
+	var lines []DirtyLine
 	if all {
-		dirtyLines = s.screen.flushAll()
+		lines = s.screen.flushAll()
 	} else {
-		dirtyLines = s.screen.flushDirty()
+		lines = s.screen.flushDirty()
 	}
 	s.mutex.Unlock()
 
-	output := make([][]byte, len(dirtyLines))
-	for idx, line := range dirtyLines {
-		lineOut, err := json.Marshal(line)
-		if err != nil {
-			log.Fatalf("Couldn't encode %q to JSON: %s", line, err)
-		}
-		output[idx] = lineOut
-	}
-	return output
+	return lines
 }
