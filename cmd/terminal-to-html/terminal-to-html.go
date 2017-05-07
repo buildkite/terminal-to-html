@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"io"
@@ -52,6 +53,9 @@ var PreviewTemplate = `
 var streamer = new(terminal.Streamer)
 var readDone = make(chan bool)
 
+var wsClientMutex = new(sync.Mutex)
+var wsClients = make([]*websocket.Conn, 0)
+
 func check(m string, e error) {
 	if e != nil {
 		log.Fatalf("%s: %v", m, e)
@@ -67,6 +71,24 @@ func wrapPreview(s []byte) []byte {
 }
 
 func terminalWebsocket(ws *websocket.Conn) {
+	writeWS(ws, streamer.Flush(true))
+
+	wsClientMutex.Lock()
+	wsClients = append(wsClients, ws)
+	wsClientMutex.Unlock()
+
+	for {
+	}
+}
+
+func writeWS(ws *websocket.Conn, data [][]byte) {
+	for _, line := range data {
+		line = append(line, byte('\n'))
+		n, err := ws.Write(line)
+		if err != nil {
+			log.Fatalf("Could not write to websocket, wrote %d bytes of %d: %s", n, len(data), err)
+		}
+	}
 }
 
 func webservice(listen string) {
@@ -104,13 +126,20 @@ func stdin() {
 }
 
 func streamDirty() {
-	output, err := streamer.Dirty()
-	check("Error streaming output", err)
+	output := streamer.Flush(false)
+
+	wsClientMutex.Lock()
+
 	for _, line := range output {
 		if Debug {
 			fmt.Printf("%s\n", line)
 		}
 	}
+	for _, client := range wsClients {
+		writeWS(client, output)
+	}
+
+	wsClientMutex.Unlock()
 }
 
 func stream(filename string) {
@@ -130,15 +159,16 @@ func stream(filename string) {
 	}()
 
 	buf := make([]byte, 100)
-	bytesRead := 0
+	bytesRead := 0.0
 	for {
 		n, err := reader.Read(buf)
 		if err == io.EOF {
 			break
 		}
-		bytesRead += n
-		if bytesRead > RateLimit/10 && RateLimit > 0 {
+		bytesRead += float64(n)
+		if bytesRead > float64(RateLimit)/10.0 && RateLimit > 0 {
 			time.Sleep(time.Millisecond * 100)
+			bytesRead = 0.0
 		}
 		check("could not read stdin/reader", err)
 		streamer.Write(buf[0:n])
@@ -186,7 +216,6 @@ func main() {
 		RateLimit = c.Int("rateLimit")
 		Interval = c.Int("interval")
 
-		fmt.Println(c.Args().First())
 		go stream(c.Args().First())
 
 		webservice(c.String("http"))

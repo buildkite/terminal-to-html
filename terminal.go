@@ -10,11 +10,16 @@ go install github.com/buildkite/terminal/cmd/terminal-to-html
 */
 package terminal
 
-import "bytes"
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+	"log"
+	"sync"
+)
 
 type Streamer struct {
 	screen screen
+	mutex  sync.Mutex
 }
 
 // Render converts ANSI to HTML and returns the result.
@@ -26,22 +31,32 @@ func Render(input []byte) []byte {
 }
 
 func (s *Streamer) Write(input []byte) {
+	s.mutex.Lock()
 	s.screen.parse(input)
+	s.mutex.Unlock()
 }
 
 func (s *Streamer) Render() []byte {
 	return bytes.Replace(s.screen.asHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
 }
 
-func (s *Streamer) Dirty() ([][]byte, error) {
-	dirtyLines := s.screen.flushDirty()
+func (s *Streamer) Flush(all bool) [][]byte {
+	s.mutex.Lock()
+	var dirtyLines []dirtyLine
+	if all {
+		dirtyLines = s.screen.flushAll()
+	} else {
+		dirtyLines = s.screen.flushDirty()
+	}
+	s.mutex.Unlock()
+
 	output := make([][]byte, len(dirtyLines))
 	for idx, line := range dirtyLines {
 		lineOut, err := json.Marshal(line)
 		if err != nil {
-			return output, err
+			log.Fatalf("Couldn't encode %q to JSON: %s", line, err)
 		}
 		output[idx] = lineOut
 	}
-	return output, nil
+	return output
 }
