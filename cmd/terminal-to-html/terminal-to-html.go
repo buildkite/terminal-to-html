@@ -81,7 +81,7 @@ func terminalWebsocket(ws *websocket.Conn) {
 	for _, line := range data {
 		err := websocket.JSON.Send(ws, line)
 		if err != nil {
-			fmt.Printf("Warning: Could not send initial status to websocket: %s", err)
+			fmt.Printf("Warning: Could not send initial status to websocket: %s\n", err)
 			return
 		}
 	}
@@ -90,6 +90,8 @@ func terminalWebsocket(ws *websocket.Conn) {
 	wsClientMutex.Lock()
 	wsClients = append(wsClients, wsClient)
 	wsClientMutex.Unlock()
+
+	updateClientCounts()
 
 	defer func() {
 		wsClientMutex.Lock()
@@ -100,12 +102,13 @@ func terminalWebsocket(ws *websocket.Conn) {
 			}
 		}
 		wsClientMutex.Unlock()
+		updateClientCounts()
 	}()
 
 	for line := range wsClient.writer {
 		err := websocket.JSON.Send(ws, &line)
 		if err != nil {
-			fmt.Printf("Warning: Could not write to websocket %s", err)
+			fmt.Printf("Warning: Could not write to websocket %s\n", err)
 			return
 		}
 	}
@@ -162,7 +165,14 @@ func streamDirty() {
 		}
 	}
 	wsClientMutex.Unlock()
+}
 
+func updateClientCounts() {
+	wsClientMutex.Lock()
+	for _, client := range wsClients {
+		client.writer <- terminal.DirtyLine{ClientCount: len(wsClients)}
+	}
+	wsClientMutex.Unlock()
 }
 
 func stream(filename string) {

@@ -1,12 +1,15 @@
+body {
+  font-family: "Helvetica"
+}
 .term-container {
   background: #171717;
   border-radius: 5px;
   color: white;
   word-break: break-word;
   overflow-wrap: break-word;
-  font-family: Monaco, Consolas, monospace;
-  font-size: 12px;
-  line-height: 20px;
+  font-family: Consolas, monospace;
+  font-size: 16px;
+  line-height: 17px;
   padding: 14px 18px;
   white-space: pre-wrap;
 }

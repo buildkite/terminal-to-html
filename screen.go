@@ -22,8 +22,9 @@ type screenLine struct {
 	nodes []node
 }
 type DirtyLine struct {
-	Y    int    `json:"y"`
-	HTML string `json:"html"`
+	Y           int    `json:"y"`
+	HTML        string `json:"html"`
+	ClientCount int    `json:"clientCount"`
 }
 
 const screenEndOfLine = -1

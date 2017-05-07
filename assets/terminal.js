@@ -23,6 +23,10 @@ function connect() {
   console.log("Connecting ..")
   socket.addEventListener('message', function (event) {
     var data = JSON.parse(event.data);
+    if(data.clientCount > 0) {
+       document.getElementById('connected').innerHTML = "" + data.clientCount;
+       return;
+    }
     var elemId = "line" + data.y
     var elem = document.getElementById(elemId);
     if (!elem) {
