@@ -211,9 +211,9 @@ var rendererTestCases = []struct {
 		"\x1b]1337;File=name=MS5naWY=;inline=1:AA==\a",
 		`<img alt="1.gif" src="data:image/gif;base64,AA==">`,
 	}, {
-		`prints on error on malformed iTerm2 image codes`,
-		"\x1b]1337;;;;\a",
-		"*** Error parsing custom element escape sequence: expected sequence to start with 1337;File=, 1338; or 1339;, got &quot;1337;;;;&quot; instead",
+		`silently ignores unsupported ANSI escape sequences`,
+		"abc\x1b]9999\aghi",
+		"abcghi",
 	}, {
 		`correctly handles images that we decide not to render`,
 		"hi\x1b]1337;File=name=MS5naWY=;inline=0:AA==\ahello",
