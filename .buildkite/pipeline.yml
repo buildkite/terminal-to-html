@@ -23,13 +23,13 @@ steps:
   - block: ":rocket: Release"
 
   - name: ":octocat:"
-    command: script/release
+    command: .buildkite/steps/release
     branches: "master"
     agents:
       queue: "deploy"
 
   - name: ":packagecloud:"
-    command: script/package_and_upload
+    command: .buildkite/steps/package_and_upload
     branches: "master"
     agents:
       queue: "deploy"
