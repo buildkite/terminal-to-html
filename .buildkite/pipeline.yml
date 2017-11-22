@@ -1,0 +1,29 @@
+steps:
+  - name: ":bomb: Test"
+    command: make test
+    plugins:
+      docker-compose#v1.7.0:
+        run: terminal
+
+  - wait
+  - name: ":neckbeard: Benchmark"
+    command: make bench
+    plugins:
+      docker-compose#v1.7.0:
+        run: terminal
+
+  - wait
+  - name: ":hammer: Build"
+    command: make dist
+    artifact_paths: "dist/**.gz"
+    plugins:
+      docker-compose#v1.7.0:
+        run: terminal
+
+  - manual
+  - name: ":octocat: Release"
+    command: script/release
+
+  - manual
+  - name: ":packagecloud: Package"
+    command: script/package_and_upload
