@@ -57,7 +57,7 @@ echo "+++ :package: Packaging ${version}"
 
 [ -d packages ] && rm -r packages; mkdir packages
 
-for arch in amd64 i386 arm; do
+for arch in amd64 i386 armel; do
   arch_dist_file="dist/terminal-to-html-$version-linux-$arch.gz"
 
   echo "+++ :package: Building deb for $arch"
