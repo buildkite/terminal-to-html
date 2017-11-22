@@ -1,13 +1,18 @@
 #!/bin/bash
 set -eu
 
+if [[ -z $GITHUB_RELEASE_ACCESS_TOKEN ]] ; then
+  echo "GITHUB_RELEASE_ACCESS_TOKEN isn't set"
+  exit 1
+fi
+
 version=$(make version)
 
 echo "+++ :package: Downloading dist artifacts"
 
 buildkite-agent artifact download "dist/*" dist
 
-echo "+++ :rocket: Releasing $(version)"
+echo "+++ :rocket: Releasing ${version}"
 
 docker-compose run --rm terminal github-release "v$version" dist/* \
   --commit "$BUILDKITE_COMMIT" \
