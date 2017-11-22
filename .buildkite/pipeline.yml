@@ -28,7 +28,7 @@ steps:
     agents:
       queue: "deploy"
 
-  - name: ":packagecloud:x"
+  - name: ":packagecloud:"
     command: script/package_and_upload
     branches: "master"
     agents:
