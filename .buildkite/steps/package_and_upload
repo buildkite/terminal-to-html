@@ -45,7 +45,9 @@ version=$(make version)
 
 echo "+++ :package: Downloading dist artifacts"
 
-# buildkite-agent artifact download "dist/*" dist
+[ -d dist ] && rm -r dist; mkdir dist
+
+buildkite-agent artifact download "dist/*" dist
 
 echo "+++ :package: Packaging ${version}"
 
