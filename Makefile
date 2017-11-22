@@ -6,10 +6,10 @@ VERSION=$(shell cat version.go  | grep baseVersion | head -n1 | cut -d \" -f 2)
 all: test $(BINARY)
 
 bench:
-	godep go test -bench . -benchmem
+	go test -bench . -benchmem
 
 test:
-	godep go test
+	go test
 
 clean:
 	rm -f $(BINARY)
