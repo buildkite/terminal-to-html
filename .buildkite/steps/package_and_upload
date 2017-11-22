@@ -1,6 +1,7 @@
 #!/bin/bash
-
 set -eu
+
+version=$(make version)
 
 echo "+++ :package: Downloading dist artifacts"
 
@@ -8,16 +9,12 @@ echo "+++ :package: Downloading dist artifacts"
 
 buildkite-agent artifact download "dist/*" dist
 
-echo "+++ :1234: Fetching version number from build meta-data"
-
-version=$(buildkite-agent meta-data get version)
-
-echo "+++ :package: Packaging"
+echo "+++ :package: Packaging $(version)"
+exit 1
 
 [ -d packages ] && rm -r packages; mkdir packages
 
 for arch in amd64 386 arm; do
-
   arch_dist_file="dist/terminal-to-html-$version-linux-$arch.gz"
 
   echo "+++ :package: Building deb for $arch"
@@ -39,5 +36,4 @@ for arch in amd64 386 arm; do
     echo "+++ :packagecloud: Pushing rpm for $rpm_os"
     package_cloud push "buildkite/terminal/$rpm_os" "$rpm_package_path"
   done
-
 done

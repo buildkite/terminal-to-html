@@ -23,13 +23,7 @@ steps:
   - manual
   - name: ":octocat: Release"
     command: script/release
-    plugins:
-      docker-compose#v1.7.0:
-        run: terminal
 
   - manual
   - name: ":packagecloud: Package"
     command: script/package_and_upload
-    plugins:
-      docker-compose#v1.7.0:
-        run: terminal
