@@ -15,13 +15,7 @@ steps:
   - wait
   - name: ":hammer: Build"
     command: script/build
-    plugins:
-      docker-compose#v1.7.0:
-        run: terminal
-
-  - wait
-  - name: ":hammer: Build"
-    command: script/build
+    artifact_paths: "dist/**.gz"
     plugins:
       docker-compose#v1.7.0:
         run: terminal
