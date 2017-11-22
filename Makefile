@@ -26,10 +26,10 @@ version:
 
 # Cross-compiling
 
-GZ_ARCH     := linux-amd64 linux-i386 linux-arm darwin-i386 darwin-amd64
+GZ_ARCH     := linux-amd64 linux-i386 linux-armel darwin-i386 darwin-amd64
 ZIP_ARCH    := windows-i386 windows-amd64
-GZ_TARGETS  := $(foreach tar,$(GZ_ARCH), dist/$(BINARY)-$(VERSION)-$(tar).gz)
-ZIP_TARGETS := $(foreach tar,$(ZIP_ARCH), dist/$(BINARY)-$(VERSION)-$(tar).zip)
+GZ_TARGETS  := $(foreach target,$(GZ_ARCH), dist/$(BINARY)-$(VERSION)-$(target).gz)
+ZIP_TARGETS := $(foreach target,$(ZIP_ARCH), dist/$(BINARY)-$(VERSION)-$(target).zip)
 
 dist: $(GZ_TARGETS) $(ZIP_TARGETS)
 
@@ -44,6 +44,6 @@ dist/%.zip: bin/%
 
 bin/$(BINARY)-$(VERSION)-%: $(SRC)
 	@[ -d bin ] || mkdir bin
-	GOOS=$(firstword $(subst -, , $*)) GOARCH=$(lastword $(subst i386, 386, $(subst -, , $*))) $(BUILDCMD)
+	GOOS=$(firstword $(subst -, , $*)) GOARCH=$(lastword $(subst armel, arm, $(subst i386, 386, $(subst -, , $*)))) $(BUILDCMD)
 
 .PHONY: clean bench test dist version
