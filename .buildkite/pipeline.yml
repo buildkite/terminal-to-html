@@ -20,10 +20,16 @@ steps:
       docker-compose#v1.7.0:
         run: terminal
 
-  - manual
-  - name: ":octocat: Release"
-    command: script/release
+  - block: ":rocket: Release"
 
-  - manual
-  - name: ":packagecloud: Package"
+  - name: ":octocat:"
+    command: script/release
+    branches: "master"
+    agents:
+      queue: "deploy"
+
+  - name: ":packagecloud:x"
     command: script/package_and_upload
+    branches: "master"
+    agents:
+      queue: "deploy"
