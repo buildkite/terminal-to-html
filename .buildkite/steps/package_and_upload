@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eu
 
-if [[ -z $PACKAGECLOUD_TOKEN ]] ; then
-  echo "GITHUB_RELEASE_ACCESS_TOKEN isn't set"
+if [[ -z ${PACKAGECLOUD_TOKEN:-} ]] ; then
+  echo "PACKAGECLOUD_TOKEN isn't set"
   exit 1
 fi
 
