@@ -1,7 +1,7 @@
 package terminal
 
-var baseVersion string = "3.0.4"
+var baseVersion string = "3.0.5"
 
 func Version() string {
-	return baseVersion
+  return baseVersion
 }
