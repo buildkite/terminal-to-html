@@ -14,7 +14,7 @@ steps:
 
   - wait
   - name: ":hammer: Build"
-    command: make build
+    command: make dist
     artifact_paths: "dist/**.gz"
     plugins:
       docker-compose#v1.7.0:
