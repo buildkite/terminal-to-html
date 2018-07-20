@@ -28,6 +28,7 @@ OPTIONS:
 `
 
 var PreviewMode = false
+var MinifyMode = false
 
 var PreviewTemplate = `
 	<!DOCTYPE html>
@@ -50,8 +51,13 @@ func check(m string, e error) {
 
 func wrapPreview(s []byte) []byte {
 	if PreviewMode {
-		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
-		s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
+		if MinifyMode {
+			s = bytes.TrimSpace(bytes.Replace(bytes.Replace([]byte(PreviewTemplate), []byte("\n"), []byte(""), -1), []byte("CONTENT"), s, 1))
+			s = bytes.TrimSpace(bytes.Replace(s, []byte("STYLESHEET"), bytes.Replace(MustAsset("assets/terminal.css"), []byte("\n"), []byte(""), -1), 1))
+		} else {
+			s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
+			s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
+		}
 	}
 	return s
 }
@@ -98,9 +104,14 @@ func main() {
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
+		cli.BoolFlag{
+			Name:  "minify",
+			Usage: "minify the html header and css",
+		},
 	}
 	app.Action = func(c *cli.Context) {
 		PreviewMode = c.Bool("preview")
+		MinifyMode = c.Bool("minify")
 		if c.String("http") != "" {
 			webservice(c.String("http"))
 		} else {
