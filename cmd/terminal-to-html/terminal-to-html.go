@@ -11,6 +11,9 @@ import (
 
 	"github.com/buildkite/terminal"
 	"github.com/codegangsta/cli"
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/css"
+	"github.com/tdewolff/minify/html"
 )
 
 var AppHelpTemplate = `{{.Name}} - {{.Usage}}
@@ -49,11 +52,38 @@ func check(m string, e error) {
 	}
 }
 
+func MinifyHtml(s string) string {
+	m := minify.New()
+	m.AddFunc("text/html", html.Minify)
+	m.Add("text/html", &html.Minifier{
+		KeepDefaultAttrVals: true,
+		KeepWhitespace:      false,
+	})
+	var err error
+	s, err = m.String("text/html", s)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+func MinifyCss(b []byte) []byte {
+	m := minify.New()
+	m.AddFunc("text/css", css.Minify)
+	m.Add("text/css", &css.Minifier{})
+	var err error
+	b, err = m.Bytes("text/css", b)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
 func wrapPreview(s []byte) []byte {
 	if PreviewMode {
 		if MinifyMode {
-			s = bytes.TrimSpace(bytes.Replace(bytes.Replace([]byte(PreviewTemplate), []byte("\n"), []byte(""), -1), []byte("CONTENT"), s, 1))
-			s = bytes.TrimSpace(bytes.Replace(s, []byte("STYLESHEET"), bytes.Replace(MustAsset("assets/terminal.css"), []byte("\n"), []byte(""), -1), 1))
+			s = bytes.Replace([]byte(MinifyHtml(PreviewTemplate)), []byte("CONTENT"), s, 1)
+			s = bytes.Replace(s, []byte("STYLESHEET"), MinifyCss(MustAsset("assets/terminal.css")), 1)
 		} else {
 			s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
 			s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)

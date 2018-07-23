@@ -7,6 +7,54 @@
 			"comment": "1.2.0-74-g50c77ec",
 			"path": "github.com/codegangsta/cli",
 			"revision": "50c77ecec0068c9aef9d90ae0fd0fdf410041da3"
+		},
+		{
+			"checksumSHA1": "hB1kzJXVfsQyU9dBjc9ezP2XUak=",
+			"path": "github.com/tdewolff/minify",
+			"revision": "5ba3abdf255ad71035cec25b615b32b478c50720",
+			"revisionTime": "2018-07-19T05:42:39Z"
+		},
+		{
+			"checksumSHA1": "yM1QR7IB1/QZqUVLNB1KuyKGRTE=",
+			"path": "github.com/tdewolff/minify/css",
+			"revision": "5ba3abdf255ad71035cec25b615b32b478c50720",
+			"revisionTime": "2018-07-19T05:42:39Z"
+		},
+		{
+			"checksumSHA1": "FoucELEWTkni5kPpY+YgLU1bF1I=",
+			"path": "github.com/tdewolff/minify/html",
+			"revision": "5ba3abdf255ad71035cec25b615b32b478c50720",
+			"revisionTime": "2018-07-19T05:42:39Z"
+		},
+		{
+			"checksumSHA1": "ytbPF6rJvRmYqFuiU5bWxMjnxJ0=",
+			"path": "github.com/tdewolff/parse",
+			"revision": "4ceb50b40fad068875f5b093c5df0619012dc544",
+			"revisionTime": "2018-07-19T05:29:33Z"
+		},
+		{
+			"checksumSHA1": "bFczQeEt4V5STOU9jd9rHxnyAD0=",
+			"path": "github.com/tdewolff/parse/buffer",
+			"revision": "4ceb50b40fad068875f5b093c5df0619012dc544",
+			"revisionTime": "2018-07-19T05:29:33Z"
+		},
+		{
+			"checksumSHA1": "qHkEAOXHyX5fFnWyTOQgm3k1v+Q=",
+			"path": "github.com/tdewolff/parse/css",
+			"revision": "4ceb50b40fad068875f5b093c5df0619012dc544",
+			"revisionTime": "2018-07-19T05:29:33Z"
+		},
+		{
+			"checksumSHA1": "u9ZP3M5MtMwxc81qvvJ4upJI1Yk=",
+			"path": "github.com/tdewolff/parse/html",
+			"revision": "4ceb50b40fad068875f5b093c5df0619012dc544",
+			"revisionTime": "2018-07-19T05:29:33Z"
+		},
+		{
+			"checksumSHA1": "IrorTJ5lfYWU5QdWqMuLexxzoYA=",
+			"path": "github.com/tdewolff/parse/strconv",
+			"revision": "4ceb50b40fad068875f5b093c5df0619012dc544",
+			"revisionTime": "2018-07-19T05:29:33Z"
 		}
 	],
 	"rootPath": "github.com/buildkite/terminal"
