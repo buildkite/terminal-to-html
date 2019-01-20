@@ -1,11 +1,11 @@
-![logo](http://buildkite.github.io/terminal/images/logo.svg)
+![logo](http://buildkite.github.io/terminal-to-html/images/logo.svg)
 
 Terminal is a Go library for converting arbitrary shell output (with ANSI) into beautifully rendered HTML. See http://en.wikipedia.org/wiki/ANSI_escape_code for more information about ANSI Terminal Control Escape Sequences.
 
 It provides a single command, `terminal-to-html`, that can be used to convert terminal output via STDIN, as well as via a simple web server.
 
 [![Build status](https://badge.buildkite.com/20b99da4c5267bad4b1a8b30013b0d3f644b70fbf43039b973.svg?branch=master)](https://buildkite.com/terminal/terminal)
-[![GoDoc](https://godoc.org/github.com/buildkite/terminal?status.svg)](https://godoc.org/github.com/buildkite/terminal)
+[![GoDoc](https://godoc.org/github.com/buildkite/terminal-to-html?status.svg)](https://godoc.org/github.com/buildkite/terminal-to-html)
 
 ## Usage
 
@@ -60,7 +60,7 @@ You can also just download the standalone binary from [https://github.com/buildk
 To get a bash prompt with all the go cross-compilation tools set up for you already:
 
 ```
-$ docker build -t terminal . && docker run -it --rm -v $(pwd):/go/src/github.com/buildkite/terminal terminal bash
+$ docker build -t terminal . && docker run -it --rm -v $(pwd):/go/src/github.com/buildkite/terminal-to-html terminal bash
 ```
 
 ## Benchmarking
@@ -77,7 +77,7 @@ Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: t
 
 ## Licence
 
-> Copyright (c) 2015 Keith Pitt, Tim Lucas, Michael Pearson
+> Copyright (c) 2019 Keith Pitt, Tim Lucas, Michael Pearson
 >
 > MIT License
 >
