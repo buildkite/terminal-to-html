@@ -203,6 +203,10 @@ var rendererTestCases = []struct {
 		"\x1b[2mbegin\x1b[22m\r\nend",
 		"<span class=\"term-fg2\">begin</span>\nend",
 	}, {
+		`ignores cursor show/hide`,
+		"\x1b[?25ldoing a thing without a cursor\x1b[?25h",
+		"doing a thing without a cursor",
+	}, {
 		`renders simple images on their own line`, // http://iterm2.com/images.html
 		"hi\x1b]1337;File=name=MS5naWY=;inline=1:AA==\ahello",
 		"hi\n" + `<img alt="1.gif" src="data:image/gif;base64,AA==">` + "\nhello",

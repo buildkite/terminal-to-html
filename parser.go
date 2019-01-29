@@ -123,7 +123,7 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 func (p *parser) handleControlSequence(char rune) {
 	char = unicode.ToUpper(char)
 	switch char {
-	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+	case '?', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		// Part of an instruction
 	case ';':
 		p.addInstruction()
@@ -131,6 +131,9 @@ func (p *parser) handleControlSequence(char rune) {
 	case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
 		p.addInstruction()
 		p.screen.applyEscape(char, p.instructions)
+		p.mode = MODE_NORMAL
+	case 'H', 'L':
+		// Set/reset mode (SM/RM), ignore and continue
 		p.mode = MODE_NORMAL
 	default:
 		// unrecognized character, abort the escapeCode
