@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	MODE_NORMAL         = iota
-	MODE_PRE_ESCAPE     = iota
-	MODE_ESCAPE         = iota
-	MODE_ELEMENT_ESCAPE = iota
+	MODE_NORMAL  = iota
+	MODE_ESCAPE  = iota
+	MODE_CONTROL = iota
+	MODE_OSC     = iota
 )
 
 // Stateful ANSI parser
@@ -32,28 +32,29 @@ type parser struct {
  * can change the location of its cursor accordingly.
  *
  * If we're in MODE_NORMAL and we receive an escape character (\x1b) we enter
- * MODE_PRE_ESCAPE. In this mode we know we might be able to enter an escape
- * sequence, but we're not sure whether it's a regular escape sequence, one
- * of our special element sequences, or an invalid sequence.
+ * MODE_ESCAPE. The following character could start an escape sequence, a
+ * control sequence, an operating system command, or be invalid or not understood.
  *
- * If we're in MODE_PRE_ESCAPE and we receive a [, we enter
- * MODE_ESCAPE. If we instead receive a ] we enter MODE_ELEMENT_ESCAPE. In
- * both cases we start our instruction buffer. The instruction buffer is used
- * to store the individual characters that make up ANSI instructions before
- * sending them to the screen. If we receive neither of these characters,
- * we treat this as an invalid escape and return to MODE_NORMAL.
+ * If we're in MODE_ESCAPE and we receive a [, we enter MODE_CONTROL and start
+ * looking for a control sequence. If we instead receive a ] we enter MODE_OSC
+ * and look for an operating system command. In both cases we start our
+ * instruction buffer. The instruction buffer is used to store the individual
+ * characters that make up ANSI instructions before sending them to the screen.
+ * If we receive neither of these characters, we treat this as an invalid or
+ * unknown escape and return to MODE_NORMAL.
  *
- * If we're in MODE_ESCAPE, we expect to receive a sequence of characters
- * looking like 1;30;42m. That's an instruction to turn on bold, set the
- * foreground colour to black and the background colour to green. We receive
- * these characters one by one turning them in to instruction parts (1, 30, 42)
- * followed by an instruction type (m). Once the instruction type is received
- * we send it and its parts to the screen and return to MODE_NORMAL.
+ * If we're in MODE_CONTROL, we expect to receive a sequence of parameters and
+ * then a terminal alphabetic character looking like 1;30;42m. That's an
+ * instruction to turn on bold, set the foreground colour to black and the
+ * background colour to green. We receive these characters one by one turning
+ * the parameters into instruction parts (1, 30, 42) followed by an instruction
+ * type (m). Once the instruction type is received we send it and its parts to
+ * the screen and return to MODE_NORMAL.
  *
- * If we're in MODE_ELEMENT_ESCAPE, we expect to receive a sequence of
- * characters up to and including a bell (\a). We skip forward until this bell
- * is reached, then send everything from when we entered MODE_ELEMENT_ESCAPE
- * up to the bell to parseElementSequence and return to MODE_NORMAL.
+ * If we're in MODE_OSC, we expect to receive a sequence of characters up to
+ * and including a bell (\a). We skip forward until this bell is reached, then
+ * send everything from when we entered MODE_OSC up to the bell to
+ * parseElementSequence and return to MODE_NORMAL.
  */
 
 func parseANSIToScreen(s *screen, ansi []byte) {
@@ -65,14 +66,14 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 
 		switch p.mode {
 		case MODE_ESCAPE:
-			// We're inside an escape code - figure out its code and its instructions.
-			p.handleEscape(char)
-		case MODE_PRE_ESCAPE:
 			// We've received an escape character but aren't inside an escape sequence yet
-			p.handlePreEscape(char)
-		case MODE_ELEMENT_ESCAPE:
-			// We're inside an element escape sequence, capture until we hit a bell character
-			p.handleElementEscape(char)
+			p.handleEscape(char)
+		case MODE_CONTROL:
+			// We're inside a control sequence - figure out its code and its instructions.
+			p.handleControlSequence(char)
+		case MODE_OSC:
+			// We're inside an operating system command, capture until we hit a bell character
+			p.handleOperatingSystemCommand(char)
 		case MODE_NORMAL:
 			// Outside of an escape sequence entirely, normal input
 			p.handleNormal(char)
@@ -82,7 +83,7 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 	}
 }
 
-func (p *parser) handleElementEscape(char rune) {
+func (p *parser) handleOperatingSystemCommand(char rune) {
 	if char != '\a' {
 		return
 	}
@@ -119,10 +120,10 @@ func (p *parser) handleElementEscape(char rune) {
 
 }
 
-func (p *parser) handleEscape(char rune) {
+func (p *parser) handleControlSequence(char rune) {
 	char = unicode.ToUpper(char)
 	switch char {
-	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+	case '?', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		// Part of an instruction
 	case ';':
 		p.addInstruction()
@@ -130,6 +131,9 @@ func (p *parser) handleEscape(char rune) {
 	case 'Q', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
 		p.addInstruction()
 		p.screen.applyEscape(char, p.instructions)
+		p.mode = MODE_NORMAL
+	case 'H', 'L':
+		// Set/reset mode (SM/RM), ignore and continue
 		p.mode = MODE_NORMAL
 	default:
 		// unrecognized character, abort the escapeCode
@@ -148,21 +152,21 @@ func (p *parser) handleNormal(char rune) {
 		p.screen.backspace()
 	case '\x1b':
 		p.escapeStartedAt = p.cursor
-		p.mode = MODE_PRE_ESCAPE
+		p.mode = MODE_ESCAPE
 	default:
 		p.screen.append(char)
 	}
 }
 
-func (p *parser) handlePreEscape(char rune) {
+func (p *parser) handleEscape(char rune) {
 	switch char {
 	case '[':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.instructions = make([]string, 0, 1)
-		p.mode = MODE_ESCAPE
+		p.mode = MODE_CONTROL
 	case ']':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
-		p.mode = MODE_ELEMENT_ESCAPE
+		p.mode = MODE_OSC
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
