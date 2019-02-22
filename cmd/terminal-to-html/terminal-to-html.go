@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/buildkite/terminal"
+	"github.com/buildkite/terminal-to-html
 	"github.com/codegangsta/cli"
 )
 

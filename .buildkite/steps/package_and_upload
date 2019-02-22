@@ -67,7 +67,7 @@ for arch in amd64 i386 armel; do
 
   for deb_os in ubuntu/trusty; do
     echo "+++ :packagecloud: Pushing deb for $deb_os"
-    run_in_container package_cloud push "buildkite/terminal/$deb_os" "$deb_package_path"
+    run_in_container package_cloud push "buildkite/terminal-to-html$deb_os" "$deb_package_path"
   done
 
   echo "+++ :package: Building rpm for $arch"
@@ -77,6 +77,6 @@ for arch in amd64 i386 armel; do
 
   for rpm_os in el/7; do
     echo "+++ :packagecloud: Pushing rpm for $rpm_os"
-    run_in_container package_cloud push "buildkite/terminal/$rpm_os" "$rpm_package_path"
+    run_in_container package_cloud push "buildkite/terminal-to-html$rpm_os" "$rpm_package_path"
   done
 done
