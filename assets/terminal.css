@@ -4,16 +4,14 @@
   color: white;
   word-break: break-word;
   overflow-wrap: break-word;
-  font-family: Monaco, Consolas, monospace;
+  font-family: "SFMono-Regular", Monaco, Menlo, Consolas, "Liberation Mono", Courier, monospace
   font-size: 12px;
   line-height: 20px;
   padding: 14px 18px;
   white-space: pre-wrap;
 }
 
-.term-container img {
-  max-width: 100%;
-}
+.term-container img { max-width: 100%; }
 
 @keyframes blink-animation {
   to {
