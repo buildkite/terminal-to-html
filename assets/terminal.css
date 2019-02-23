@@ -4,7 +4,7 @@
   color: white;
   word-break: break-word;
   overflow-wrap: break-word;
-  font-family: "SFMono-Regular", Monaco, Menlo, Consolas, "Liberation Mono", Courier, monospace
+  font-family: "SFMono-Regular", Monaco, Menlo, Consolas, "Liberation Mono", Courier, monospace;
   font-size: 12px;
   line-height: 20px;
   padding: 14px 18px;
@@ -26,13 +26,13 @@
 .term-fg5 { animation: blink-animation 1s steps(3, start) infinite; } /* blink */
 .term-fg9 { text-decoration: line-through; } /* crossed-out */
 
-.term-fg30 { color: #666; } /* black (but we can't use black, so a diff color) */
-.term-fg31 { color: #e10c02; } /* red */
-.term-fg32 { color: #99ff5e; } /* green */
+.term-fg30 { color: #666666; } /* black (but we can't use black, so a diff color) */
+.term-fg31 { color: #ff7070; } /* red */
+.term-fg32 { color: #b0f986; } /* green */
 .term-fg33 { color: #c6c502; } /* yellow */
 .term-fg34 { color: #8db7e0; } /* blue */
 .term-fg35 { color: #f271fb; } /* magenta */
-.term-fg36 { color: #00cdd9; } /* cyan */
+.term-fg36 { color: #6bf7ff; } /* cyan */
 
 /* high intense colors */
 .term-fgi1 { color: #5ef765; }
