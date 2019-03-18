@@ -10,6 +10,7 @@ const (
 	MODE_ESCAPE  = iota
 	MODE_CONTROL = iota
 	MODE_OSC     = iota
+	MODE_CHARSET = iota
 )
 
 // Stateful ANSI parser
@@ -35,13 +36,16 @@ type parser struct {
  * MODE_ESCAPE. The following character could start an escape sequence, a
  * control sequence, an operating system command, or be invalid or not understood.
  *
- * If we're in MODE_ESCAPE and we receive a [, we enter MODE_CONTROL and start
- * looking for a control sequence. If we instead receive a ] we enter MODE_OSC
- * and look for an operating system command. In both cases we start our
- * instruction buffer. The instruction buffer is used to store the individual
- * characters that make up ANSI instructions before sending them to the screen.
- * If we receive neither of these characters, we treat this as an invalid or
- * unknown escape and return to MODE_NORMAL.
+ * If we're in MODE_ESCAPE we look for three possible characters:
+ *
+ * 1. For `[` we enter MODE_CONTROL and start looking for a control sequence.
+ * 2. For `]` we enter MODE_OSC and look for an operating system command.
+ * 3. For `(` or ')' we enter MODE_CHARSET and look for a character set name.
+ *
+ * In all cases we start our instruction buffer. The instruction buffer is used
+ * to store the individual characters that make up ANSI instructions before
+ * sending them to the screen. If we receive neither of these characters, we
+ * treat this as an invalid or unknown escape and return to MODE_NORMAL.
  *
  * If we're in MODE_CONTROL, we expect to receive a sequence of parameters and
  * then a terminal alphabetic character looking like 1;30;42m. That's an
@@ -55,6 +59,9 @@ type parser struct {
  * and including a bell (\a). We skip forward until this bell is reached, then
  * send everything from when we entered MODE_OSC up to the bell to
  * parseElementSequence and return to MODE_NORMAL.
+ *
+ * If we're in MODE_CHARSET we simply discard the next character which would
+ * normally designate the character set.
  */
 
 func parseANSIToScreen(s *screen, ansi []byte) {
@@ -74,6 +81,9 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 		case MODE_OSC:
 			// We're inside an operating system command, capture until we hit a bell character
 			p.handleOperatingSystemCommand(char)
+		case MODE_CHARSET:
+			// We're inside a charset sequence, capture the next character.
+			p.handleCharset(char)
 		case MODE_NORMAL:
 			// Outside of an escape sequence entirely, normal input
 			p.handleNormal(char)
@@ -81,6 +91,10 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 
 		p.cursor += charLen
 	}
+}
+
+func (p *parser) handleCharset(char rune) {
+	p.mode = MODE_NORMAL
 }
 
 func (p *parser) handleOperatingSystemCommand(char rune) {
@@ -167,6 +181,9 @@ func (p *parser) handleEscape(char rune) {
 	case ']':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.mode = MODE_OSC
+	case ')', '(':
+		p.instructionStartedAt = p.cursor + utf8.RuneLen('(')
+		p.mode = MODE_CHARSET
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
