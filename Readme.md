@@ -50,10 +50,10 @@ You can use the provided `link.sh` to produce this escape sequence.
 If you have Go installed you can simply run the following command to install the `terminal-to-html` command into `$GOPATH/bin`:
 
 ```bash
-$ go get github.com/buildkite/terminal/cmd/terminal-to-html
+$ go get github.com/buildkite/terminal-to-html/cmd/terminal-to-html
 ```
 
-You can also just download the standalone binary from [https://github.com/buildkite/terminal/releases](https://github.com/buildkite/terminal/releases)
+You can also just download the standalone binary from [https://github.com/buildkite/terminal-to-html/releases](https://github.com/buildkite/terminal-to-html/releases)
 
 ## Developing
 

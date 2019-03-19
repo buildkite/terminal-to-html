@@ -9,5 +9,5 @@
 			"revision": "50c77ecec0068c9aef9d90ae0fd0fdf410041da3"
 		}
 	],
-	"rootPath": "github.com/buildkite/terminal"
+	"rootPath": "github.com/buildkite/terminal-to-html"
 }
