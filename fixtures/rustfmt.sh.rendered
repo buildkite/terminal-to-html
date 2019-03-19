@@ -1,0 +1,7 @@
+Diff in &#47;Users&#47;ryan&#47;Code&#47;arret&#47;compiler&#47;hir&#47;loader.rs at line 1:
+<span class="term-fg31">- use std::collections::HashMap;</span>
+<span class="term-fg32">+</span>
+<span class="term-fg32">+use std::collections::HashMap;</span>
+ use std::path;
+&nbsp;
+ use crate::hir::error::{Error, ErrorKind, Result};
