@@ -11,7 +11,7 @@ RUN apt-get update -q && apt-get install -y zip ruby ruby-dev rpm locales && \
   echo "en_US UTF-8" > /etc/locale.gen && \
   locale-gen en_US.UTF-8
 
-WORKDIR /go/src/github.com/buildkite/terminal
-ADD . /go/src/github.com/buildkite/terminal
+WORKDIR /go/src/github.com/buildkite/terminal-to-html
+ADD . /go/src/github.com/buildkite/terminal-to-html
 
 CMD [ "make", "dist"]
