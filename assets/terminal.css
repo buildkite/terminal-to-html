@@ -45,8 +45,9 @@
 .term-fgi96 { color: #60fcff; } /* cyan */
 
 /* background colors */
-.term-bg42 { background: #99ff5f; }
-.term-bg40 { background: #676767; }
+.term-bg40 { background: #676767; } /* grey */
+.term-bg41 { background: #ff4343; } /* red */
+.term-bg42 { background: #99ff5f; } /* green */
 
 /* custom foreground/background combos for readability */
 .term-fg31.term-bg40 { color: #F8A39F; }
