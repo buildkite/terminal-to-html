@@ -13,6 +13,9 @@
 
 .term-container img { max-width: 100%; }
 
+.term a { color: inherit; text-decoration-style: dashed; }
+.term a:hover { color: #2882F9 }
+
 @keyframes blink-animation {
   to {
     visibility: hidden;
