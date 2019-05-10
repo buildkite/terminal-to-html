@@ -53,6 +53,7 @@ func wrapPreview(s []byte) []byte {
 		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
 		s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
 	}
+	s = bytes.Replace(s, []byte("`"), []byte("&#96;"), -1)
 	return s
 }
 
