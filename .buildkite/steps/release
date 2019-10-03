@@ -19,4 +19,4 @@ echo "+++ :rocket: Releasing ${version}"
 docker-compose run --rm terminal github-release "v$version" dist/* \
   --commit "$BUILDKITE_COMMIT" \
   --tag "v$version" \
-  --github-repository "buildkite/terminal"
+  --github-repository "buildkite/terminal-to-html"

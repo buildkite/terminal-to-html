@@ -236,13 +236,9 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
-		`ignores \x1b(B to set the ASCII charset`,
-		"Hello \x1b(Bworld",
-		`Hello world`,
-	}, {
-		`silently ignores unknown charsets`,
-		"Hello \x1b)2world",
-		`Hello world`,
+		`uses URL as link content if missing`,
+		"\x1b]1339;url=http://google.com\a",
+		`<a href="http://google.com">http://google.com</a>`,
 	},
 }
 
