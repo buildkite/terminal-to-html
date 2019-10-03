@@ -4,14 +4,17 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"mime"
+	"strconv"
 	"strings"
 )
 
 const (
-	ELEMENT_ITERM_IMAGE = iota
-	ELEMENT_IMAGE       = iota
-	ELEMENT_LINK        = iota
+	ELEMENT_ITERM_IMAGE  = iota
+	ELEMENT_IMAGE        = iota
+	ELEMENT_LINK         = iota
+	ELEMENT_BK_TIMESTAMP = iota
 )
 
 type element struct {
@@ -21,6 +24,7 @@ type element struct {
 	content     string
 	height      string
 	width       string
+	time        int64
 	elementType int
 }
 
@@ -33,6 +37,10 @@ func (i *element) asHTML() string {
 			content = i.url
 		}
 		return fmt.Sprintf(`<a href="%s">%s</a>`, i.url, content)
+	}
+
+	if i.elementType == ELEMENT_BK_TIMESTAMP {
+		return fmt.Sprintf(`<?bk t="%d"?>`, i.time)
 	}
 
 	alt := i.alt
@@ -185,4 +193,22 @@ func splitAndVerifyElementSequence(s string) (arguments string, elementType int,
 	}
 
 	return
+}
+
+func parseBuildkiteElementSequence(sequence string) (*element, error) {
+	// Expect bk;t=123123234234234
+
+	log.Printf("Seq: %s", sequence)
+	log.Printf("After: %s", sequence[5:])
+
+	if !strings.HasPrefix(sequence, "bk;t=") {
+		return nil, nil
+	}
+
+	ts, err := strconv.ParseInt(sequence[5:], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	return &element{elementType: ELEMENT_BK_TIMESTAMP, time: ts}, nil
 }

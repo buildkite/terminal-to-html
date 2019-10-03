@@ -240,9 +240,9 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
-		`renders APC escapes as processing instructions `,
+		`renders APC escapes as processing instructions`,
 		"\x1b_bk;t=123456789102\x07",
-		`<?bk t="123456789102">`,
+		`<?bk t="123456789102"?>`,
 	},
 }
 
