@@ -1,4 +1,4 @@
-module github.com/buildkite/terminal
+module github.com/buildkite/terminal-to-html
 
 go 1.12
 
