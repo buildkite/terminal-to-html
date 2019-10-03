@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"mime"
 	"strconv"
 	"strings"
@@ -197,9 +196,7 @@ func splitAndVerifyElementSequence(s string) (arguments string, elementType int,
 
 func parseBuildkiteElementSequence(sequence string) (*element, error) {
 	// Expect bk;t=123123234234234
-
-	log.Printf("Seq: %s", sequence)
-	log.Printf("After: %s", sequence[5:])
+	// TODO: Properly handle parsing multiple arguments
 
 	if !strings.HasPrefix(sequence, "bk;t=") {
 		return nil, nil
