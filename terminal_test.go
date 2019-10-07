@@ -241,8 +241,8 @@ var rendererTestCases = []struct {
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
 		`renders APC escapes as processing instructions`,
-		"\x1b_bk;t=123456789102\x07",
-		`<?bk t="123456789102"?>`,
+		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
+		`<?bk x="llamas;" y="alpacas"?>`,
 	},
 }
 

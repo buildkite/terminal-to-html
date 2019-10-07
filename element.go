@@ -5,15 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"mime"
-	"strconv"
 	"strings"
 )
 
 const (
-	ELEMENT_ITERM_IMAGE  = iota
-	ELEMENT_IMAGE        = iota
-	ELEMENT_LINK         = iota
-	ELEMENT_BK_TIMESTAMP = iota
+	ELEMENT_ITERM_IMAGE = iota
+	ELEMENT_IMAGE       = iota
+	ELEMENT_LINK        = iota
+	ELEMENT_BK          = iota
 )
 
 type element struct {
@@ -23,8 +22,8 @@ type element struct {
 	content     string
 	height      string
 	width       string
-	time        int64
 	elementType int
+	bk          map[string]string
 }
 
 var errUnsupportedElementSequence = errors.New("Unsupported element sequence")
@@ -38,8 +37,12 @@ func (i *element) asHTML() string {
 		return fmt.Sprintf(`<a href="%s">%s</a>`, i.url, content)
 	}
 
-	if i.elementType == ELEMENT_BK_TIMESTAMP {
-		return fmt.Sprintf(`<?bk t="%d"?>`, i.time)
+	if i.elementType == ELEMENT_BK {
+		output := `<?bk`
+		for key, value := range i.bk {
+			output = output + ` ` + key + `="` + strings.Replace(value, `"`, "&quot;", -1) + `"`
+		}
+		return output + `?>`
 	}
 
 	alt := i.alt
@@ -67,7 +70,7 @@ func (i *element) asHTML() string {
 func parseElementSequence(sequence string) (*element, error) {
 	// Expect 1337;File=name=1.gif;inline=1:BASE64
 
-	arguments, elementType, content, err := splitAndVerifyElementSequence(sequence)
+	args, elementType, content, err := splitAndVerifyElementSequence(sequence)
 	if err != nil {
 		if err == errUnsupportedElementSequence {
 			err = nil
@@ -75,21 +78,24 @@ func parseElementSequence(sequence string) (*element, error) {
 		return nil, err
 	}
 
-	arguments = strings.Map(htmlStripper, arguments)
-	arguments = strings.Replace(arguments, `\;`, "\x00", -1)
+	args = strings.Map(htmlStripper, args)
+
+	tokens, err := tokenizeString(args, ';', '\\')
+	if err != nil {
+		return nil, err
+	}
 
 	imageInline := false
 
 	elem := &element{content: content, elementType: elementType}
 
-	for _, arg := range strings.Split(arguments, ";") {
-		arg = strings.Replace(arg, "\x00", ";", -1) // reconstitute escaped semicolons
-		argParts := strings.SplitN(arg, "=", 2)
-		if len(argParts) != 2 {
+	for _, token := range tokens {
+		parts := strings.SplitN(token, "=", 2)
+		if len(parts) != 2 {
 			continue
 		}
-		key := argParts[0]
-		val := argParts[1]
+		key := parts[0]
+		val := parts[1]
 		switch strings.ToLower(key) {
 		case "name":
 			nameBytes, err := base64.StdEncoding.DecodeString(val)
@@ -195,17 +201,50 @@ func splitAndVerifyElementSequence(s string) (arguments string, elementType int,
 }
 
 func parseBuildkiteElementSequence(sequence string) (*element, error) {
-	// Expect bk;t=123123234234234
-	// TODO: Properly handle parsing multiple arguments
+	// Expect bk;t=123123234234234;llamas=blah
 
-	if !strings.HasPrefix(sequence, "bk;t=") {
+	if !strings.HasPrefix(sequence, "bk;") {
 		return nil, nil
 	}
 
-	ts, err := strconv.ParseInt(sequence[5:], 10, 64)
+	tokens, err := tokenizeString(sequence[3:], ';', '\\')
 	if err != nil {
 		return nil, err
 	}
 
-	return &element{elementType: ELEMENT_BK_TIMESTAMP, time: ts}, nil
+	params := map[string]string{}
+
+	for _, token := range tokens {
+		tokenParts := strings.SplitN(token, "=", 2)
+		if len(tokenParts) != 2 {
+			return nil, fmt.Errorf("Failed to read key=value from token %q", token)
+		}
+		params[tokenParts[0]] = tokenParts[1]
+	}
+
+	return &element{elementType: ELEMENT_BK, bk: params}, nil
+}
+
+func tokenizeString(s string, sep, escape rune) (tokens []string, err error) {
+	var runes []rune
+	inEscape := false
+	for _, r := range s {
+		switch {
+		case inEscape:
+			inEscape = false
+			fallthrough
+		default:
+			runes = append(runes, r)
+		case r == escape:
+			inEscape = true
+		case r == sep:
+			tokens = append(tokens, string(runes))
+			runes = runes[:0]
+		}
+	}
+	tokens = append(tokens, string(runes))
+	if inEscape {
+		err = errors.New("invalid terminal escape")
+	}
+	return tokens, err
 }
