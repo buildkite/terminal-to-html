@@ -239,6 +239,10 @@ var rendererTestCases = []struct {
 		`uses URL as link content if missing`,
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
+	}, {
+		`renders APC escapes as processing instructions`,
+		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
+		`<?bk x="llamas;" y="alpacas"?>`,
 	},
 }
 

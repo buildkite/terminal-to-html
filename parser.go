@@ -11,6 +11,7 @@ const (
 	MODE_CONTROL = iota
 	MODE_OSC     = iota
 	MODE_CHARSET = iota
+	MODE_APC     = iota
 )
 
 // Stateful ANSI parser
@@ -41,6 +42,7 @@ type parser struct {
  * 1. For `[` we enter MODE_CONTROL and start looking for a control sequence.
  * 2. For `]` we enter MODE_OSC and look for an operating system command.
  * 3. For `(` or ')' we enter MODE_CHARSET and look for a character set name.
+ * 4. For `_` we enter MODE_APC and parse the rest of the custom control sequence
  *
  * In all cases we start our instruction buffer. The instruction buffer is used
  * to store the individual characters that make up ANSI instructions before
@@ -84,6 +86,9 @@ func parseANSIToScreen(s *screen, ansi []byte) {
 		case MODE_CHARSET:
 			// We're inside a charset sequence, capture the next character.
 			p.handleCharset(char)
+		case MODE_APC:
+			// We're inside a custom escape sequence
+			p.handleApplicationProgramCommand(char)
 		case MODE_NORMAL:
 			// Outside of an escape sequence entirely, normal input
 			p.handleNormal(char)
@@ -131,7 +136,28 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 	if ownLine {
 		p.screen.newLine()
 	}
+}
 
+func (p *parser) handleApplicationProgramCommand(char rune) {
+	if char != '\a' && char != '\x07' {
+		return
+	}
+	p.mode = MODE_NORMAL
+
+	// Bell received, stop parsing our potential image
+	el, err := parseBuildkiteElementSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
+
+	if el == nil && err == nil {
+		// No element & no error, nothing to render
+		return
+	}
+
+	if err != nil {
+		p.screen.appendMany([]rune("*** Error parsing buildkite element escape sequence: "))
+		p.screen.appendMany([]rune(err.Error()))
+	} else {
+		p.screen.appendElement(el)
+	}
 }
 
 func (p *parser) handleControlSequence(char rune) {
@@ -184,6 +210,9 @@ func (p *parser) handleEscape(char rune) {
 	case ')', '(':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('(')
 		p.mode = MODE_CHARSET
+	case '_':
+		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
+		p.mode = MODE_APC
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
