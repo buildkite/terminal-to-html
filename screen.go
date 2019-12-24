@@ -133,6 +133,15 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 		s.color(instructions)
 	case 'G':
 		s.x = 0
+	case 'J':
+		switch instructions[0] {
+			case "", "0":
+				for i := s.y; i	< len(s.screen); i++ {
+					s.clear(i, screenStartOfLine, screenEndOfLine)
+				}
+			case "2", "3":
+				s.screen = nil
+		}
 	case 'K':
 		switch instructions[0] {
 		case "0", "":
