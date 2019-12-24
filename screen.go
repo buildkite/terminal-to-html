@@ -184,6 +184,12 @@ func (s *screen) newLine() {
 	s.y++
 }
 
+func (s *screen) revNewLine() {
+	if s.y > 0 {
+		s.y--
+	}
+}
+
 func (s *screen) carriageReturn() {
 	s.x = 0
 }

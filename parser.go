@@ -213,6 +213,9 @@ func (p *parser) handleEscape(char rune) {
 	case '_':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.mode = MODE_APC
+	case 'M':
+		p.screen.revNewLine()
+		p.mode = MODE_NORMAL
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
