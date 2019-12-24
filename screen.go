@@ -42,7 +42,7 @@ func pi(s string) int {
 	if s == "" {
 		return 1
 	}
-	i, _ := strconv.ParseInt(s, 10, 8)
+	i, _ := strconv.ParseUint(s, 10, 8)
 	return int(i)
 }
 
