@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/buildkite/terminal-to-html"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var AppHelpTemplate = `{{.Name}} - {{.Usage}}
