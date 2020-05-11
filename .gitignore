@@ -1,5 +1,6 @@
 /dist/*
 /bin/*
 /terminal-to-html
+/cmd/terminal-to-html/terminal-to-html
 /packages-dist/*
 /packages/*
