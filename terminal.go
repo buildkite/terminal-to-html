@@ -6,7 +6,7 @@ https://raw.githubusercontent.com/buildkite/terminal-to-html/master/assets/termi
 and wrapped in a term-container div.
 
 You can call this library from the command line with terminal-to-html:
-go install github.com/buildkite/terminal-to-html/cmd/terminal-to-html
+GO111MODULE=on go install github.com/buildkite/terminal-to-html/v3/cmd/terminal-to-html
 */
 package terminal
 
