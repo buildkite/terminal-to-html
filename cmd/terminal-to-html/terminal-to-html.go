@@ -33,6 +33,7 @@ var PreviewTemplate = `
 	<!DOCTYPE html>
 	<html>
 		<head>
+			<meta charset="UTF-8">
 			<title>terminal-to-html Preview</title>
 			<style>STYLESHEET</style>
 		</head>
