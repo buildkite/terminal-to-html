@@ -1,4 +1,4 @@
-FROM golang:1.9.2
+FROM golang:1.12
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
