@@ -14,4 +14,6 @@ RUN apt-get update -q && apt-get install -y zip ruby ruby-dev rpm locales && \
 WORKDIR /go/src/github.com/buildkite/terminal-to-html
 ADD . /go/src/github.com/buildkite/terminal-to-html
 
-CMD [ "make", "dist"]
+ENV GO111MODULE=on
+
+CMD [ "make", "dist" ]
