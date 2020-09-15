@@ -136,10 +136,13 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 	// "Erase in Display"
 	case 'J':
 		switch instructions[0] {
-			case "", "0":
-				for i := s.y; i	< len(s.screen); i++ {
-					s.clear(i, screenStartOfLine, screenEndOfLine)
-				}
+			// "erase from current position to end (inclusive)"
+			case "0", "":
+				// This line should be equivalent to K0
+				s.clear(s.y, s.x, screenEndOfLine)
+				// Truncate the screen below the current line
+				s.screen = s.screen[:s.y+1]
+			// "erase from beginning to current position (inclusive)"
 			case "1":
 				// This line should be equivalent to K1
 				s.clear(s.y, screenStartOfLine, s.x)
