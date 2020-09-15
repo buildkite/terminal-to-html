@@ -133,6 +133,31 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 		s.color(instructions)
 	case 'G':
 		s.x = 0
+	// "Erase in Display"
+	case 'J':
+		switch instructions[0] {
+			// "erase from current position to end (inclusive)"
+			case "0", "":
+				// This line should be equivalent to K0
+				s.clear(s.y, s.x, screenEndOfLine)
+				// Truncate the screen below the current line
+				s.screen = s.screen[:s.y+1]
+			// "erase from beginning to current position (inclusive)"
+			case "1":
+				// This line should be equivalent to K1
+				s.clear(s.y, screenStartOfLine, s.x)
+				// Truncate the screen above the current line
+				s.screen = s.screen[s.y+1:]
+				// Adjust the cursor position to compensate
+				s.y = 0
+			// 2: "erase entire display", 3: "erase whole display including scroll-back buffer"
+			// Given we don't have a scrollback of our own, we treat these as equivalent
+			case "2", "3":
+				s.screen = nil
+				s.x = 0
+				s.y = 0
+		}
+	// "Erase in Line"
 	case 'K':
 		switch instructions[0] {
 		case "0", "":
@@ -173,6 +198,12 @@ func (s *screen) asHTML() []byte {
 func (s *screen) newLine() {
 	s.x = 0
 	s.y++
+}
+
+func (s *screen) revNewLine() {
+	if s.y > 0 {
+		s.y--
+	}
 }
 
 func (s *screen) carriageReturn() {

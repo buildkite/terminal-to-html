@@ -128,6 +128,22 @@ var rendererTestCases = []struct {
 		"\x1b[33mhello\x1b[0m\x1b[33m\x1b[44m\x1b[0Ggoodbye",
 		"<span class=\"term-fg33 term-bg44\">goodbye</span>",
 	}, {
+		`allows clearing lines below the current line`,
+		"foo\nbar\x1b[A\x1b[Jbaz",
+		"foobaz",
+	}, {
+		`allows clearing lines above the current line`,
+		"foo\nbar\x1b[A\x1b[1Jbaz",
+		"barbaz",
+	}, {
+		`allows clearing the entire scrollback buffer with escape 2J`,
+		"this is a big long bit of terminal output\nplease pay it no mind, we will clear it soon\nokay, get ready for a disappearing act...\nand...and...\n\n\x1b[2Jhey presto",
+		"hey presto",
+	}, {
+		`allows clearing the entire scrollback buffer with escape 3J also`,
+		"this is a big long bit of terminal output\nplease pay it no mind, we will clear it soon\nokay, get ready for a disappearing act...\nand...and...\n\n\x1b[2Jhey presto",
+		"hey presto",
+	}, {
 		`allows erasing the current line up to a point`,
 		"hello friend\x1b[1K!",
 		"            !",
@@ -143,6 +159,10 @@ var rendererTestCases = []struct {
 		`\x1b[K correctly clears all previous parts of the string`,
 		"remote: Compressing objects:   0% (1/3342)\x1b[K\rremote: Compressing objects:   1% (34/3342)",
 		"remote: Compressing objects:   1% (34&#47;3342)",
+	}, {
+		`handles reverse linefeed`,
+		"meow\npurr\nnyan\x1bMrawr",
+		"meow\npurrrawr\nnyan",
 	}, {
 		`collapses many spans of the same color into 1`,
 		"\x1b[90m․\x1b[90m․\x1b[90m․\x1b[90m․\n\x1b[90m․\x1b[90m․\x1b[90m․\x1b[90m․",
