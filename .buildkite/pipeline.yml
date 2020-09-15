@@ -20,16 +20,16 @@ steps:
       docker-compose#v1.7.0:
         run: terminal
 
-  - block: ":rocket: Release"
+  #- block: ":rocket: Release"
 
-  - name: ":octocat:"
-    command: .buildkite/steps/release
-    branches: "master"
-    agents:
-      queue: "deploy"
+  #- name: ":octocat:"
+  #  command: .buildkite/steps/release
+  #  branches: "master"
+  #  agents:
+  #    queue: "deploy"
 
-  - name: ":packagecloud:"
-    command: .buildkite/steps/package_and_upload
-    branches: "master"
-    agents:
-      queue: "deploy"
+  #- name: ":packagecloud:"
+  #  command: .buildkite/steps/package_and_upload
+  #  branches: "master"
+  #  agents:
+  #    queue: "deploy"
