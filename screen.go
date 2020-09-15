@@ -139,8 +139,12 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 				for i := s.y; i	< len(s.screen); i++ {
 					s.clear(i, screenStartOfLine, screenEndOfLine)
 				}
+			// 2: "erase entire display", 3: "erase whole display including scroll-back buffer"
+			// Given we don't have a scrollback of our own, we treat these as equivalent
 			case "2", "3":
 				s.screen = nil
+				s.x = 0
+				s.y = 0
 		}
 	case 'K':
 		switch instructions[0] {
