@@ -1,4 +1,4 @@
-FROM golang:1.9.2
+FROM golang:1.12
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
@@ -14,4 +14,6 @@ RUN apt-get update -q && apt-get install -y zip ruby ruby-dev rpm locales && \
 WORKDIR /go/src/github.com/buildkite/terminal-to-html
 ADD . /go/src/github.com/buildkite/terminal-to-html
 
-CMD [ "make", "dist"]
+ENV GO111MODULE=on
+
+CMD [ "make", "dist" ]
