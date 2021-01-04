@@ -26,7 +26,7 @@ version:
 
 # Cross-compiling
 
-GZ_ARCH     := linux-amd64 linux-i386 linux-armel darwin-i386 darwin-amd64
+GZ_ARCH     := linux-amd64 linux-i386 linux-armel darwin-amd64 darwin-arm64
 ZIP_ARCH    := windows-i386 windows-amd64
 GZ_TARGETS  := $(foreach target,$(GZ_ARCH), dist/$(BINARY)-$(VERSION)-$(target).gz)
 ZIP_TARGETS := $(foreach target,$(ZIP_ARCH), dist/$(BINARY)-$(VERSION)-$(target).zip)
