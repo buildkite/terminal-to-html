@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/buildkite/terminal-to-html"
+	"github.com/buildkite/terminal-to-html/v3"
 	"github.com/urfave/cli/v2"
 )
 
