@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/buildkite/terminal-to-html/v3"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var AppHelpTemplate = `{{.Name}} - {{.Usage}}
@@ -90,23 +90,24 @@ func main() {
 	app.Version = terminal.Version()
 	app.Usage = "turn ANSI in to HTML"
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "http",
 			Value: "",
 			Usage: "HTTP service mode (eg --http :6060), endpoint is /terminal",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
 	}
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		PreviewMode = c.Bool("preview")
 		if c.String("http") != "" {
 			webservice(c.String("http"))
 		} else {
 			stdin()
 		}
+		return nil
 	}
 	app.Run(os.Args)
 }
