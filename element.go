@@ -78,8 +78,6 @@ func parseElementSequence(sequence string) (*element, error) {
 		return nil, err
 	}
 
-	args = strings.Map(htmlStripper, args)
-
 	tokens, err := tokenizeString(args, ';', '\\')
 	if err != nil {
 		return nil, err
@@ -225,26 +223,35 @@ func parseBuildkiteElementSequence(sequence string) (*element, error) {
 	return &element{elementType: ELEMENT_BK, bk: params}, nil
 }
 
-func tokenizeString(s string, sep, escape rune) (tokens []string, err error) {
+func tokenizeString(input string, sep, escape rune) (tokens []string, err error) {
 	var runes []rune
 	inEscape := false
-	for _, r := range s {
+	inSingleQuotes := false
+	inDoubleQuotes := false
+	for _, rune := range input {
 		switch {
 		case inEscape:
 			inEscape = false
 			fallthrough
 		default:
-			runes = append(runes, r)
-		case r == escape:
+			runes = append(runes, rune)
+		case rune == '\'':
+			inSingleQuotes = !inSingleQuotes
+		case rune == '"':
+			inDoubleQuotes = !inDoubleQuotes
+		case rune == escape:
 			inEscape = true
-		case r == sep:
-			tokens = append(tokens, string(runes))
+		case rune == sep && !inSingleQuotes && !inDoubleQuotes:
+			tokens = append(tokens, strings.Map(htmlStripper, string(runes)))
 			runes = runes[:0]
 		}
 	}
-	tokens = append(tokens, string(runes))
+	tokens = append(tokens, strings.Map(htmlStripper, string(runes)))
 	if inEscape {
 		err = errors.New("invalid terminal escape")
+	}
+	if inSingleQuotes || inDoubleQuotes {
+		err = errors.New("invalid syntax: unclosed quotation marks")
 	}
 	return tokens, err
 }

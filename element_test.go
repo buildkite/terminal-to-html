@@ -31,6 +31,10 @@ var errorCases = []struct {
 		"1337;File=name=foo.baz:AA==",
 		`name= value of "foo.baz" is not valid base64`,
 	}, {
+		`1337: errors for unclosed quotes`,
+		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%;height='50px>;inline=1:AA==`,
+		`invalid syntax: unclosed quotation marks`,
+	}, {
 		`1337: can't determine content type`,
 		"1337;File=name=" + base64Encode("foo.baz") + ":AA==",
 		`can't determine content type for "foo.baz"`,
@@ -71,8 +75,8 @@ var validCases = []struct {
 		`1337;File=name=Zm9vLmdpZg==;width=100%;height=50px;inline=1:AA==`,
 		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "100%", height: "50px", elementType: ELEMENT_ITERM_IMAGE},
 	}, {
-		`1337: protects against XSS in image name, width & height by stripping brackets & quotes`,
-		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%;height='50px>;inline=1:AA==`,
+		`1337: protects against XSS in image name, width & height by stripping brackets`,
+		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%";height='50px'>;inline=1:AA==`,
 		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "100%", height: "50px", elementType: ELEMENT_ITERM_IMAGE},
 	}, {
 		`1337: converts width & height without percent or px to em`,
@@ -102,6 +106,22 @@ var validCases = []struct {
 		`1339: link with url and content`,
 		"1339;url=foo.gif;content=bar",
 		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
+	}, {
+		`1339: link in quotes with url only`,
+		"1339;url='foo.gif'",
+		&element{url: "foo.gif", elementType: ELEMENT_LINK},
+	}, {
+		`1339: link in quotes with url and content`,
+		"1339;url='foo.gif';content=bar",
+		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
+	}, {
+		`1339: link with url and content in quotes`,
+		"1339;url='foo.gif';content='bar'",
+		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
+	}, {
+		`1339: link in quotes with semicolon in url`,
+		"1339;url='foo.gif?weirdparams=something;somethingelse'",
+		&element{url: "foo.gif?weirdparams=something;somethingelse", elementType: ELEMENT_LINK},
 	},
 }
 
