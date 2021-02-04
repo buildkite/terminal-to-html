@@ -43,6 +43,9 @@ Terminal can also render hyperlinks:
 
 You can use the provided `link.sh` to produce this escape sequence.
 
+Links which contain semicolons can be surrounded by either single or double quotation marks:
+
+`1339;url='https://example.com/link-with;semicolon?argument=something';content=Example`
 
 ## Installation
 
