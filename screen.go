@@ -141,21 +141,17 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 				// This line should be equivalent to K0
 				s.clear(s.y, s.x, screenEndOfLine)
 				// Truncate the screen below the current line
-				thisLineOrEndOfScreen := len(s.screen)
-				if s.y+1 <= thisLineOrEndOfScreen {
-					thisLineOrEndOfScreen = s.y+1
+				if len(s.screen) > s.y {
+					s.screen = s.screen[:s.y+1]
 				}
-				s.screen = s.screen[:thisLineOrEndOfScreen]
 			// "erase from beginning to current position (inclusive)"
 			case "1":
 				// This line should be equivalent to K1
 				s.clear(s.y, screenStartOfLine, s.x)
 				// Truncate the screen above the current line
-				thisLineOrEndOfScreen := len(s.screen)
-				if s.y+1 <= thisLineOrEndOfScreen {
-					thisLineOrEndOfScreen = s.y+1
+				if len(s.screen) > s.y {
+					s.screen = s.screen[s.y+1:]
 				}
-				s.screen = s.screen[thisLineOrEndOfScreen:]
 				// Adjust the cursor position to compensate
 				s.y = 0
 			// 2: "erase entire display", 3: "erase whole display including scroll-back buffer"
