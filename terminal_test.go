@@ -132,9 +132,17 @@ var rendererTestCases = []struct {
 		"foo\nbar\x1b[A\x1b[Jbaz",
 		"foobaz",
 	}, {
+		`doesn't freak out about clearing lines below when there aren't any`,
+		"foobar\x1b[0J",
+		"foobar",
+	}, {
 		`allows clearing lines above the current line`,
 		"foo\nbar\x1b[A\x1b[1Jbaz",
 		"barbaz",
+	}, {
+		`doesn't freak out about clearing lines above when there aren't any`,
+		"\x1b[1Jfoobar",
+		"foobar",
 	}, {
 		`allows clearing the entire scrollback buffer with escape 2J`,
 		"this is a big long bit of terminal output\nplease pay it no mind, we will clear it soon\nokay, get ready for a disappearing act...\nand...and...\n\n\x1b[2Jhey presto",
