@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mime"
 	"strings"
+	"sort"
 )
 
 const (
@@ -39,8 +40,20 @@ func (i *element) asHTML() string {
 
 	if i.elementType == ELEMENT_BK {
 		output := `<?bk`
-		for key, value := range i.bk {
-			output = output + ` ` + key + `="` + strings.Replace(value, `"`, "&quot;", -1) + `"`
+		// We pre-sort the keys to guarantee alphabetical output,
+		// because Golang `map`s have guaranteed disorder
+		keys := make([]string, len(i.bk))
+		// Make a list of the map's keys
+		idx := 0
+		for key := range i.bk {
+			keys[idx] = key
+			idx++
+		}
+		sort.Strings(keys)
+		// Then iterate over the sorted list of keys
+		for idx := range keys {
+			key := keys[idx]
+			output = output + ` ` + key + `="` + strings.Replace(i.bk[key], `"`, "&quot;", -1) + `"`
 		}
 		return output + `?>`
 	}
