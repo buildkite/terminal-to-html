@@ -11,7 +11,7 @@ It provides a single command, `terminal-to-html`, that can be used to convert te
 Piping in terminal output via the command line:
 
 ``` bash
-cat fixtures/pickachu.sh.raw | terminal-to-html -preview > out.html
+cat fixtures/pikachu.sh.raw | terminal-to-html -preview > out.html
 ```
 
 Posting terminal content via HTTP:
