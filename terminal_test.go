@@ -284,23 +284,27 @@ var rendererTestCases = []struct {
 
 func TestRendererAgainstCases(t *testing.T) {
 	for _, c := range rendererTestCases {
-		output := string(Render([]byte(c.input)))
-		if output != c.expected {
-			t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, output, c.expected)
-		}
+		t.Run(c.name, func(t *testing.T) {
+			output := string(Render([]byte(c.input)))
+			if output != c.expected {
+				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, output, c.expected)
+			}
+		})
 	}
 }
 
 func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
-		raw := loadFixture(t, base, "raw")
-		expected := string(loadFixture(t, base, "rendered"))
+		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
+			raw := loadFixture(t, base, "raw")
+			expected := string(loadFixture(t, base, "rendered"))
 
-		output := string(Render(raw))
+			output := string(Render(raw))
 
-		if output != expected {
-			t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
-		}
+			if output != expected {
+				t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
+			}
+		})
 	}
 }
 
