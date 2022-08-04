@@ -279,6 +279,14 @@ var rendererTestCases = []struct {
 		`renders bk APC escapes surrounded by text`,
 		"hello \x1b_bk;t=123\x07 world",
 		`hello <?bk t="123"?> world`,
+	}, {
+		`handles cursor movement and overwrite`,
+		"Buildbox\x1b[3Dkite", // Buildbox{CUBx3}kite
+		`Buildkite`,
+	}, {
+		`handles _bk timestamps as zero-width for cursor movement`,
+		"Buildb\x1b_bk;t=0\x07ox\x1b[3Dkite", // Buildb{TS}ox{CUBx3}kite
+		`Buildkite`,
 	},
 }
 
