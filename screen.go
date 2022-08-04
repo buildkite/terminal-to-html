@@ -38,7 +38,7 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 }
 
 // "Safe" parseint for parsing ANSI instructions
-func pi(s string) int {
+func ansiInt(s string) int {
 	if s == "" {
 		return 1
 	}
@@ -48,23 +48,23 @@ func pi(s string) int {
 
 // Move the cursor up, if we can
 func (s *screen) up(i string) {
-	s.y -= pi(i)
+	s.y -= ansiInt(i)
 	s.y = int(math.Max(0, float64(s.y)))
 }
 
 // Move the cursor down
 func (s *screen) down(i string) {
-	s.y += pi(i)
+	s.y += ansiInt(i)
 }
 
 // Move the cursor forward on the line
 func (s *screen) forward(i string) {
-	s.x += pi(i)
+	s.x += ansiInt(i)
 }
 
 // Move the cursor backward, if we can
 func (s *screen) backward(i string) {
-	s.x -= pi(i)
+	s.x -= ansiInt(i)
 	s.x = int(math.Max(0, float64(s.x)))
 }
 
