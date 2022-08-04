@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"bytes"
 	"math"
 	"strconv"
 	"strings"
@@ -197,6 +198,22 @@ func (s *screen) asHTML() []byte {
 	}
 
 	return []byte(strings.Join(lines, "\n"))
+}
+
+// asPlainText renders the screen without any ANSI style etc.
+func (s *screen) asPlainText() string {
+	var buf bytes.Buffer
+	for i, line := range s.screen {
+		for _, node := range line {
+			if node.elem == nil {
+				buf.WriteRune(node.blob)
+			}
+		}
+		if i < len(s.screen)-1 {
+			buf.WriteRune('\n')
+		}
+	}
+	return strings.TrimRight(buf.String(), " \t")
 }
 
 func (s *screen) newLine() {
