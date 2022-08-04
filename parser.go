@@ -144,7 +144,7 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 	}
 	p.mode = MODE_NORMAL
 
-	// Bell received, stop parsing our potential image
+	// this might be a Buildkite Application Program Command sequence...
 	el, err := parseBuildkiteElementSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
 
 	if el == nil && err == nil {
