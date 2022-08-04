@@ -65,10 +65,13 @@ func outputLineAsHTML(line []node) string {
 				}
 			}
 		}
-		if node.elem != nil {
-			lineBuf.buf.WriteString(node.elem.asHTML())
-		} else {
-			lineBuf.appendChar(node.blob)
+
+		if elem := node.elem; elem != nil {
+			lineBuf.buf.WriteString(elem.asHTML())
+		}
+
+		if r, ok := node.getRune(); ok {
+			lineBuf.appendChar(r)
 		}
 	}
 	if spanOpen {
