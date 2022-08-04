@@ -87,11 +87,17 @@ func (s *screen) growLineWidth(line []node) []node {
 // Write a character to the screen's current X&Y, along with the current screen style
 func (s *screen) write(data rune) {
 	s.growScreenHeight()
-
 	line := s.screen[s.y]
+
+	// If the node already exists with a persistent element, retain that element.
+	var persistentElement *element
+	if s.x <= len(line)-1 && line[s.x].hasPersistentElement() {
+		persistentElement = line[s.x].elem
+	}
+
 	line = s.growLineWidth(line)
 
-	line[s.x] = node{blob: data, style: s.style}
+	line[s.x] = node{blob: data, style: s.style, elem: persistentElement}
 	s.screen[s.y] = line
 }
 
@@ -108,13 +114,18 @@ func (s *screen) appendMany(data []rune) {
 	}
 }
 
-func (s *screen) appendElement(i *element) {
+func (s *screen) appendElement(el *element) {
 	s.growScreenHeight()
 	line := s.growLineWidth(s.screen[s.y])
 
-	line[s.x] = node{style: s.style, elem: i}
+	line[s.x] = node{style: s.style, elem: el}
 	s.screen[s.y] = line
-	s.x++
+
+	if el.elementType == ELEMENT_BK {
+		// x is not incremented: we've placed the element node onto the _next_ cell
+	} else {
+		s.x++
+	}
 }
 
 // Apply color instruction codes to the screen's current style
@@ -205,8 +216,8 @@ func (s *screen) asPlainText() string {
 	var buf bytes.Buffer
 	for i, line := range s.screen {
 		for _, node := range line {
-			if node.elem == nil {
-				buf.WriteRune(node.blob)
+			if r, ok := node.getRune(); ok {
+				buf.WriteRune(r)
 			}
 		}
 		if i < len(s.screen)-1 {

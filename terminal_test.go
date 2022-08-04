@@ -284,9 +284,9 @@ var rendererTestCases = []struct {
 		"Buildbox\x1b[3Dkite", // Buildbox{CUBx3}kite
 		`Buildkite`,
 	}, {
-		`handles _bk timestamps as zero-width for cursor movement`,
-		"Buildb\x1b_bk;t=0\x07ox\x1b[3Dkite", // Buildb{TS}ox{CUBx3}kite
-		`Buildkite`,
+		`handles _bk timestmaps as zero-width for cursor movement`,
+		"Buildb\x1b_bk;t=123\x07ox\x1b[3Dkite", // Buildb{TS}ox{CUBx3}kite
+		`Buildk<?bk t="123"?>ite`,
 	},
 }
 
