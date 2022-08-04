@@ -268,9 +268,17 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
-		`renders APC escapes as processing instructions`,
+		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
 		`<?bk x="llamas;" y="alpacas"?>`,
+	}, {
+		`renders bk APC escapes followed by text`,
+		"\x1b_bk;t=123\x07hello",
+		`<?bk t="123"?>hello`,
+	}, {
+		`renders bk APC escapes surrounded by text`,
+		"hello \x1b_bk;t=123\x07 world",
+		`hello <?bk t="123"?> world`,
 	},
 }
 
