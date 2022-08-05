@@ -138,25 +138,42 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 	}
 }
 
+// handleApplicationProgramCommand is called for each character consumed while
+// in MODE_APC, but does nothing until the APC is terminated with BEL (0x07).
+//
+// Technically an APC sequence is terminated by String Terminator (ST; 0x9C):
+// https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls
+//
+// But:
+// > For historical reasons, Xterm can end the command with BEL as well as the standard ST
+// https://en.wikipedia.org/wiki/ANSI_escape_code#OSC_(Operating_System_Command)_sequences
+//
+// .. and this is how iTerm2 implements inline images:
+// > ESC ] 1337 ; key = value ^G
+// https://iterm2.com/documentation-images.html
+//
+// Buildkite's ansi timestamper does the same, and we don't _expect_ to be
+// seeing any other APCs that could be ST-terminated... 🤞🏼
 func (p *parser) handleApplicationProgramCommand(char rune) {
-	if char != '\a' && char != '\x07' {
-		return
+	// check for APC terminator (\a = 0x07 = \x07 = BEL)
+	if char != '\x07' {
+		return // APC continues...
 	}
+
+	// APC terminator has been received; return to normal mode and handle the APC...
 	p.mode = MODE_NORMAL
+	sequence := string(p.ansi[p.instructionStartedAt:p.cursor])
 
 	// this might be a Buildkite Application Program Command sequence...
-	el, err := parseBuildkiteElementSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
-
-	if el == nil && err == nil {
-		// No element & no error, nothing to render
+	data, err := parseApcBk(sequence)
+	if err != nil {
+		p.screen.appendMany([]rune("*** Error parsing Buildkite APC ANSI escape sequence: "))
+		p.screen.appendMany([]rune(err.Error()))
 		return
 	}
 
-	if err != nil {
-		p.screen.appendMany([]rune("*** Error parsing buildkite element escape sequence: "))
-		p.screen.appendMany([]rune(err.Error()))
-	} else {
-		p.screen.appendElement(el)
+	if data != nil {
+		p.screen.setnxLineMetadata(bkNamespace, data)
 	}
 }
 

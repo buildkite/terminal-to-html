@@ -2,6 +2,8 @@ package terminal
 
 import (
 	"bytes"
+	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -24,6 +26,27 @@ func (b *outputBuffer) closeStyle() {
 	b.buf.Write([]byte("</span>"))
 }
 
+func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
+	// We pre-sort the keys to guarantee alphabetical output,
+	// because Golang `map`s have guaranteed disorder
+	keys := make([]string, len(data))
+	// Make a list of the map's keys
+	i := 0
+	for key := range data {
+		keys[i] = key
+		i++
+	}
+	sort.Strings(keys)
+
+	b.buf.WriteString("<?" + namespace)
+	for i := range keys {
+		key := keys[i]
+		value := strings.Replace(data[key], `"`, "&quot;", -1)
+		fmt.Fprintf(&b.buf, ` %s="%s"`, key, value)
+	}
+	b.buf.WriteString("?>")
+}
+
 // Append a character to our outputbuffer, escaping HTML bits as necessary.
 func (b *outputBuffer) appendChar(char rune) {
 	switch char {
@@ -44,16 +67,20 @@ func (b *outputBuffer) appendChar(char rune) {
 	}
 }
 
-func outputLineAsHTML(line []node) string {
+func outputLineAsHTML(line screenLine) string {
 	var spanOpen bool
 	var lineBuf outputBuffer
 
-	for idx, node := range line {
+	if data, ok := line.metadata[bkNamespace]; ok {
+		lineBuf.appendMeta(bkNamespace, data)
+	}
+
+	for idx, node := range line.nodes {
 		if idx == 0 && !node.style.isEmpty() {
 			lineBuf.appendNodeStyle(node)
 			spanOpen = true
 		} else if idx > 0 {
-			previous := line[idx-1]
+			previous := line.nodes[idx-1]
 			if !node.hasSameStyle(previous) {
 				if spanOpen {
 					lineBuf.closeStyle()

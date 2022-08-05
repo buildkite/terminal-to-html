@@ -11,8 +11,16 @@ import (
 type screen struct {
 	x      int
 	y      int
-	screen [][]node
+	screen []screenLine
 	style  *style
+}
+
+type screenLine struct {
+	nodes []node
+
+	// metadata is { namespace => { key => value, ... }, ... }
+	// e.g. { "bk" => { "t" => "1234" } }
+	metadata map[string]map[string]string
 }
 
 const screenEndOfLine = -1
@@ -24,16 +32,17 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 		return
 	}
 
+	line := s.screen[y]
 	if xStart == screenStartOfLine && xEnd == screenEndOfLine {
-		s.screen[y] = make([]node, 0, 80)
+		// Blank the entire line, but keep any existing line metadata.
+		s.screen[y].nodes = make([]node, 0, 80)
 	} else {
-		line := s.screen[y]
-
 		if xEnd == screenEndOfLine {
-			xEnd = len(line) - 1
+			xEnd = len(line.nodes) - 1
 		}
-		for i := xStart; i <= xEnd && i < len(line); i++ {
-			line[i] = emptyNode
+		// TODO: optimise clear-to-end-of-line by truncating line.nodes?
+		for i := xStart; i <= xEnd && i < len(line.nodes); i++ {
+			line.nodes[i] = emptyNode
 		}
 	}
 }
@@ -69,30 +78,25 @@ func (s *screen) backward(i string) {
 	s.x = int(math.Max(0, float64(s.x)))
 }
 
-// Add rows to our screen if necessary
-func (s *screen) growScreenHeight() {
+func (s *screen) getCurrentLineForWriting() *screenLine {
+	// Add rows to our screen if necessary
 	for i := len(s.screen); i <= s.y; i++ {
-		s.screen = append(s.screen, make([]node, 0, 80))
+		s.screen = append(s.screen, screenLine{nodes: make([]node, 0, 80)})
 	}
-}
 
-// Add columns to our current line if necessary
-func (s *screen) growLineWidth(line []node) []node {
-	for i := len(line); i <= s.x; i++ {
-		line = append(line, emptyNode)
+	line := &s.screen[s.y]
+
+	// Add columns if currently shorter than the cursor's x position
+	for i := len(line.nodes); i <= s.x; i++ {
+		line.nodes = append(line.nodes, emptyNode)
 	}
 	return line
 }
 
 // Write a character to the screen's current X&Y, along with the current screen style
 func (s *screen) write(data rune) {
-	s.growScreenHeight()
-
-	line := s.screen[s.y]
-	line = s.growLineWidth(line)
-
-	line[s.x] = node{blob: data, style: s.style}
-	s.screen[s.y] = line
+	line := s.getCurrentLineForWriting()
+	line.nodes[s.x] = node{blob: data, style: s.style}
 }
 
 // Append a character to the screen
@@ -109,12 +113,29 @@ func (s *screen) appendMany(data []rune) {
 }
 
 func (s *screen) appendElement(i *element) {
-	s.growScreenHeight()
-	line := s.growLineWidth(s.screen[s.y])
-
-	line[s.x] = node{style: s.style, elem: i}
-	s.screen[s.y] = line
+	line := s.getCurrentLineForWriting()
+	line.nodes[s.x] = node{style: s.style, elem: i}
 	s.x++
+}
+
+// Set non-existing line metadata. Merges the provided data into any existing
+// metadata for the current line, keeping existing data when keys collide.
+func (s *screen) setnxLineMetadata(namespace string, data map[string]string) {
+	line := s.getCurrentLineForWriting()
+	if line.metadata == nil {
+		line.metadata = make(map[string]map[string]string)
+	}
+	if ns, nsExists := line.metadata[namespace]; nsExists {
+		// set keys that don't already exist
+		for k, v := range data {
+			if _, kExists := ns[k]; !kExists {
+				ns[k] = v
+			}
+		}
+	} else {
+		// namespace did not exist, set all data
+		line.metadata[namespace] = data
+	}
 }
 
 // Apply color instruction codes to the screen's current style
@@ -204,7 +225,7 @@ func (s *screen) asHTML() []byte {
 func (s *screen) asPlainText() string {
 	var buf bytes.Buffer
 	for i, line := range s.screen {
-		for _, node := range line {
+		for _, node := range line.nodes {
 			if node.elem == nil {
 				buf.WriteRune(node.blob)
 			}

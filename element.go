@@ -5,15 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"mime"
-	"sort"
 	"strings"
 )
 
 const (
 	ELEMENT_ITERM_IMAGE = iota
-	ELEMENT_IMAGE       = iota
-	ELEMENT_LINK        = iota
-	ELEMENT_BK          = iota
+	ELEMENT_IMAGE
+	ELEMENT_LINK
 )
 
 type element struct {
@@ -24,7 +22,6 @@ type element struct {
 	height      string
 	width       string
 	elementType int
-	bk          map[string]string
 }
 
 var errUnsupportedElementSequence = errors.New("Unsupported element sequence")
@@ -36,26 +33,6 @@ func (i *element) asHTML() string {
 			content = i.url
 		}
 		return fmt.Sprintf(`<a href="%s">%s</a>`, i.url, content)
-	}
-
-	if i.elementType == ELEMENT_BK {
-		output := `<?bk`
-		// We pre-sort the keys to guarantee alphabetical output,
-		// because Golang `map`s have guaranteed disorder
-		keys := make([]string, len(i.bk))
-		// Make a list of the map's keys
-		idx := 0
-		for key := range i.bk {
-			keys[idx] = key
-			idx++
-		}
-		sort.Strings(keys)
-		// Then iterate over the sorted list of keys
-		for idx := range keys {
-			key := keys[idx]
-			output = output + ` ` + key + `="` + strings.Replace(i.bk[key], `"`, "&quot;", -1) + `"`
-		}
-		return output + `?>`
 	}
 
 	alt := i.alt
@@ -209,31 +186,6 @@ func splitAndVerifyElementSequence(s string) (arguments string, elementType int,
 	}
 
 	return
-}
-
-func parseBuildkiteElementSequence(sequence string) (*element, error) {
-	// Expect bk;t=123123234234234;llamas=blah
-
-	if !strings.HasPrefix(sequence, "bk;") {
-		return nil, nil
-	}
-
-	tokens, err := tokenizeString(sequence[3:], ';', '\\')
-	if err != nil {
-		return nil, err
-	}
-
-	params := map[string]string{}
-
-	for _, token := range tokens {
-		tokenParts := strings.SplitN(token, "=", 2)
-		if len(tokenParts) != 2 {
-			return nil, fmt.Errorf("Failed to read key=value from token %q", token)
-		}
-		params[tokenParts[0]] = tokenParts[1]
-	}
-
-	return &element{elementType: ELEMENT_BK, bk: params}, nil
 }
 
 func tokenizeString(input string, sep, escape rune) (tokens []string, err error) {
