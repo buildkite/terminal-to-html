@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"mime"
-	"strings"
 	"sort"
+	"strings"
 )
 
 const (

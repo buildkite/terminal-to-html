@@ -268,31 +268,43 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
-		`renders APC escapes as processing instructions`,
+		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
 		`<?bk x="llamas;" y="alpacas"?>`,
+	}, {
+		`renders bk APC escapes followed by text`,
+		"\x1b_bk;t=123\x07hello",
+		`<?bk t="123"?>hello`,
+	}, {
+		`renders bk APC escapes surrounded by text`,
+		"hello \x1b_bk;t=123\x07 world",
+		`hello <?bk t="123"?> world`,
 	},
 }
 
 func TestRendererAgainstCases(t *testing.T) {
 	for _, c := range rendererTestCases {
-		output := string(Render([]byte(c.input)))
-		if output != c.expected {
-			t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, output, c.expected)
-		}
+		t.Run(c.name, func(t *testing.T) {
+			output := string(Render([]byte(c.input)))
+			if output != c.expected {
+				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, output, c.expected)
+			}
+		})
 	}
 }
 
 func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
-		raw := loadFixture(t, base, "raw")
-		expected := string(loadFixture(t, base, "rendered"))
+		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
+			raw := loadFixture(t, base, "raw")
+			expected := string(loadFixture(t, base, "rendered"))
 
-		output := string(Render(raw))
+			output := string(Render(raw))
 
-		if output != expected {
-			t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
-		}
+			if output != expected {
+				t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
+			}
+		})
 	}
 }
 

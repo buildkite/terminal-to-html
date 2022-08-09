@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"bytes"
 	"math"
 	"strconv"
 	"strings"
@@ -38,7 +39,7 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 }
 
 // "Safe" parseint for parsing ANSI instructions
-func pi(s string) int {
+func ansiInt(s string) int {
 	if s == "" {
 		return 1
 	}
@@ -48,23 +49,23 @@ func pi(s string) int {
 
 // Move the cursor up, if we can
 func (s *screen) up(i string) {
-	s.y -= pi(i)
+	s.y -= ansiInt(i)
 	s.y = int(math.Max(0, float64(s.y)))
 }
 
 // Move the cursor down
 func (s *screen) down(i string) {
-	s.y += pi(i)
+	s.y += ansiInt(i)
 }
 
 // Move the cursor forward on the line
 func (s *screen) forward(i string) {
-	s.x += pi(i)
+	s.x += ansiInt(i)
 }
 
 // Move the cursor backward, if we can
 func (s *screen) backward(i string) {
-	s.x -= pi(i)
+	s.x -= ansiInt(i)
 	s.x = int(math.Max(0, float64(s.x)))
 }
 
@@ -136,30 +137,30 @@ func (s *screen) applyEscape(code rune, instructions []string) {
 	// "Erase in Display"
 	case 'J':
 		switch instructions[0] {
-			// "erase from current position to end (inclusive)"
-			case "0", "":
-				// This line should be equivalent to K0
-				s.clear(s.y, s.x, screenEndOfLine)
-				// Truncate the screen below the current line
-				if len(s.screen) > s.y {
-					s.screen = s.screen[:s.y+1]
-				}
-			// "erase from beginning to current position (inclusive)"
-			case "1":
-				// This line should be equivalent to K1
-				s.clear(s.y, screenStartOfLine, s.x)
-				// Truncate the screen above the current line
-				if len(s.screen) > s.y {
-					s.screen = s.screen[s.y+1:]
-				}
-				// Adjust the cursor position to compensate
-				s.y = 0
-			// 2: "erase entire display", 3: "erase whole display including scroll-back buffer"
-			// Given we don't have a scrollback of our own, we treat these as equivalent
-			case "2", "3":
-				s.screen = nil
-				s.x = 0
-				s.y = 0
+		// "erase from current position to end (inclusive)"
+		case "0", "":
+			// This line should be equivalent to K0
+			s.clear(s.y, s.x, screenEndOfLine)
+			// Truncate the screen below the current line
+			if len(s.screen) > s.y {
+				s.screen = s.screen[:s.y+1]
+			}
+		// "erase from beginning to current position (inclusive)"
+		case "1":
+			// This line should be equivalent to K1
+			s.clear(s.y, screenStartOfLine, s.x)
+			// Truncate the screen above the current line
+			if len(s.screen) > s.y {
+				s.screen = s.screen[s.y+1:]
+			}
+			// Adjust the cursor position to compensate
+			s.y = 0
+		// 2: "erase entire display", 3: "erase whole display including scroll-back buffer"
+		// Given we don't have a scrollback of our own, we treat these as equivalent
+		case "2", "3":
+			s.screen = nil
+			s.x = 0
+			s.y = 0
 		}
 	// "Erase in Line"
 	case 'K':
@@ -197,6 +198,22 @@ func (s *screen) asHTML() []byte {
 	}
 
 	return []byte(strings.Join(lines, "\n"))
+}
+
+// asPlainText renders the screen without any ANSI style etc.
+func (s *screen) asPlainText() string {
+	var buf bytes.Buffer
+	for i, line := range s.screen {
+		for _, node := range line {
+			if node.elem == nil {
+				buf.WriteRune(node.blob)
+			}
+		}
+		if i < len(s.screen)-1 {
+			buf.WriteRune('\n')
+		}
+	}
+	return strings.TrimRight(buf.String(), " \t")
 }
 
 func (s *screen) newLine() {
