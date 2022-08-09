@@ -29,7 +29,6 @@ func TestParseAfterOverwriteAndClearToEndOfLine(t *testing.T) {
 // Application Program Command should be zero-width
 func TestParseZeroWidthAPC(t *testing.T) {
 	s := parsedScreen("\x1b_bk;t=0\x07")
-	t.Skip("zero-width _bk;t=... bug")
 	if err := assertTextXY(t, s, "", 0, 0); err != nil {
 		t.Error(err)
 	}
@@ -38,7 +37,6 @@ func TestParseZeroWidthAPC(t *testing.T) {
 // Application Program Command can be followed by normal text
 func TestParseAPCPrefix(t *testing.T) {
 	s := parsedScreen("\x1b_bk;t=0\x07hello")
-	t.Skip("zero-width _bk;t=... bug")
 	if err := assertTextXY(t, s, "hello", 5, 0); err != nil {
 		t.Error(err)
 	}
@@ -47,7 +45,6 @@ func TestParseAPCPrefix(t *testing.T) {
 // Application Program Command should be zero-width for cursor movement
 func TestParseXYAfterCursorMovementThroughBuildkiteTimestampAPC(t *testing.T) {
 	s := parsedScreen("hel\x1b_bk;t=0\x07lo\x1b[4D3")
-	t.Skip("zero-width _bk;t=... bug")
 	if err := assertTextXY(t, s, "h3llo", 2, 0); err != nil {
 		t.Error(err)
 	}

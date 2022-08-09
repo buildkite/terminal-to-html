@@ -271,14 +271,33 @@ var rendererTestCases = []struct {
 		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
 		`<?bk x="llamas;" y="alpacas"?>`,
-	}, {
+	},
+	// double quotes in values are HTML-escaped by outputBuffer.appendMeta,
+	// however they're currently dropped by tokenizeString() during parsing,
+	// which I think is a bug. But so far there's no use-case for double-quotes
+	// in values, so rather than fixing it we'll let sleeping dogs lie...
+	// But here's a test for how I think it should probably behave:
+	// {
+	//	`renders bk APC escapes as processing instructions`,
+	//	"\x1b" + `_bk;a=1 ("one");b=2 ("two")` + "\x07",
+	//	`<?bk a="1 (&quot;one&quot;)" b="2 (&quot;two&quot;)"?>`,
+	// },
+	{
 		`renders bk APC escapes followed by text`,
 		"\x1b_bk;t=123\x07hello",
 		`<?bk t="123"?>hello`,
 	}, {
-		`renders bk APC escapes surrounded by text`,
-		"hello \x1b_bk;t=123\x07 world",
-		`hello <?bk t="123"?> world`,
+		`handles bk APC escapes surrounded by text`,
+		"hello \x1b_bk;t=123\x07world",
+		`<?bk t="123"?>hello world`,
+	}, {
+		`prefixes lines with the first timestamp seen`,
+		"hello\x1b_bk;t=123\x07 world\x1b_bk;t=456\x07!",
+		`<?bk t="123"?>hello world!`,
+	}, {
+		`handles timestamps across multiple lines`,
+		"hello\x1b_bk;t=123\x07 world\x1b_bk;t=234\x07!\nanother\x1b_bk;t=345\x07 line\x1b_bk;t=456\x07!",
+		`<?bk t="123"?>hello world!` + "\n" + `<?bk t="345"?>another line!`,
 	},
 }
 
