@@ -1,7 +1,9 @@
-terminal:
-  build: .
-  volumes:
-    - ./:/go/src/github.com/buildkite/terminal-to-html
-  environment:
-    - GITHUB_RELEASE_ACCESS_TOKEN
-    - PACKAGECLOUD_TOKEN
+services:
+
+  terminal:
+    build: .
+    volumes:
+      - ./:/go/src/github.com/buildkite/terminal-to-html
+    environment:
+      - GITHUB_RELEASE_ACCESS_TOKEN
+      - PACKAGECLOUD_TOKEN

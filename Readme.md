@@ -52,7 +52,7 @@ Links which contain semicolons can be surrounded by either single or double quot
 If you have Go installed you can simply run the following command to install the `terminal-to-html` command into `$GOPATH/bin`:
 
 ```bash
-$ GO111MODULE=on go get github.com/buildkite/terminal-to-html/v3/cmd/terminal-to-html
+$ go install github.com/buildkite/terminal-to-html/v3/cmd/terminal-to-html
 ```
 
 You can also just download the standalone binary from [https://github.com/buildkite/terminal-to-html/releases](https://github.com/buildkite/terminal-to-html/releases)

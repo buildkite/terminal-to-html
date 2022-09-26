@@ -1,6 +1,6 @@
 SRC=*.go cmd/terminal-to-html/*.go
 BINARY=terminal-to-html
-BUILDCMD=go build -o $@ ./cmd/terminal-to-html
+BUILDCMD=go build -trimpath -o $@ ./cmd/terminal-to-html
 VERSION=$(shell cat version.go  | grep baseVersion | head -n1 | cut -d \" -f 2)
 
 all: test $(BINARY)
