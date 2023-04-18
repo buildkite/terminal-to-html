@@ -35,7 +35,7 @@ func (i *element) asHTML() string {
 		if content == "" {
 			content = i.url
 		}
-		return fmt.Sprintf(`<a href="%s">%s</a>`, e(i.url), e(content))
+		return fmt.Sprintf(`<a href="%s">%s</a>`, e(sanitizeURL(i.url)), e(content))
 	}
 
 	alt := i.alt
@@ -45,12 +45,21 @@ func (i *element) asHTML() string {
 
 	parts := []string{fmt.Sprintf(`alt="%s"`, e(alt))}
 
-	if i.elementType == ELEMENT_ITERM_IMAGE {
+	switch i.elementType {
+	case ELEMENT_ITERM_IMAGE:
 		src := fmt.Sprintf(`src="data:%s;base64,%s"`, e(i.contentType), e(i.content))
 		parts = append(parts, src)
-	} else {
-		src := fmt.Sprintf(`src="%s"`, e(i.url))
+	case ELEMENT_IMAGE:
+		url := sanitizeURL(i.url)
+		if url == "" || url == unsafeURLSubstitution {
+			// don't emit an <img> at all if the URL is empty or didn't sanitize
+			return ""
+		}
+		src := fmt.Sprintf(`src="%s"`, e(url))
 		parts = append(parts, src)
+	default:
+		// unreachable, but…
+		return ""
 	}
 
 	if i.width != "" {
@@ -59,6 +68,7 @@ func (i *element) asHTML() string {
 	if i.height != "" {
 		parts = append(parts, fmt.Sprintf(`height="%s"`, e(i.height)))
 	}
+
 	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
 
@@ -206,10 +216,12 @@ func tokenizeString(input string, sep, escape rune) (tokens []string, err error)
 		case rune == escape:
 			inEscape = true
 		case rune == sep && !inSingleQuotes && !inDoubleQuotes:
+			// end of token: append to tokens and start a new token
 			tokens = append(tokens, string(runes))
 			runes = runes[:0]
 		}
 	}
+	// end of all tokens; append final token to tokens
 	tokens = append(tokens, string(runes))
 	if inEscape {
 		err = errors.New("invalid terminal escape")
