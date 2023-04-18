@@ -24,9 +24,9 @@ func TestSanitizeURL(t *testing.T) {
 		{input: "javascript:alert(1)", want: "#"},
 
 		// not-specifically-allow-listed schemes
-		{input: "ftp://example.org/", want: "#"},
-		{input: "tel:0123456789", want: "#"},
-		{input: "entirelymadeup://default-deny/this-is-the-way", want: "#"},
+		{input: "ftp://example.org/", want: "ftp://example.org/"},
+		{input: "tel:0123456789", want: "tel:0123456789"},
+		{input: "entirelymadeup://begrudgingly/allow", want: "entirelymadeup://begrudgingly/allow"},
 	}
 
 	for _, tc := range testCases {
