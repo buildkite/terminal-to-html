@@ -127,22 +127,26 @@ var validCases = []struct {
 
 func TestErrorCases(t *testing.T) {
 	for _, c := range errorCases {
-		elem, err := parseElementSequence(c.input)
-		if elem != nil {
-			t.Errorf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, elem)
-		} else if err.Error() != c.expected {
-			t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, err.Error(), c.expected)
-		}
+		t.Run(c.name, func(t *testing.T) {
+			elem, err := parseElementSequence(c.input)
+			if elem != nil {
+				t.Errorf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, elem)
+			} else if err.Error() != c.expected {
+				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, err.Error(), c.expected)
+			}
+		})
 	}
 }
 
 func TestElementCases(t *testing.T) {
 	for _, c := range validCases {
-		elem, err := parseElementSequence(c.input)
-		if err != nil {
-			t.Errorf("%s\ninput\t\t%q\nexpected no error, received %s", c.name, c.input, err.Error())
-		} else if !reflect.DeepEqual(elem, c.expected) {
-			t.Errorf("%s\ninput\t\t%q\nreceived\t%+v\nexpected\t%+v", c.name, c.input, elem, c.expected)
-		}
+		t.Run(c.name, func(t *testing.T) {
+			elem, err := parseElementSequence(c.input)
+			if err != nil {
+				t.Errorf("%s\ninput\t\t%q\nexpected no error, received %s", c.name, c.input, err.Error())
+			} else if !reflect.DeepEqual(elem, c.expected) {
+				t.Errorf("%s\ninput\t\t%q\nreceived\t%+v\nexpected\t%+v", c.name, c.input, elem, c.expected)
+			}
+		})
 	}
 }
