@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"html"
 	"mime"
 	"strings"
 )
@@ -27,12 +28,14 @@ type element struct {
 var errUnsupportedElementSequence = errors.New("Unsupported element sequence")
 
 func (i *element) asHTML() string {
+	e := html.EscapeString
+
 	if i.elementType == ELEMENT_LINK {
 		content := i.content
 		if content == "" {
 			content = i.url
 		}
-		return fmt.Sprintf(`<a href="%s">%s</a>`, i.url, content)
+		return fmt.Sprintf(`<a href="%s">%s</a>`, e(i.url), e(content))
 	}
 
 	alt := i.alt
@@ -40,25 +43,30 @@ func (i *element) asHTML() string {
 		alt = i.url
 	}
 
-	parts := []string{fmt.Sprintf(`alt="%s"`, alt)}
+	parts := []string{fmt.Sprintf(`alt="%s"`, e(alt))}
 
 	if i.elementType == ELEMENT_ITERM_IMAGE {
-		parts = append(parts, fmt.Sprintf(`src="data:%s;base64,%s"`, i.contentType, i.content))
+		src := fmt.Sprintf(`src="data:%s;base64,%s"`, e(i.contentType), e(i.content))
+		parts = append(parts, src)
 	} else {
-		parts = append(parts, fmt.Sprintf(`src="%s"`, i.url))
+		src := fmt.Sprintf(`src="%s"`, e(i.url))
+		parts = append(parts, src)
 	}
 
 	if i.width != "" {
-		parts = append(parts, fmt.Sprintf(`width="%s"`, i.width))
+		parts = append(parts, fmt.Sprintf(`width="%s"`, e(i.width)))
 	}
 	if i.height != "" {
-		parts = append(parts, fmt.Sprintf(`height="%s"`, i.height))
+		parts = append(parts, fmt.Sprintf(`height="%s"`, e(i.height)))
 	}
 	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
 
 func parseElementSequence(sequence string) (*element, error) {
-	// Expect 1337;File=name=1.gif;inline=1:BASE64
+	// Expect:
+	// - iTerm style inline image: 1337;File=name=1.gif;inline=1:BASE64
+	// - Buildkite external image: 1338;url=…;alt=…;width=…;height=…
+	// - Buildkite hyperlink:      1339;url=…;content=…
 
 	args, elementType, content, err := splitAndVerifyElementSequence(sequence)
 	if err != nil {
@@ -90,7 +98,7 @@ func parseElementSequence(sequence string) (*element, error) {
 			if err != nil {
 				return nil, fmt.Errorf("name= value of %q is not valid base64", val)
 			}
-			elem.url = strings.Map(htmlStripper, string(nameBytes))
+			elem.url = string(nameBytes)
 			elem.contentType = contentTypeForFile(elem.url)
 		case "url":
 			elem.url = val
@@ -145,15 +153,6 @@ func parseImageDimension(s string) string {
 	}
 }
 
-func htmlStripper(r rune) rune {
-	switch r {
-	case '<', '>', '\'', '"':
-		return -1
-	default:
-		return r
-	}
-}
-
 func splitAndVerifyElementSequence(s string) (arguments string, elementType int, content string, err error) {
 	if strings.HasPrefix(s, "1338;") {
 		return s[len("1338;"):], ELEMENT_IMAGE, "", nil
@@ -200,18 +199,18 @@ func tokenizeString(input string, sep, escape rune) (tokens []string, err error)
 			fallthrough
 		default:
 			runes = append(runes, rune)
-		case rune == '\'':
+		case rune == '\'' && !inDoubleQuotes:
 			inSingleQuotes = !inSingleQuotes
-		case rune == '"':
+		case rune == '"' && !inSingleQuotes:
 			inDoubleQuotes = !inDoubleQuotes
 		case rune == escape:
 			inEscape = true
 		case rune == sep && !inSingleQuotes && !inDoubleQuotes:
-			tokens = append(tokens, strings.Map(htmlStripper, string(runes)))
+			tokens = append(tokens, string(runes))
 			runes = runes[:0]
 		}
 	}
-	tokens = append(tokens, strings.Map(htmlStripper, string(runes)))
+	tokens = append(tokens, string(runes))
 	if inEscape {
 		err = errors.New("invalid terminal escape")
 	}

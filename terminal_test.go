@@ -268,6 +268,18 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
+		`protects inline images against XSS by escaping HTML during rendering`,
+		"hi\x1b]1337;File=name=" + base64Encode("<script>.pdf") + ";inline=1:AA==\ahello",
+		"hi\n" + `<img alt="&lt;script&gt;.pdf" src="data:application/pdf;base64,AA==">` + "\nhello",
+	}, {
+		`protects external images against XSS by escaping HTML during rendering`,
+		"\x1b]1338;url=\"https://example.com/a.gif&a=<b>&c='d'\";alt=foo&bar;width=\"<wat>\";height=2px\a",
+		`<img alt="foo&amp;bar" src="https://example.com/a.gif&amp;a=&lt;b&gt;&amp;c=&#39;d&#39;" width="&lt;wat&gt;em" height="2px">`,
+	}, {
+		`protects links against XSS by escaping HTML during rendering`,
+		"\x1b]1339;url=\"https://example.com/a.gif&a=<b>&c='d'\";content=<h1>hello</h1>\a",
+		`<a href="https://example.com/a.gif&amp;a=&lt;b&gt;&amp;c=&#39;d&#39;">&lt;h1&gt;hello&lt;/h1&gt;</a>`,
+	}, {
 		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
 		`<?bk x="llamas;" y="alpacas"?>`,

@@ -3,6 +3,8 @@ package terminal
 import (
 	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 var errorCases = []struct {
@@ -49,6 +51,19 @@ var errorCases = []struct {
 	},
 }
 
+func TestErrorCases(t *testing.T) {
+	for _, c := range errorCases {
+		t.Run(c.name, func(t *testing.T) {
+			elem, err := parseElementSequence(c.input)
+			if elem != nil {
+				t.Errorf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, elem)
+			} else if err.Error() != c.expected {
+				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, err.Error(), c.expected)
+			}
+		})
+	}
+}
+
 var validCases = []struct {
 	name     string
 	input    string
@@ -75,9 +90,9 @@ var validCases = []struct {
 		`1337;File=name=Zm9vLmdpZg==;width=100%;height=50px;inline=1:AA==`,
 		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "100%", height: "50px", elementType: ELEMENT_ITERM_IMAGE},
 	}, {
-		`1337: protects against XSS in image name, width & height by stripping brackets`,
+		`1337: parsing is NOT concerned with XSS in image name, width & height by stripping brackets, because that's protected at render time`,
 		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%";height='50px'>;inline=1:AA==`,
-		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "100%", height: "50px", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: `foo".gif`, content: "AA==", contentType: "image/gif", width: "100%", height: "50px>em", elementType: ELEMENT_ITERM_IMAGE},
 	}, {
 		`1337: converts width & height without percent or px to em`,
 		`1337;File=name=Zm9vLmdpZg==;width=1;height=5;inline=1:AA==`,
@@ -122,20 +137,18 @@ var validCases = []struct {
 		`1339: link in quotes with semicolon in url`,
 		"1339;url='foo.gif?weirdparams=something;somethingelse'",
 		&element{url: "foo.gif?weirdparams=something;somethingelse", elementType: ELEMENT_LINK},
+	}, {
+		`1339: link with HTML special characters in attributes`,
+		`1339;url=https://example.com/a?b=<c>&d=e#f;height="<hello>";width=<world%>;alt=&;content=<h1>heading</h1>`,
+		&element{
+			url:         "https://example.com/a?b=<c>&d=e#f",
+			alt:         "&",
+			content:     "<h1>heading</h1>",
+			height:      "<hello>em",
+			width:       "<world%>em",
+			elementType: ELEMENT_LINK,
+		},
 	},
-}
-
-func TestErrorCases(t *testing.T) {
-	for _, c := range errorCases {
-		t.Run(c.name, func(t *testing.T) {
-			elem, err := parseElementSequence(c.input)
-			if elem != nil {
-				t.Errorf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, elem)
-			} else if err.Error() != c.expected {
-				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, err.Error(), c.expected)
-			}
-		})
-	}
 }
 
 func TestElementCases(t *testing.T) {
@@ -146,6 +159,71 @@ func TestElementCases(t *testing.T) {
 				t.Errorf("%s\ninput\t\t%q\nexpected no error, received %s", c.name, c.input, err.Error())
 			} else if !reflect.DeepEqual(elem, c.expected) {
 				t.Errorf("%s\ninput\t\t%q\nreceived\t%+v\nexpected\t%+v", c.name, c.input, elem, c.expected)
+			}
+		})
+	}
+}
+
+var asHTMLCases = []struct {
+	name     string
+	element  element
+	expected string
+}{
+	{
+		"inline image (simple)",
+		element{
+			elementType: ELEMENT_ITERM_IMAGE,
+			url:         "test.png",
+			contentType: "image/png",
+			content:     "AA==",
+		},
+		`<img alt="test.png" src="data:image/png;base64,AA==">`,
+	}, {
+		"inline image (HTML minefield)",
+		element{
+			elementType: ELEMENT_ITERM_IMAGE,
+			url:         "<script>.pdf",
+			contentType: "application/pdf",
+			content:     "<script>",
+			width:       "<'&'>%",
+			height:      "<'&'>px",
+		},
+		`<img alt="&lt;script&gt;.pdf" src="data:application/pdf;base64,&lt;script&gt;" width="&lt;&#39;&amp;&#39;&gt;%" height="&lt;&#39;&amp;&#39;&gt;px">`,
+	}, {
+		"external image (simple)",
+		element{elementType: ELEMENT_IMAGE, url: "https://example.com/a.png"},
+		`<img alt="https://example.com/a.png" src="https://example.com/a.png">`,
+	}, {
+		"external image (HTML minefield)",
+		element{
+			elementType: ELEMENT_IMAGE,
+			url:         "https://example.com/?tag=<script>&a=b",
+			alt:         "<script>'hello & world'</script>",
+			width:       "<'&'>%",
+			height:      "<'&'>px",
+		},
+		`<img alt="&lt;script&gt;&#39;hello &amp; world&#39;&lt;/script&gt;" src="https://example.com/?tag=&lt;script&gt;&amp;a=b" width="&lt;&#39;&amp;&#39;&gt;%" height="&lt;&#39;&amp;&#39;&gt;px">`,
+	}, {
+		"link (simple)",
+		element{elementType: ELEMENT_LINK, url: "https://example.com/"},
+		`<a href="https://example.com/">https://example.com/</a>`,
+	}, {
+		"link (HTML minefield)",
+		element{
+			elementType: ELEMENT_LINK,
+			url:         "https://example.com/?tag=<script>&a=b",
+			content:     "<script>'hello & world'</script>",
+		},
+		`<a href="https://example.com/?tag=&lt;script&gt;&amp;a=b">&lt;script&gt;&#39;hello &amp; world&#39;&lt;/script&gt;</a>`,
+	},
+}
+
+func TestAsHTMLCases(t *testing.T) {
+	for _, c := range asHTMLCases {
+		t.Run(c.name, func(t *testing.T) {
+			html := c.element.asHTML()
+			if diff := cmp.Diff(html, c.expected); diff != "" {
+				t.Errorf("%v.asHTML() diff (-got +want):\n%s", c.element, diff)
 			}
 		})
 	}
