@@ -289,11 +289,11 @@ var rendererTestCases = []struct {
 	// which I think is a bug. But so far there's no use-case for double-quotes
 	// in values, so rather than fixing it we'll let sleeping dogs lie...
 	// But here's a test for how I think it should probably behave:
-	// {
-	//	`renders bk APC escapes as processing instructions`,
-	//	"\x1b" + `_bk;a=1 ("one");b=2 ("two")` + "\x07",
-	//	`<?bk a="1 (&quot;one&quot;)" b="2 (&quot;two&quot;)"?>`,
-	// },
+	{
+		`renders bk APC escapes as processing instructions`,
+		"\x1b" + `_bk;a='1 ("one")';b="2 ('two')"` + "\x07",
+		`<?bk a="1 (&#34;one&#34;)" b="2 (&#39;two&#39;)"?>`,
+	},
 	{
 		`renders bk APC escapes followed by text`,
 		"\x1b_bk;t=123\x07hello",
@@ -318,7 +318,7 @@ func TestRendererAgainstCases(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			output := string(Render([]byte(c.input)))
 			if output != c.expected {
-				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, output, c.expected)
+				t.Errorf("%s\ninput\t\t%q\nexpected\t%q\nreceived\t%q", c.name, c.input, c.expected, output)
 			}
 		})
 	}
