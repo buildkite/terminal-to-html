@@ -10,12 +10,13 @@ import (
 var TestFiles = []string{
 	"control.sh",
 	"curl.sh",
-	"homer.sh",
-	"pikachu.sh",
-	"npm.sh",
+	"cursor-save-restore.sh",
 	"docker-pull.sh",
-	"weather.sh",
+	"homer.sh",
+	"npm.sh",
+	"pikachu.sh",
 	"rustfmt.sh",
+	"weather.sh",
 }
 
 func loadFixture(t testing.TB, base string, ext string) []byte {

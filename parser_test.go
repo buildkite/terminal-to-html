@@ -2,6 +2,8 @@ package terminal
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -50,12 +52,31 @@ func TestParseXYAfterCursorMovementThroughBuildkiteTimestampAPC(t *testing.T) {
 	}
 }
 
+func TestParseDECCursorSaveRestore(t *testing.T) {
+	decsc := "\x1b7"
+	decrc := "\x1b8"
+	moveUpAndClearLine := csi(2, "A") + csi(2, "K") + csi(1, "G")
+
+	s := parsedScreen("one\ntwo\nthree\n" + decsc + moveUpAndClearLine + "overwrite\n" + decrc + "four\n")
+
+	expected := strings.Join([]string{"one", "overwrite", "three", "four"}, "\n")
+	if err := assertTextXY(t, s, expected, 0, 4); err != nil {
+		t.Error(err)
+	}
+}
+
 // ----------------------------------------
 
 func parsedScreen(data string) *screen {
 	s := &screen{}
 	parseANSIToScreen(s, []byte(data))
 	return s
+}
+
+// csi is a test helper for CSI ANSI sequences.
+// https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_(Control_Sequence_Introducer)_sequences
+func csi(n int, code string) string {
+	return "\x1b[" + strconv.Itoa(n) + code
 }
 
 func assertXY(t *testing.T, s *screen, x, y int) error {

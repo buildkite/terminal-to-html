@@ -14,6 +14,10 @@ const (
 	MODE_APC     = iota
 )
 
+type position struct {
+	x, y int
+}
+
 // Stateful ANSI parser
 type parser struct {
 	mode                 int
@@ -23,6 +27,7 @@ type parser struct {
 	escapeStartedAt      int
 	instructions         []string
 	instructionStartedAt int
+	savePosition         position
 }
 
 /*
@@ -232,6 +237,13 @@ func (p *parser) handleEscape(char rune) {
 		p.mode = MODE_APC
 	case 'M':
 		p.screen.revNewLine()
+		p.mode = MODE_NORMAL
+	case '7':
+		p.savePosition = position{x: p.screen.x, y: p.screen.y}
+		p.mode = MODE_NORMAL
+	case '8':
+		p.screen.x = p.savePosition.x
+		p.screen.y = p.savePosition.y
 		p.mode = MODE_NORMAL
 	default:
 		// Not an escape code, false alarm
