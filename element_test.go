@@ -56,9 +56,10 @@ func TestErrorCases(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			elem, err := parseElementSequence(c.input)
 			if elem != nil {
-				t.Errorf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, elem)
-			} else if err.Error() != c.expected {
-				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, err.Error(), c.expected)
+				t.Fatalf("%s\ninput\t\t%q\nexpected no image, received %+v", c.name, c.input, elem)
+			}
+			if diff := cmp.Diff(err.Error(), c.expected); diff != "" {
+				t.Errorf("%v.Error() diff (-got +want):\n%s", err, diff)
 			}
 		})
 	}
