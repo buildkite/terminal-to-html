@@ -28,14 +28,14 @@ type element struct {
 var errUnsupportedElementSequence = errors.New("Unsupported element sequence")
 
 func (i *element) asHTML() string {
-	e := html.EscapeString
+	h := html.EscapeString
 
 	if i.elementType == ELEMENT_LINK {
 		content := i.content
 		if content == "" {
 			content = i.url
 		}
-		return fmt.Sprintf(`<a href="%s">%s</a>`, e(i.url), e(content))
+		return fmt.Sprintf(`<a href="%s">%s</a>`, h(i.url), h(content))
 	}
 
 	alt := i.alt
@@ -43,21 +43,21 @@ func (i *element) asHTML() string {
 		alt = i.url
 	}
 
-	parts := []string{fmt.Sprintf(`alt="%s"`, e(alt))}
+	parts := []string{fmt.Sprintf(`alt="%s"`, h(alt))}
 
 	if i.elementType == ELEMENT_ITERM_IMAGE {
-		src := fmt.Sprintf(`src="data:%s;base64,%s"`, e(i.contentType), e(i.content))
+		src := fmt.Sprintf(`src="data:%s;base64,%s"`, h(i.contentType), h(i.content))
 		parts = append(parts, src)
 	} else {
-		src := fmt.Sprintf(`src="%s"`, e(i.url))
+		src := fmt.Sprintf(`src="%s"`, h(i.url))
 		parts = append(parts, src)
 	}
 
 	if i.width != "" {
-		parts = append(parts, fmt.Sprintf(`width="%s"`, e(i.width)))
+		parts = append(parts, fmt.Sprintf(`width="%s"`, h(i.width)))
 	}
 	if i.height != "" {
-		parts = append(parts, fmt.Sprintf(`height="%s"`, e(i.height)))
+		parts = append(parts, fmt.Sprintf(`height="%s"`, h(i.height)))
 	}
 	return fmt.Sprintf(`<img %s>`, strings.Join(parts, " "))
 }
