@@ -50,21 +50,40 @@ func check(m string, e error) {
 	}
 }
 
-func wrapPreview(s []byte) []byte {
+func wrapPreview(s []byte) ([]byte, error) {
 	if PreviewMode {
 		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
 		styleSheet, err := assets.TerminalCSS()
-		check("could not retrive stylesheet", err)
+		if err != nil {
+			return nil, err
+		}
 		s = bytes.Replace(s, []byte("STYLESHEET"), styleSheet, 1)
 	}
-	return s
+	return s, nil
 }
 
 func webservice(listen string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		input, err := io.ReadAll(r.Body)
-		check("could not read from HTTP stream", err)
-		w.Write(wrapPreview(terminal.Render(input)))
+		if err != nil {
+			log.Printf("could not read from HTTP stream: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "Error reading request.")
+			return
+		}
+
+		respBody, err := wrapPreview(terminal.Render(input))
+		if err != nil {
+			log.Printf("error wrapping preview: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "Error creating preview.")
+			return
+		}
+
+		_, err = w.Write(respBody)
+		if err != nil {
+			log.Printf("error writing response: %v", err)
+		}
 	})
 
 	log.Printf("Listening on %s", listen)
@@ -81,7 +100,9 @@ func stdin() {
 		input, err = io.ReadAll(os.Stdin)
 		check("could not read stdin", err)
 	}
-	fmt.Printf("%s", wrapPreview(terminal.Render(input)))
+	output, err := wrapPreview(terminal.Render(input))
+	check("could not wrap preview", err)
+	fmt.Printf("%s", output)
 }
 
 func main() {
@@ -112,5 +133,8 @@ func main() {
 		}
 		return nil
 	}
-	app.Run(os.Args)
+
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 }
