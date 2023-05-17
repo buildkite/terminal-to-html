@@ -5,6 +5,12 @@ steps:
       docker-compose#v1.7.0:
         run: terminal
 
+  - name: ":robot: Generation Check"
+    command: make generate && git diff --exit-code
+    plugins:
+      docker-compose#v1.7.0:
+        run: terminal
+
   - wait
   - name: ":neckbeard: Benchmark"
     command: make bench
