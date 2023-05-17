@@ -3,7 +3,7 @@ package terminal
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -20,7 +20,7 @@ var TestFiles = []string{
 
 func loadFixture(t testing.TB, base string, ext string) []byte {
 	filename := fmt.Sprintf("fixtures/%s.%s", base, ext)
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		t.Errorf("could not load fixture %s: %v", filename, err)
 	}

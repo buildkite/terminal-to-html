@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -59,7 +59,7 @@ func wrapPreview(s []byte) []byte {
 
 func webservice(listen string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
-		input, err := ioutil.ReadAll(r.Body)
+		input, err := io.ReadAll(r.Body)
 		check("could not read from HTTP stream", err)
 		w.Write(wrapPreview(terminal.Render(input)))
 	})
@@ -72,10 +72,10 @@ func stdin() {
 	var input []byte
 	var err error
 	if len(flag.Arg(0)) > 0 {
-		input, err = ioutil.ReadFile(flag.Arg(0))
+		input, err = os.ReadFile(flag.Arg(0))
 		check(fmt.Sprintf("could not read %s", flag.Arg(0)), err)
 	} else {
-		input, err = ioutil.ReadAll(os.Stdin)
+		input, err = io.ReadAll(os.Stdin)
 		check("could not read stdin", err)
 	}
 	fmt.Printf("%s", wrapPreview(terminal.Render(input)))
