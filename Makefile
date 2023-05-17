@@ -18,7 +18,10 @@ clean:
 cmd/terminal-to-html/_bindata.go: assets/terminal.css
 	go-bindata -o cmd/terminal-to-html/bindata.go -nomemcopy assets
 
-$(BINARY): $(SRC)
+generate:
+	go generate ./...
+
+$(BINARY): generate $(SRC)
 	$(BUILDCMD)
 
 version:
