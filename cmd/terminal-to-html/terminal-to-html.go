@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/buildkite/terminal-to-html/v3"
+	"github.com/buildkite/terminal-to-html/v3/internal/assets"
 	"github.com/urfave/cli/v2"
 )
 
@@ -52,7 +53,9 @@ func check(m string, e error) {
 func wrapPreview(s []byte) []byte {
 	if PreviewMode {
 		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
-		s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
+		styleSheet, err := assets.TerminalCSS()
+		check("could not retrive stylesheet", err)
+		s = bytes.Replace(s, []byte("STYLESHEET"), styleSheet, 1)
 	}
 	return s
 }
