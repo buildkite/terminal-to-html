@@ -257,13 +257,13 @@ var rendererTestCases = []struct {
 		"\x1b]1338;url=http://foo.com/foobar.gif;alt=foo bar\a",
 		`<img alt="foo bar" src="http://foo.com/foobar.gif">`,
 	}, {
+		`disallows non-allow-listed schemes for images`,
+		"before\x1b]1338;url=javascript:alert(1);alt=hello\x07after",
+		"before\n&nbsp;\nafter", // don't really care about the middle, as long as it's white-spacey
+	}, {
 		`renders links, and renders them inline on other content`,
 		"a link to \x1b]1339;url=http://google.com;content=google\a.",
 		`a link to <a href="http://google.com">google</a>.`,
-	}, {
-		`uses URL as link content if missing`,
-		"\x1b]1339;url=http://google.com\a",
-		`<a href="http://google.com">http://google.com</a>`,
 	}, {
 		`uses URL as link content if missing`,
 		"\x1b]1339;url=http://google.com\a",
@@ -275,11 +275,19 @@ var rendererTestCases = []struct {
 	}, {
 		`protects external images against XSS by escaping HTML during rendering`,
 		"\x1b]1338;url=\"https://example.com/a.gif&a=<b>&c='d'\";alt=foo&bar;width=\"<wat>\";height=2px\a",
-		`<img alt="foo&amp;bar" src="https://example.com/a.gif&amp;a=&lt;b&gt;&amp;c=&#39;d&#39;" width="&lt;wat&gt;em" height="2px">`,
+		`<img alt="foo&amp;bar" src="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27" width="&lt;wat&gt;em" height="2px">`,
 	}, {
 		`protects links against XSS by escaping HTML during rendering`,
 		"\x1b]1339;url=\"https://example.com/a.gif&a=<b>&c='d'\";content=<h1>hello</h1>\a",
-		`<a href="https://example.com/a.gif&amp;a=&lt;b&gt;&amp;c=&#39;d&#39;">&lt;h1&gt;hello&lt;/h1&gt;</a>`,
+		`<a href="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27">&lt;h1&gt;hello&lt;/h1&gt;</a>`,
+	}, {
+		`disallows javascript: scheme URLs`,
+		"\x1b]1339;url=javascript:alert(1);content=hello\x07",
+		`<a href="#">hello</a>`,
+	}, {
+		`allows artifact: scheme URLs`,
+		"\x1b]1339;url=artifact://hello.txt\x07\n",
+		`<a href="artifact://hello.txt">artifact://hello.txt</a>`,
 	}, {
 		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
