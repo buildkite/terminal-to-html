@@ -3,7 +3,7 @@ package terminal
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ var TestFiles = []string{
 
 func loadFixture(t testing.TB, base string, ext string) []byte {
 	filename := fmt.Sprintf("fixtures/%s.%s", base, ext)
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		t.Errorf("could not load fixture %s: %v", filename, err)
 	}
@@ -257,6 +257,10 @@ var rendererTestCases = []struct {
 		"\x1b]1338;url=http://foo.com/foobar.gif;alt=foo bar\a",
 		`<img alt="foo bar" src="http://foo.com/foobar.gif">`,
 	}, {
+		`disallows non-allow-listed schemes for images`,
+		"before\x1b]1338;url=javascript:alert(1);alt=hello\x07after",
+		"before\n&nbsp;\nafter", // don't really care about the middle, as long as it's white-spacey
+	}, {
 		`renders links, and renders them inline on other content`,
 		"a link to \x1b]1339;url=http://google.com;content=google\a.",
 		`a link to <a href="http://google.com">google</a>.`,
@@ -265,25 +269,34 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
 	}, {
-		`uses URL as link content if missing`,
-		"\x1b]1339;url=http://google.com\a",
-		`<a href="http://google.com">http://google.com</a>`,
+		`protects inline images against XSS by escaping HTML during rendering`,
+		"hi\x1b]1337;File=name=" + base64Encode("<script>.pdf") + ";inline=1:AA==\ahello",
+		"hi\n" + `<img alt="&lt;script&gt;.pdf" src="data:application/pdf;base64,AA==">` + "\nhello",
+	}, {
+		`protects external images against XSS by escaping HTML during rendering`,
+		"\x1b]1338;url=\"https://example.com/a.gif&a=<b>&c='d'\";alt=foo&bar;width=\"<wat>\";height=2px\a",
+		`<img alt="foo&amp;bar" src="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27" width="&lt;wat&gt;em" height="2px">`,
+	}, {
+		`protects links against XSS by escaping HTML during rendering`,
+		"\x1b]1339;url=\"https://example.com/a.gif&a=<b>&c='d'\";content=<h1>hello</h1>\a",
+		`<a href="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27">&lt;h1&gt;hello&lt;/h1&gt;</a>`,
+	}, {
+		`disallows javascript: scheme URLs`,
+		"\x1b]1339;url=javascript:alert(1);content=hello\x07",
+		`<a href="#">hello</a>`,
+	}, {
+		`allows artifact: scheme URLs`,
+		"\x1b]1339;url=artifact://hello.txt\x07\n",
+		`<a href="artifact://hello.txt">artifact://hello.txt</a>`,
 	}, {
 		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
 		`<?bk x="llamas;" y="alpacas"?>`,
-	},
-	// double quotes in values are HTML-escaped by outputBuffer.appendMeta,
-	// however they're currently dropped by tokenizeString() during parsing,
-	// which I think is a bug. But so far there's no use-case for double-quotes
-	// in values, so rather than fixing it we'll let sleeping dogs lie...
-	// But here's a test for how I think it should probably behave:
-	// {
-	//	`renders bk APC escapes as processing instructions`,
-	//	"\x1b" + `_bk;a=1 ("one");b=2 ("two")` + "\x07",
-	//	`<?bk a="1 (&quot;one&quot;)" b="2 (&quot;two&quot;)"?>`,
-	// },
-	{
+	}, {
+		`renders bk APC escapes as processing instructions`,
+		"\x1b" + `_bk;a='1 ("one")';b="2 ('two')"` + "\x07",
+		`<?bk a="1 (&#34;one&#34;)" b="2 (&#39;two&#39;)"?>`,
+	}, {
 		`renders bk APC escapes followed by text`,
 		"\x1b_bk;t=123\x07hello",
 		`<?bk t="123"?>hello`,
@@ -307,7 +320,7 @@ func TestRendererAgainstCases(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			output := string(Render([]byte(c.input)))
 			if output != c.expected {
-				t.Errorf("%s\ninput\t\t%q\nreceived\t%q\nexpected\t%q", c.name, c.input, output, c.expected)
+				t.Errorf("%s\ninput\t\t%q\nexpected\t%q\nreceived\t%q", c.name, c.input, c.expected, output)
 			}
 		})
 	}

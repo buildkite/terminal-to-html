@@ -3,6 +3,7 @@ package terminal
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"sort"
 	"strings"
 )
@@ -41,8 +42,7 @@ func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
 	b.buf.WriteString("<?" + namespace)
 	for i := range keys {
 		key := keys[i]
-		value := strings.Replace(data[key], `"`, "&quot;", -1)
-		fmt.Fprintf(&b.buf, ` %s="%s"`, key, value)
+		fmt.Fprintf(&b.buf, ` %s="%s"`, key, html.EscapeString(data[key]))
 	}
 	b.buf.WriteString("?>")
 }

@@ -24,12 +24,12 @@ steps:
 
   #- name: ":octocat:"
   #  command: .buildkite/steps/release
-  #  branches: "master"
+  #  branches: "main"
   #  agents:
   #    queue: "deploy"
 
   #- name: ":packagecloud:"
   #  command: .buildkite/steps/package_and_upload
-  #  branches: "master"
+  #  branches: "main"
   #  agents:
   #    queue: "deploy"
