@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/buildkite/terminal-to-html/v3"
+	"github.com/buildkite/terminal-to-html/v3/internal/assets"
 	"github.com/urfave/cli/v2"
 )
 
@@ -49,19 +50,40 @@ func check(m string, e error) {
 	}
 }
 
-func wrapPreview(s []byte) []byte {
+func wrapPreview(s []byte) ([]byte, error) {
 	if PreviewMode {
 		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
-		s = bytes.Replace(s, []byte("STYLESHEET"), MustAsset("assets/terminal.css"), 1)
+		styleSheet, err := assets.TerminalCSS()
+		if err != nil {
+			return nil, err
+		}
+		s = bytes.Replace(s, []byte("STYLESHEET"), styleSheet, 1)
 	}
-	return s
+	return s, nil
 }
 
 func webservice(listen string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
-		input, err := ioutil.ReadAll(r.Body)
-		check("could not read from HTTP stream", err)
-		w.Write(wrapPreview(terminal.Render(input)))
+		input, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Printf("could not read from HTTP stream: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "Error reading request.")
+			return
+		}
+
+		respBody, err := wrapPreview(terminal.Render(input))
+		if err != nil {
+			log.Printf("error wrapping preview: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "Error creating preview.")
+			return
+		}
+
+		_, err = w.Write(respBody)
+		if err != nil {
+			log.Printf("error writing response: %v", err)
+		}
 	})
 
 	log.Printf("Listening on %s", listen)
@@ -72,13 +94,15 @@ func stdin() {
 	var input []byte
 	var err error
 	if len(flag.Arg(0)) > 0 {
-		input, err = ioutil.ReadFile(flag.Arg(0))
+		input, err = os.ReadFile(flag.Arg(0))
 		check(fmt.Sprintf("could not read %s", flag.Arg(0)), err)
 	} else {
-		input, err = ioutil.ReadAll(os.Stdin)
+		input, err = io.ReadAll(os.Stdin)
 		check("could not read stdin", err)
 	}
-	fmt.Printf("%s", wrapPreview(terminal.Render(input)))
+	output, err := wrapPreview(terminal.Render(input))
+	check("could not wrap preview", err)
+	fmt.Printf("%s", output)
 }
 
 func main() {
@@ -109,5 +133,8 @@ func main() {
 		}
 		return nil
 	}
-	app.Run(os.Args)
+
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 }
