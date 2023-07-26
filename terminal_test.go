@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -305,13 +306,19 @@ var rendererTestCases = []struct {
 		"hello \x1b_bk;t=123\x07world",
 		`<?bk t="123"?>hello world`,
 	}, {
-		`prefixes lines with the first timestamp seen`,
+		`prefixes lines with the last timestamp seen`,
 		"hello\x1b_bk;t=123\x07 world\x1b_bk;t=456\x07!",
-		`<?bk t="123"?>hello world!`,
+		`<?bk t="456"?>hello world!`,
 	}, {
 		`handles timestamps across multiple lines`,
-		"hello\x1b_bk;t=123\x07 world\x1b_bk;t=234\x07!\nanother\x1b_bk;t=345\x07 line\x1b_bk;t=456\x07!",
-		`<?bk t="123"?>hello world!` + "\n" + `<?bk t="345"?>another line!`,
+		strings.Join([]string{
+			"hello\x1b_bk;t=123\x07 world\x1b_bk;t=234\x07!",
+			"another\x1b_bk;t=345\x07 line\x1b_bk;t=456\x07!",
+		}, "\n"),
+		strings.Join([]string{
+			`<?bk t="234"?>hello world!`,
+			`<?bk t="456"?>another line!`,
+		}, "\n"),
 	},
 }
 

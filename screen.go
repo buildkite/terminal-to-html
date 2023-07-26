@@ -32,18 +32,14 @@ func (s *screen) clear(y int, xStart int, xEnd int) {
 		return
 	}
 
-	line := s.screen[y]
-	if xStart == screenStartOfLine && xEnd == screenEndOfLine {
-		// Blank the entire line, but keep any existing line metadata.
-		s.screen[y].nodes = make([]node, 0, 80)
-	} else {
-		if xEnd == screenEndOfLine {
-			xEnd = len(line.nodes) - 1
-		}
-		// TODO: optimise clear-to-end-of-line by truncating line.nodes?
-		for i := xStart; i <= xEnd && i < len(line.nodes); i++ {
-			line.nodes[i] = emptyNode
-		}
+	line := &s.screen[y]
+	if xEnd == screenEndOfLine {
+		line.nodes = line.nodes[:xStart]
+		return
+	}
+
+	for i := xStart; i <= xEnd && i < len(line.nodes); i++ {
+		line.nodes[i] = emptyNode
 	}
 }
 
@@ -118,23 +114,27 @@ func (s *screen) appendElement(i *element) {
 	s.x++
 }
 
-// Set non-existing line metadata. Merges the provided data into any existing
-// metadata for the current line, keeping existing data when keys collide.
-func (s *screen) setnxLineMetadata(namespace string, data map[string]string) {
+// Set line metadata. Merges the provided data into any existing
+// metadata for the current line, overwriting data when keys collide.
+func (s *screen) setLineMetadata(namespace string, data map[string]string) {
 	line := s.getCurrentLineForWriting()
 	if line.metadata == nil {
-		line.metadata = make(map[string]map[string]string)
-	}
-	if ns, nsExists := line.metadata[namespace]; nsExists {
-		// set keys that don't already exist
-		for k, v := range data {
-			if _, kExists := ns[k]; !kExists {
-				ns[k] = v
-			}
+		line.metadata = map[string]map[string]string{
+			namespace: data,
 		}
-	} else {
+		return
+	}
+
+	ns := line.metadata[namespace]
+	if ns == nil {
 		// namespace did not exist, set all data
 		line.metadata[namespace] = data
+		return
+	}
+
+	// copy new data over old data
+	for k, v := range data {
+		ns[k] = v
 	}
 }
 
