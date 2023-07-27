@@ -177,9 +177,10 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 		return
 	}
 
-	if data != nil {
-		p.screen.setnxLineMetadata(bkNamespace, data)
+	if data == nil {
+		return
 	}
+	p.screen.setLineMetadata(bkNamespace, data)
 }
 
 func (p *parser) handleControlSequence(char rune) {
