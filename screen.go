@@ -23,22 +23,40 @@ type screenLine struct {
 	metadata map[string]map[string]string
 }
 
-const screenEndOfLine = -1
-const screenStartOfLine = 0
+const (
+	screenStartOfLine = 0
+	screenEndOfLine   = math.MaxInt
+)
 
-// Clear part (or all) of a line on the screen
-func (s *screen) clear(y int, xStart int, xEnd int) {
-	if len(s.screen) <= y {
+// Clear part (or all) of a line on the screen. The range to clear is inclusive
+// of xStart and xEnd.
+func (s *screen) clear(y, xStart, xEnd int) {
+	if y < 0 || y >= len(s.screen) {
+		return
+	}
+
+	if xStart < 0 {
+		xStart = 0
+	}
+	if xEnd < xStart {
+		// Not a valid range.
 		return
 	}
 
 	line := &s.screen[y]
-	if xEnd == screenEndOfLine {
+
+	if xStart >= len(line.nodes) {
+		// Clearing part of a line starting after the end of the current line...
+		return
+	}
+
+	if xEnd >= len(line.nodes)-1 {
+		// Clear from start to end of the line
 		line.nodes = line.nodes[:xStart]
 		return
 	}
 
-	for i := xStart; i <= xEnd && i < len(line.nodes); i++ {
+	for i := xStart; i <= xEnd; i++ {
 		line.nodes[i] = emptyNode
 	}
 }
