@@ -319,6 +319,16 @@ var rendererTestCases = []struct {
 			`<?bk t="234"?>hello world!`,
 			`<?bk t="456"?>another line!`,
 		}, "\n"),
+	}, {
+		`handles timestamps and delta timestamps`,
+		strings.Join([]string{
+			"hello\x1b_bk;t=123\x07 world\x1b_bk;dt=111\x07!",
+			"another\x1b_bk;dt=111\x07 line\x1b_bk;dt=111\x07!",
+		}, "\n"),
+		strings.Join([]string{
+			`<?bk t="234"?>hello world!`,
+			`<?bk t="456"?>another line!`,
+		}, "\n"),
 	},
 }
 

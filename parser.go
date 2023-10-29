@@ -28,6 +28,9 @@ type parser struct {
 	instructions         []string
 	instructionStartedAt int
 	savePosition         position
+
+	// Buildkite-specific state
+	lastTimestamp int64
 }
 
 /*
@@ -170,7 +173,7 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 	sequence := string(p.ansi[p.instructionStartedAt:p.cursor])
 
 	// this might be a Buildkite Application Program Command sequence...
-	data, err := parseApcBk(sequence)
+	data, err := p.parseBuildkiteAPC(sequence)
 	if err != nil {
 		p.screen.appendMany([]rune("*** Error parsing Buildkite APC ANSI escape sequence: "))
 		p.screen.appendMany([]rune(err.Error()))
