@@ -21,7 +21,7 @@ type position struct {
 // Stateful ANSI parser
 type parser struct {
 	mode                 int
-	screen               *screen
+	screen               *Screen
 	ansi                 []byte
 	cursor               int
 	escapeStartedAt      int
@@ -74,7 +74,7 @@ type parser struct {
  * normally designate the character set.
  */
 
-func parseANSIToScreen(s *screen, ansi []byte) {
+func parseANSIToScreen(s *Screen, ansi []byte) {
 	p := parser{mode: MODE_NORMAL, ansi: ansi, screen: s}
 	p.mode = MODE_NORMAL
 	length := len(p.ansi)
