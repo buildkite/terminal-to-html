@@ -13,6 +13,7 @@ test:
 
 clean:
 	rm -f $(BINARY)
+	rm -f $(BINARY).wasm
 	rm -rf dist bin
 
 cmd/terminal-to-html/_bindata.go: assets/terminal.css
@@ -20,6 +21,11 @@ cmd/terminal-to-html/_bindata.go: assets/terminal.css
 
 $(BINARY): $(SRC)
 	$(BUILDCMD)
+
+$(BINARY).wasm: $(SRC)
+	tinygo build --no-debug -o $@ -target wasm ./cmd/terminal-to-html/terminal-to-html.go
+
+wasm: $(BINARY).wasm
 
 version:
 	@echo $(VERSION)
@@ -46,4 +52,4 @@ bin/$(BINARY)-$(VERSION)-%: $(SRC)
 	@[ -d bin ] || mkdir bin
 	GOOS=$(firstword $(subst -, , $*)) GOARCH=$(lastword $(subst armel, arm, $(subst i386, 386, $(subst -, , $*)))) $(BUILDCMD)
 
-.PHONY: clean bench test dist version
+.PHONY: clean bench test dist version wasm
