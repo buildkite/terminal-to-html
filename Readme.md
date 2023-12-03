@@ -21,7 +21,7 @@ terminal-to-html -http=:6060 &
 curl --data-binary "@fixtures/pikachu.sh.raw" http://localhost:6060/terminal > out.html
 ```
 
-For coloring you can use the sample [terminal.css](/assets/terminal.css) stylesheet and wrap the output in an element with class `term-container` (e.g. `<div class="term-container"><!-- terminal output --></div>`).
+For coloring you can use the sample [terminal.css](/internal/assets/terminal.css) stylesheet and wrap the output in an element with class `term-container` (e.g. `<div class="term-container"><!-- terminal output --></div>`).
 
 ### iTerm2 Image support
 
