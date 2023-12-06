@@ -1,15 +1,15 @@
 package terminal
 
-var emptyNode = node{blob: ' ', style: &emptyStyle}
+var emptyNode = node{blob: ' '}
 
 type node struct {
 	blob  rune
-	style *style
+	style style
 	elem  *element
 }
 
 func (n *node) hasSameStyle(o node) bool {
-	return n.style.isEqual(o.style)
+	return n.style == o.style
 }
 
 func (n *node) getRune() (rune, bool) {

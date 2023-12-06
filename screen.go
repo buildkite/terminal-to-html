@@ -16,7 +16,7 @@ type Screen struct {
 	screen []screenLine
 
 	// Current style
-	style *style
+	style style
 }
 
 type screenLine struct {
@@ -228,7 +228,7 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 
 // Parse ANSI input, populate our screen buffer with nodes
 func (s *Screen) Parse(ansi []byte) {
-	s.style = &emptyStyle
+	s.style = 0
 
 	parseANSIToScreen(s, ansi)
 }

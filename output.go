@@ -76,7 +76,7 @@ func outputLineAsHTML(line screenLine) string {
 	}
 
 	for idx, node := range line.nodes {
-		if idx == 0 && !node.style.isEmpty() {
+		if idx == 0 && node.style != 0 {
 			lineBuf.appendNodeStyle(node)
 			spanOpen = true
 		} else if idx > 0 {
@@ -86,7 +86,7 @@ func outputLineAsHTML(line screenLine) string {
 					lineBuf.closeStyle()
 					spanOpen = false
 				}
-				if !node.style.isEmpty() {
+				if node.style != 0 {
 					lineBuf.appendNodeStyle(node)
 					spanOpen = true
 				}
