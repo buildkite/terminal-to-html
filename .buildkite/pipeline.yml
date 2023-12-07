@@ -2,22 +2,22 @@ steps:
   - name: ":bomb: Test"
     command: make test
     plugins:
-      docker-compose#v1.7.0:
+      docker-compose#v4.16.0:
         run: terminal
 
   - wait
   - name: ":neckbeard: Benchmark"
     command: make bench
     plugins:
-      docker-compose#v1.7.0:
+      docker-compose#v4.16.0:
         run: terminal
 
   - wait
   - name: ":hammer: Build"
     command: make dist
-    artifact_paths: "dist/**.gz"
+    artifact_paths: "dist/**.{gz,zip}"
     plugins:
-      docker-compose#v1.7.0:
+      docker-compose#v4.16.0:
         run: terminal
 
   #- block: ":rocket: Release"
