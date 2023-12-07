@@ -9,10 +9,14 @@ import (
 
 // A terminal 'screen'. Current cursor position, cursor style, and characters
 type Screen struct {
-	x      int
-	y      int
+	// Current cursor position
+	x, y int
+
+	// Screen contents
 	screen []screenLine
-	style  *style
+
+	// Current style
+	style style
 }
 
 type screenLine struct {
@@ -73,7 +77,7 @@ func ansiInt(s string) int {
 // Move the cursor up, if we can
 func (s *Screen) up(i string) {
 	s.y -= ansiInt(i)
-	s.y = int(math.Max(0, float64(s.y)))
+	s.y = max(0, s.y)
 }
 
 // Move the cursor down
@@ -89,7 +93,7 @@ func (s *Screen) forward(i string) {
 // Move the cursor backward, if we can
 func (s *Screen) backward(i string) {
 	s.x -= ansiInt(i)
-	s.x = int(math.Max(0, float64(s.x)))
+	s.x = max(0, s.x)
 }
 
 func (s *Screen) getCurrentLineForWriting() *screenLine {
@@ -224,7 +228,7 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 
 // Parse ANSI input, populate our screen buffer with nodes
 func (s *Screen) Parse(ansi []byte) {
-	s.style = &emptyStyle
+	s.style = 0
 
 	parseANSIToScreen(s, ansi)
 }

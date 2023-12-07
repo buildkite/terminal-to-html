@@ -359,7 +359,7 @@ func TestRendererAgainstFixtures(t *testing.T) {
 }
 
 func TestScreenWriteToXY(t *testing.T) {
-	s := Screen{style: &emptyStyle}
+	s := Screen{style: 0}
 	s.write('a')
 
 	s.x = 1
