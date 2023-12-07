@@ -17,6 +17,14 @@ type Screen struct {
 
 	// Current style
 	style style
+
+	// Optional maximum amount of backscroll to retain in the buffer.
+	// Setting to 0 or negative makes the screen buffer unlimited.
+	MaxLines int
+
+	// Optional callback. If not nil, as each line is scrolled out of the top of
+	// the buffer, this func is called with the HTML.
+	ScrollOutFunc func(lineHTML string)
 }
 
 type screenLine struct {
@@ -100,6 +108,18 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 	// Add rows to our screen if necessary
 	for i := len(s.screen); i <= s.y; i++ {
 		s.screen = append(s.screen, screenLine{nodes: make([]node, 0, 80)})
+	}
+
+	// Remove old lines from the top of the screen if MaxLines is set
+	if s.MaxLines > 0 && len(s.screen) > s.MaxLines {
+		baseY := len(s.screen) - s.MaxLines
+		if s.ScrollOutFunc != nil {
+			for _, l := range s.screen[:baseY] {
+				s.ScrollOutFunc(outputLineAsHTML(l))
+			}
+		}
+		s.screen = s.screen[baseY:]
+		s.y -= baseY
 	}
 
 	line := &s.screen[s.y]
