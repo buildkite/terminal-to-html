@@ -76,29 +76,29 @@ func outputLineAsHTML(line screenLine) string {
 	}
 
 	for idx, node := range line.nodes {
-		if idx == 0 && node.style != 0 {
-			lineBuf.appendNodeStyle(node)
-			spanOpen = true
-		} else if idx > 0 {
+		if idx == 0 {
+			if !node.style.isPlain() {
+				lineBuf.appendNodeStyle(node)
+				spanOpen = true
+			}
+		} else {
 			previous := line.nodes[idx-1]
 			if !node.hasSameStyle(previous) {
 				if spanOpen {
 					lineBuf.closeStyle()
 					spanOpen = false
 				}
-				if node.style != 0 {
+				if !node.style.isPlain() {
 					lineBuf.appendNodeStyle(node)
 					spanOpen = true
 				}
 			}
 		}
 
-		if elem := node.elem; elem != nil {
-			lineBuf.buf.WriteString(elem.asHTML())
-		}
-
-		if r, ok := node.getRune(); ok {
-			lineBuf.appendChar(r)
+		if node.style.element() {
+			lineBuf.buf.WriteString(line.elements[node.blob].asHTML())
+		} else {
+			lineBuf.appendChar(node.blob)
 		}
 	}
 	if spanOpen {

@@ -33,6 +33,10 @@ type screenLine struct {
 	// metadata is { namespace => { key => value, ... }, ... }
 	// e.g. { "bk" => { "t" => "1234" } }
 	metadata map[string]map[string]string
+
+	// element nodes refer to elements in this slice by index
+	// (if node.style.element(), then elements[node.blob] is the element)
+	elements []*element
 }
 
 const (
@@ -152,7 +156,11 @@ func (s *Screen) appendMany(data []rune) {
 
 func (s *Screen) appendElement(i *element) {
 	line := s.getCurrentLineForWriting()
-	line.nodes[s.x] = node{style: s.style, elem: i}
+	idx := len(line.elements)
+	line.elements = append(line.elements, i)
+	ns := s.style
+	ns.setElement(true)
+	line.nodes[s.x] = node{blob: rune(idx), style: ns}
 	s.x++
 }
 
@@ -268,7 +276,7 @@ func (s *Screen) asPlainText() string {
 	var buf bytes.Buffer
 	for i, line := range s.screen {
 		for _, node := range line.nodes {
-			if node.elem == nil {
+			if !node.style.element() {
 				buf.WriteRune(node.blob)
 			}
 		}

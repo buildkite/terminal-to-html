@@ -5,8 +5,8 @@ import "strconv"
 type style uint32
 
 // style encoding:
-// 0...  ...7  8... ...15  16...23  24....31
-// [fg color]  [bg color]  [flags]  [unused]
+// 0...  ...7  8... ...15  16...23     24    25....31
+// [fg color]  [bg color]  [flags]  element  [unused]
 // flags = bold, faint, etc
 
 const (
@@ -18,7 +18,15 @@ const (
 	sbUnderline
 	sbStrike
 	sbBlink
+	sbElement // meaning: this node is actually an element
 )
+
+// Used for comparing styles - ignores the element bit.
+const styleComparisonMask = 0xffffff
+
+// isPlain reports if there is no style information. elements (that have no
+// other style set) are also considered plain.
+func (s style) isPlain() bool { return s&styleComparisonMask == 0 }
 
 func (s style) fgColor() uint8  { return uint8(s & 0xff) }
 func (s style) bgColor() uint8  { return uint8((s & 0xff_00) >> 8) }
@@ -30,6 +38,7 @@ func (s style) italic() bool    { return s&sbItalic != 0 }
 func (s style) underline() bool { return s&sbUnderline != 0 }
 func (s style) strike() bool    { return s&sbStrike != 0 }
 func (s style) blink() bool     { return s&sbBlink != 0 }
+func (s style) element() bool   { return s&sbElement != 0 }
 
 func (s *style) setFGColor(v uint8)  { *s = (*s &^ 0xff) | style(v) }
 func (s *style) setBGColor(v uint8)  { *s = (*s &^ 0xff_00) | (style(v) << 8) }
@@ -41,6 +50,7 @@ func (s *style) setItalic(v bool)    { *s = (*s &^ sbItalic) | booln(v, sbItalic
 func (s *style) setUnderline(v bool) { *s = (*s &^ sbUnderline) | booln(v, sbUnderline) }
 func (s *style) setStrike(v bool)    { *s = (*s &^ sbStrike) | booln(v, sbStrike) }
 func (s *style) setBlink(v bool)     { *s = (*s &^ sbBlink) | booln(v, sbBlink) }
+func (s *style) setElement(v bool)   { *s = (*s &^ sbElement) | booln(v, sbElement) }
 
 const (
 	COLOR_NORMAL        = iota
