@@ -18,6 +18,9 @@ type Screen struct {
 	// Current style
 	style style
 
+	// Parser to use for streaming processing
+	parser *parser
+
 	// Optional maximum amount of backscroll to retain in the buffer.
 	// Setting to 0 or negative makes the screen buffer unlimited.
 	MaxLines int
@@ -281,21 +284,27 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 	}
 }
 
-// Parse ANSI input, populate our screen buffer with nodes
-func (s *Screen) Parse(ansi []byte) {
-	s.style = 0
-
-	parseANSIToScreen(s, ansi)
+// Write writes ANSI text to the screen.
+func (s *Screen) Write(input []byte) (int, error) {
+	if s.parser == nil {
+		s.parser = &parser{
+			mode:   MODE_NORMAL,
+			screen: s,
+		}
+	}
+	s.parser.parseToScreen(input)
+	return len(input), nil
 }
 
-func (s *Screen) AsHTML() []byte {
+// AsHTML returns the contents of the current screen buffer as HTML.
+func (s *Screen) AsHTML() string {
 	var lines []string
 
 	for _, line := range s.screen {
 		lines = append(lines, outputLineAsHTML(line))
 	}
 
-	return []byte(strings.Join(lines, "\n"))
+	return strings.Join(lines, "\n")
 }
 
 // asPlainText renders the screen without any ANSI style etc.

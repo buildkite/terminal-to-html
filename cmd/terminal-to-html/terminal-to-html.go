@@ -3,13 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/buildkite/terminal-to-html/v3"
@@ -18,7 +18,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var AppHelpTemplate = `{{.Name}} - {{.Usage}}
+const appHelpTemplate = `{{.Name}} - {{.Usage}}
 
 STDIN/STDOUT USAGE:
   cat input.raw | {{.Name}} [arguments...] > out.html
@@ -32,88 +32,75 @@ OPTIONS:
   {{end}}
 `
 
-var PreviewMode = false
+const (
+	// Preview = prologue + stylesheet + interlogue + content + epilogue
 
-var PreviewTemplate = `
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset="UTF-8">
-			<title>terminal-to-html Preview</title>
-			<style>STYLESHEET</style>
-		</head>
-		<body>
-			<div class="term-container">CONTENT</div>
-		</body>
-	</html>
+	previewPrologue = `
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>terminal-to-html Preview</title>
+		<style>`
+
+	previewInterlogue = `</style>
+	</head>
+	<body>
+		<div class="term-container">`
+
+	previewEpilogue = `</div>
+	</body>
+</html>
 `
+)
 
-func check(m string, e error) {
-	if e != nil {
-		log.Fatalf("%s: %v", m, e)
+func writePreviewStart(w io.Writer) error {
+	styleSheet, err := assets.TerminalCSS()
+	if err != nil {
+		return err
 	}
+	if _, err := w.Write([]byte(previewPrologue)); err != nil {
+		return err
+	}
+	if _, err := w.Write(styleSheet); err != nil {
+		return err
+	}
+	if _, err := w.Write([]byte(previewInterlogue)); err != nil {
+		return err
+	}
+	return nil
 }
 
-func wrapPreview(s []byte) ([]byte, error) {
-	if PreviewMode {
-		s = bytes.Replace([]byte(PreviewTemplate), []byte("CONTENT"), s, 1)
-		styleSheet, err := assets.TerminalCSS()
-		if err != nil {
-			return nil, err
-		}
-		s = bytes.Replace(s, []byte("STYLESHEET"), styleSheet, 1)
-	}
-	return s, nil
+func writePreviewEnd(w io.Writer) error {
+	_, err := w.Write([]byte(previewEpilogue))
+	return err
 }
 
-func webservice(listen string) {
+func webservice(listen string, preview bool, maxLines int) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
-		input, err := io.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("could not read from HTTP stream: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "Error reading request.")
-			return
-		}
-
-		respBody, err := wrapPreview(terminal.Render(input))
-		if err != nil {
-			log.Printf("error wrapping preview: %v", err)
+		// Process the request body, but write to a buffer before serving it.
+		// Consuming the body before any writes is necessary because of HTTP
+		// limitations (see http.ResponseWriter):
+		// > Depending on the HTTP protocol version and the client, calling
+		// > Write or WriteHeader may prevent future reads on the
+		// > Request.Body.
+		// However, it lets us provide Content-Length in all cases.
+		b := bytes.NewBuffer(nil)
+		if _, _, _, err := process(b, r.Body, preview, maxLines); err != nil {
+			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
-			return
 		}
 
-		_, err = w.Write(respBody)
-		if err != nil {
+		w.Header().Set("Content-Type", "text/html")
+		w.Header().Set("Content-Length", strconv.Itoa(b.Len()))
+		if _, err := w.Write(b.Bytes()); err != nil {
 			log.Printf("error writing response: %v", err)
 		}
 	})
 
 	log.Printf("Listening on %s", listen)
 	log.Fatal(http.ListenAndServe(listen, nil))
-}
-
-func stdin() (in, out int, s *terminal.Screen) {
-	var input []byte
-	var err error
-	if len(flag.Arg(0)) > 0 {
-		input, err = os.ReadFile(flag.Arg(0))
-		check(fmt.Sprintf("could not read %s", flag.Arg(0)), err)
-	} else {
-		input, err = io.ReadAll(os.Stdin)
-		check("could not read stdin", err)
-	}
-
-	// Like terminal.Render, but we get access to *terminal.Screen afterwards
-	screen := &terminal.Screen{}
-	screen.Parse(input)
-	outputPlain := bytes.Replace(screen.AsHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
-
-	output, err := wrapPreview(outputPlain)
-	check("could not wrap preview", err)
-	fmt.Printf("%s", output)
-	return len(input), len(output), screen
 }
 
 func logStats(start time.Time, in, out int, s *terminal.Screen) {
@@ -172,8 +159,53 @@ func logStats(start time.Time, in, out int, s *terminal.Screen) {
 	}
 }
 
+type writeCounter struct {
+	out     io.Writer
+	counter int
+}
+
+func (wc *writeCounter) Write(b []byte) (int, error) {
+	n, err := wc.out.Write(b)
+	wc.counter += n
+	return n, err
+}
+
+// process streams the src through a terminal renderer to the dst. If preview is
+// true, the preview wrapper is added.
+func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out int, screen *terminal.Screen, err error) {
+	// Wrap dst in writeCounter to count bytes written
+	wc := &writeCounter{out: dst}
+
+	if preview {
+		if err := writePreviewStart(wc); err != nil {
+			return 0, wc.counter, nil, fmt.Errorf("write start of preview: %w", err)
+		}
+	}
+
+	screen = &terminal.Screen{
+		MaxLines:      maxLines,
+		ScrollOutFunc: func(line string) { fmt.Fprintln(wc, line) },
+	}
+	inBytes, err := io.Copy(screen, src)
+	if err != nil {
+		return int(inBytes), wc.counter, screen, fmt.Errorf("read input into screen buffer: %w", err)
+	}
+
+	// Write what remains in the screen buffer (everything that didn't scroll
+	// out of the top).
+	fmt.Fprintln(wc, screen.AsHTML())
+	// TODO:	output := strings.Replace(screen.AsHTML(), "\n\n", "\n&nbsp;\n", -1)
+
+	if preview {
+		if err := writePreviewEnd(wc); err != nil {
+			return int(inBytes), wc.counter, screen, fmt.Errorf("write end of preview: %w", err)
+		}
+	}
+	return int(inBytes), wc.counter, screen, nil
+}
+
 func main() {
-	cli.AppHelpTemplate = AppHelpTemplate
+	cli.AppHelpTemplate = appHelpTemplate
 
 	app := cli.NewApp()
 
@@ -194,23 +226,42 @@ func main() {
 			Name:  "log-stats-to-stderr",
 			Usage: "Logs a JSON object to stderr containing resource and processing statistics after successfully processing",
 		},
+		&cli.IntFlag{
+			Name:  "buffer-max-lines",
+			Usage: "Sets a limit on the number of lines to hold in the screen buffer, allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs",
+		},
 	}
 	app.Action = func(c *cli.Context) error {
-		PreviewMode = c.Bool("preview")
-		if c.String("http") != "" {
-			webservice(c.String("http"))
-		} else {
-			start := time.Now()
-			in, out, screen := stdin()
+		// Run a web server?
+		if addr := c.String("http"); addr != "" {
+			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"))
+			return nil
+		}
 
-			if c.Bool("log-stats-to-stderr") {
-				logStats(start, in, out, screen)
+		start := time.Now()
+
+		// Read input from either stdin or a file.
+		input := os.Stdin
+		if args := c.Args(); args.Len() > 0 {
+			fpath := args.Get(0)
+			f, err := os.Open(args.Get(0))
+			if err != nil {
+				return fmt.Errorf("read %s: %w", fpath, err)
 			}
+			input = f
+		}
+
+		in, out, screen, err := process(os.Stdout, input, c.Bool("preview"), c.Int("buffer-max-lines"))
+		if err != nil {
+			return err
+		}
+		if c.Bool("log-stats-to-stderr") {
+			logStats(start, in, out, screen)
 		}
 		return nil
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Couldn't %v", err)
 	}
 }
