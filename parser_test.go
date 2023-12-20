@@ -69,7 +69,7 @@ func TestParseDECCursorSaveRestore(t *testing.T) {
 
 func parsedScreen(data string) *Screen {
 	s := &Screen{}
-	parseANSIToScreen(s, []byte(data))
+	s.Write([]byte(data))
 	return s
 }
 
