@@ -382,20 +382,43 @@ func TestScreenWriteToXY(t *testing.T) {
 	}
 }
 
-func BenchmarkRendererControl(b *testing.B)    { benchmark("control.sh", b) }
-func BenchmarkRendererCurl(b *testing.B)       { benchmark("curl.sh", b) }
-func BenchmarkRendererHomer(b *testing.B)      { benchmark("homer.sh", b) }
-func BenchmarkRendererDockerPull(b *testing.B) { benchmark("docker-pull.sh", b) }
-func BenchmarkRendererPikachu(b *testing.B)    { benchmark("pikachu.sh", b) }
-func BenchmarkRendererPlaywright(b *testing.B) { benchmark("playwright.sh", b) }
-func BenchmarkRendererRustFmt(b *testing.B)    { benchmark("rustfmt.sh", b) }
-func BenchmarkRendererWeather(b *testing.B)    { benchmark("weather.sh", b) }
-func BenchmarkRendererNpm(b *testing.B)        { benchmark("npm.sh", b) }
+func BenchmarkRendererControl(b *testing.B)    { benchmarkRender("control.sh", b) }
+func BenchmarkRendererCurl(b *testing.B)       { benchmarkRender("curl.sh", b) }
+func BenchmarkRendererHomer(b *testing.B)      { benchmarkRender("homer.sh", b) }
+func BenchmarkRendererDockerPull(b *testing.B) { benchmarkRender("docker-pull.sh", b) }
+func BenchmarkRendererPikachu(b *testing.B)    { benchmarkRender("pikachu.sh", b) }
+func BenchmarkRendererPlaywright(b *testing.B) { benchmarkRender("playwright.sh", b) }
+func BenchmarkRendererRustFmt(b *testing.B)    { benchmarkRender("rustfmt.sh", b) }
+func BenchmarkRendererWeather(b *testing.B)    { benchmarkRender("weather.sh", b) }
+func BenchmarkRendererNpm(b *testing.B)        { benchmarkRender("npm.sh", b) }
 
-func benchmark(filename string, b *testing.B) {
+func benchmarkRender(filename string, b *testing.B) {
 	raw := loadFixture(b, filename, "raw")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Render(raw)
+	}
+}
+
+func BenchmarkStreamingControl(b *testing.B)    { benchmarkStreaming("control.sh", b) }
+func BenchmarkStreamingCurl(b *testing.B)       { benchmarkStreaming("curl.sh", b) }
+func BenchmarkStreamingHomer(b *testing.B)      { benchmarkStreaming("homer.sh", b) }
+func BenchmarkStreamingDockerPull(b *testing.B) { benchmarkStreaming("docker-pull.sh", b) }
+func BenchmarkStreamingPikachu(b *testing.B)    { benchmarkStreaming("pikachu.sh", b) }
+func BenchmarkStreamingPlaywright(b *testing.B) { benchmarkStreaming("playwright.sh", b) }
+func BenchmarkStreamingRustFmt(b *testing.B)    { benchmarkStreaming("rustfmt.sh", b) }
+func BenchmarkStreamingWeather(b *testing.B)    { benchmarkStreaming("weather.sh", b) }
+func BenchmarkStreamingNpm(b *testing.B)        { benchmarkStreaming("npm.sh", b) }
+
+func benchmarkStreaming(filename string, b *testing.B) {
+	raw := loadFixture(b, filename, "raw")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := &Screen{
+			MaxLines:      300,
+			ScrollOutFunc: func(string) {},
+		}
+		s.Write(raw)
+		_ = s.AsHTML()
 	}
 }
