@@ -122,22 +122,30 @@ func (s *Screen) backward(i string) {
 }
 
 func (s *Screen) getCurrentLineForWriting() *screenLine {
-	// Add rows to our screen if necessary
-	for i := len(s.screen); i <= s.y; i++ {
-		s.screen = append(s.screen, screenLine{nodes: make([]node, 0, 80)})
-	}
-
-	// Remove old lines from the top of the screen if MaxLines is set
-	if s.MaxLines > 0 && len(s.screen) > s.MaxLines {
-		baseY := len(s.screen) - s.MaxLines
-		if s.ScrollOutFunc != nil {
-			for _, l := range s.screen[:baseY] {
-				s.ScrollOutFunc(l.asHTML())
-			}
+	// Ensure there are enough lines on screen for the cursor's Y position.
+	for s.y >= len(s.screen) {
+		// If MaxLines is not in use, or adding a new line would not make it
+		// larger than MaxLines, then just allocate a new line.
+		if s.MaxLines <= 0 || len(s.screen)+1 <= s.MaxLines {
+			// nodes is preallocated with space for 80 columns, which is
+			// arbitrary, but also the traditional terminal width.
+			newLine := screenLine{nodes: make([]node, 0, 80)}
+			s.screen = append(s.screen, newLine)
+			continue
 		}
-		s.LinesScrolledOut += baseY
-		s.screen = s.screen[baseY:]
-		s.y -= baseY
+
+		// MaxLines is in effect, and adding a new line would make the screen
+		// larger than MaxLines.
+		// Pass the line being scrolled out to ScrollOutFunc if it exists.
+		if s.ScrollOutFunc != nil {
+			s.ScrollOutFunc(s.screen[0].asHTML())
+		}
+		s.LinesScrolledOut++
+
+		// Trim the first line off the top of the screen.
+		// Recycle its nodes slice to make a new line on the bottom.
+		s.screen = append(s.screen[1:], screenLine{nodes: s.screen[0].nodes[:0]})
+		s.y--
 	}
 
 	line := &s.screen[s.y]
