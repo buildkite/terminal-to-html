@@ -194,7 +194,6 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 	// Write what remains in the screen buffer (everything that didn't scroll
 	// out of the top).
 	fmt.Fprintln(wc, screen.AsHTML())
-	// TODO:	output := strings.Replace(screen.AsHTML(), "\n\n", "\n&nbsp;\n", -1)
 
 	if preview {
 		if err := writePreviewEnd(wc); err != nil {

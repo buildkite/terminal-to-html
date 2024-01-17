@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 var TestFiles = []string{
@@ -113,7 +115,7 @@ var rendererTestCases = []struct {
 	}, {
 		`clears everything after the \x1b[0K`,
 		"hello\nfriend!\x1b[A\r\x1b[0K",
-		"\nfriend!",
+		"&nbsp;\nfriend!",
 	}, {
 		`handles \x1b[0G ghetto style`,
 		"hello friend\x1b[Ggoodbye buddy!",
@@ -336,9 +338,11 @@ var rendererTestCases = []struct {
 func TestRendererAgainstCases(t *testing.T) {
 	for _, c := range rendererTestCases {
 		t.Run(c.name, func(t *testing.T) {
-			output := string(Render([]byte(c.input)))
-			if output != c.expected {
-				t.Errorf("%s\ninput\t\t%q\nexpected\t%q\nreceived\t%q", c.name, c.input, c.expected, output)
+			got := Render([]byte(c.input))
+			want := c.expected
+
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("%s Render(%q) diff (-got +want):\n%s", c.name, c.input, diff)
 			}
 		})
 	}
@@ -348,12 +352,12 @@ func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
 		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
 			raw := loadFixture(t, base, "raw")
-			expected := string(loadFixture(t, base, "rendered"))
+			want := string(loadFixture(t, base, "rendered"))
 
-			output := string(Render(raw))
+			got := Render(raw)
 
-			if output != expected {
-				t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("%s diff (-got +want):\n%s", base, diff)
 			}
 		})
 	}
@@ -371,7 +375,7 @@ func TestScreenWriteToXY(t *testing.T) {
 	s.y = 2
 	s.write('c')
 
-	output := string(s.AsHTML())
+	output := s.AsHTML()
 	expected := "a\n b\n  c"
 	if output != expected {
 		t.Errorf("got %q, wanted %q", output, expected)

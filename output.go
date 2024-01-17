@@ -104,7 +104,11 @@ func (l *screenLine) asHTML() string {
 	if spanOpen {
 		lineBuf.closeStyle()
 	}
-	return strings.TrimRight(lineBuf.buf.String(), " \t")
+	line := strings.TrimRight(lineBuf.buf.String(), " \t")
+	if line == "" {
+		return "&nbsp;"
+	}
+	return line
 }
 
 // asPlain returns the line contents without any added HTML.
