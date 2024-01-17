@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"bytes"
 	"fmt"
 	"html"
 	"sort"
@@ -9,22 +8,22 @@ import (
 )
 
 type outputBuffer struct {
-	buf bytes.Buffer
+	buf strings.Builder
 }
 
 func (b *outputBuffer) appendNodeStyle(n node) {
-	b.buf.Write([]byte(`<span class="`))
+	b.buf.WriteString(`<span class="`)
 	for idx, class := range n.style.asClasses() {
 		if idx > 0 {
-			b.buf.Write([]byte(" "))
+			b.buf.WriteString(" ")
 		}
-		b.buf.Write([]byte(class))
+		b.buf.WriteString(class)
 	}
-	b.buf.Write([]byte(`">`))
+	b.buf.WriteString(`">`)
 }
 
 func (b *outputBuffer) closeStyle() {
-	b.buf.Write([]byte("</span>"))
+	b.buf.WriteString("</span>")
 }
 
 func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
