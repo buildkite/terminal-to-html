@@ -342,7 +342,7 @@ func TestRendererAgainstCases(t *testing.T) {
 			want := c.expected
 
 			if diff := cmp.Diff(got, want); diff != "" {
-				t.Errorf("%s Render(%q) diff (-got +want):\n%s", c.name, c.input, diff)
+				t.Errorf("Render(%q) diff (-got +want):\n%s", c.input, diff)
 			}
 		})
 	}
@@ -357,7 +357,48 @@ func TestRendererAgainstFixtures(t *testing.T) {
 			got := Render(raw)
 
 			if diff := cmp.Diff(got, want); diff != "" {
-				t.Errorf("%s diff (-got +want):\n%s", base, diff)
+				t.Errorf("Render diff (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func streamingRender(raw []byte) string {
+	var buf strings.Builder
+	s := &Screen{
+		MaxLines: 300,
+		ScrollOutFunc: func(line string) {
+			fmt.Fprintln(&buf, line)
+		},
+	}
+	s.Write(raw)
+	buf.WriteString(s.AsHTML())
+	return buf.String()
+}
+
+func TestStreamingRendererAgainstCases(t *testing.T) {
+	for _, c := range rendererTestCases {
+		t.Run(c.name, func(t *testing.T) {
+			got := streamingRender([]byte(c.input))
+			want := c.expected
+
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("streamingRender(%q) diff (-got +want):\n%s", c.input, diff)
+			}
+		})
+	}
+}
+
+func TestStreamingRendererAgainstFixtures(t *testing.T) {
+	for _, base := range TestFiles {
+		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
+			raw := loadFixture(t, base, "raw")
+			want := string(loadFixture(t, base, "rendered"))
+
+			got := streamingRender(raw)
+
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("streamingRender diff (-got +want):\n%s", diff)
 			}
 		})
 	}
