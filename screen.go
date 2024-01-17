@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"bytes"
 	"math"
 	"strconv"
 	"strings"
@@ -133,7 +132,7 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 		baseY := len(s.screen) - s.MaxLines
 		if s.ScrollOutFunc != nil {
 			for _, l := range s.screen[:baseY] {
-				s.ScrollOutFunc(outputLineAsHTML(l))
+				s.ScrollOutFunc(l.asHTML())
 			}
 		}
 		s.LinesScrolledOut += baseY
@@ -298,29 +297,24 @@ func (s *Screen) Write(input []byte) (int, error) {
 
 // AsHTML returns the contents of the current screen buffer as HTML.
 func (s *Screen) AsHTML() string {
-	var lines []string
+	lines := make([]string, 0, len(s.screen))
 
 	for _, line := range s.screen {
-		lines = append(lines, outputLineAsHTML(line))
+		lines = append(lines, line.asHTML())
 	}
 
 	return strings.Join(lines, "\n")
 }
 
-// asPlainText renders the screen without any ANSI style etc.
-func (s *Screen) asPlainText() string {
-	var buf bytes.Buffer
-	for i, line := range s.screen {
-		for _, node := range line.nodes {
-			if !node.style.element() {
-				buf.WriteRune(node.blob)
-			}
-		}
-		if i < len(s.screen)-1 {
-			buf.WriteRune('\n')
-		}
+// AsPlainText renders the screen without any ANSI style etc.
+func (s *Screen) AsPlainText() string {
+	lines := make([]string, 0, len(s.screen))
+
+	for _, line := range s.screen {
+		lines = append(lines, line.asPlain())
 	}
-	return strings.TrimRight(buf.String(), " \t")
+
+	return strings.Join(lines, "\n")
 }
 
 func (s *Screen) newLine() {
