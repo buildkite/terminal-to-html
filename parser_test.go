@@ -90,7 +90,7 @@ func assertXY(t *testing.T, s *Screen, x, y int) error {
 }
 
 func assertText(t *testing.T, s *Screen, expected string) error {
-	if actual := s.asPlainText(); actual != expected {
+	if actual := s.AsPlainText(); actual != expected {
 		return fmt.Errorf("expected text %q, got %q", expected, actual)
 	}
 	return nil
