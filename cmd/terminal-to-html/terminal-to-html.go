@@ -227,7 +227,8 @@ func main() {
 		},
 		&cli.IntFlag{
 			Name:  "buffer-max-lines",
-			Usage: "Sets a limit on the number of lines to hold in the screen buffer, allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs",
+			Value: 300,
+			Usage: "Sets a limit on the number of lines to hold in the screen buffer, allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs. Setting to 0 disables the limit, causing the renderer to buffer the entire screen before producing any output",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
