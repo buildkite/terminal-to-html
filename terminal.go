@@ -10,12 +10,9 @@ GO111MODULE=on go install github.com/buildkite/terminal-to-html/v3/cmd/terminal-
 */
 package terminal
 
-import "bytes"
-
 // Render converts ANSI to HTML and returns the result.
-func Render(input []byte) []byte {
+func Render(input []byte) string {
 	screen := Screen{}
-	screen.Parse(input)
-	output := bytes.Replace(screen.AsHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
-	return output
+	screen.Write(input)
+	return screen.AsHTML()
 }

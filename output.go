@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"bytes"
 	"fmt"
 	"html"
 	"sort"
@@ -9,22 +8,22 @@ import (
 )
 
 type outputBuffer struct {
-	buf bytes.Buffer
+	buf strings.Builder
 }
 
 func (b *outputBuffer) appendNodeStyle(n node) {
-	b.buf.Write([]byte(`<span class="`))
+	b.buf.WriteString(`<span class="`)
 	for idx, class := range n.style.asClasses() {
 		if idx > 0 {
-			b.buf.Write([]byte(" "))
+			b.buf.WriteString(" ")
 		}
-		b.buf.Write([]byte(class))
+		b.buf.WriteString(class)
 	}
-	b.buf.Write([]byte(`">`))
+	b.buf.WriteString(`">`)
 }
 
 func (b *outputBuffer) closeStyle() {
-	b.buf.Write([]byte("</span>"))
+	b.buf.WriteString("</span>")
 }
 
 func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
@@ -67,22 +66,23 @@ func (b *outputBuffer) appendChar(char rune) {
 	}
 }
 
-func outputLineAsHTML(line screenLine) string {
+// asHTML returns the line with HTML formatting.
+func (l *screenLine) asHTML() string {
 	var spanOpen bool
 	var lineBuf outputBuffer
 
-	if data, ok := line.metadata[bkNamespace]; ok {
+	if data, ok := l.metadata[bkNamespace]; ok {
 		lineBuf.appendMeta(bkNamespace, data)
 	}
 
-	for idx, node := range line.nodes {
+	for idx, node := range l.nodes {
 		if idx == 0 {
 			if !node.style.isPlain() {
 				lineBuf.appendNodeStyle(node)
 				spanOpen = true
 			}
 		} else {
-			previous := line.nodes[idx-1]
+			previous := l.nodes[idx-1]
 			if !node.hasSameStyle(previous) {
 				if spanOpen {
 					lineBuf.closeStyle()
@@ -96,7 +96,7 @@ func outputLineAsHTML(line screenLine) string {
 		}
 
 		if node.style.element() {
-			lineBuf.buf.WriteString(line.elements[node.blob].asHTML())
+			lineBuf.buf.WriteString(l.elements[node.blob].asHTML())
 		} else {
 			lineBuf.appendChar(node.blob)
 		}
@@ -104,5 +104,22 @@ func outputLineAsHTML(line screenLine) string {
 	if spanOpen {
 		lineBuf.closeStyle()
 	}
-	return strings.TrimRight(lineBuf.buf.String(), " \t")
+	line := strings.TrimRight(lineBuf.buf.String(), " \t")
+	if line == "" {
+		return "&nbsp;"
+	}
+	return line
+}
+
+// asPlain returns the line contents without any added HTML.
+func (l *screenLine) asPlain() string {
+	var buf strings.Builder
+
+	for _, node := range l.nodes {
+		if !node.style.element() {
+			buf.WriteRune(node.blob)
+		}
+	}
+
+	return strings.TrimRight(buf.String(), " \t")
 }
