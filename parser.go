@@ -77,7 +77,11 @@ type parser struct {
  */
 
 func (p *parser) parseToScreen(input []byte) {
-	p.buffer = append(p.buffer, input...)
+	if len(p.buffer) == 0 {
+		p.buffer = input
+	} else {
+		p.buffer = append(p.buffer, input...)
+	}
 
 	for p.cursor < len(p.buffer) {
 		char, charLen := utf8.DecodeRune(p.buffer[p.cursor:])
