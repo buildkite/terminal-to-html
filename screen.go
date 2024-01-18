@@ -144,7 +144,8 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 
 		// Trim the first line off the top of the screen.
 		// Recycle its nodes slice to make a new line on the bottom.
-		s.screen = append(s.screen[1:], screenLine{nodes: s.screen[0].nodes[:0]})
+		newLine := screenLine{nodes: s.screen[0].nodes[:0]}
+		s.screen = append(s.screen[1:], newLine)
 		s.y--
 	}
 
