@@ -194,7 +194,7 @@ func (p *parser) handleControlSequence(char rune) {
 	case ';':
 		p.addInstruction()
 		p.instructionStartedAt = p.cursor + utf8.RuneLen(';')
-	case 'Q', 'J', 'K', 'G', 'A', 'B', 'C', 'D', 'M':
+	case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'J', 'K', 'M', 'Q':
 		p.addInstruction()
 		p.screen.applyEscape(char, p.instructions)
 		p.mode = MODE_NORMAL

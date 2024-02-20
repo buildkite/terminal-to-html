@@ -1,0 +1,19 @@
+$ npx playwright test --config=app/tests/e2e/config/playwright.config.prod.ts --project=chromium -g c1
+_bk;t=1706575117741Starting the run with 8 tests
+_bk;t=1706575117741
+_bk;t=1706575117741Running 8 tests using 1 worker, shard 1 of 2
+_bk;t=1706575117741
+_bk;t=1706575118071     1 [chromium] › c1/default/checkout.spec.ts:3:5 › checkout default flow
+_bk;t=1706575129980[1A[2K_bk;t=1706575129980[0G  ✓  1 [chromium] › c1/default/checkout.spec.ts:3:5 › checkout default flow (11.7s)[1E     2 [chromium] › c1/default/checkout.spec.ts:40:5 › checkout default flow with phone number
+_bk;t=1706575144169[1A[2K_bk;t=1706575144169[0G  ✓  2 [chromium] › c1/default/checkout.spec.ts:40:5 › checkout default flow with phone number (14.2s)[1E     3 [chromium] › c1/default/checkout.spec.ts:77:5 › checkout default flow with digital product
+_bk;t=1706575156277[1A[2K_bk;t=1706575156277[0G  ✓  3 [chromium] › c1/default/checkout.spec.ts:77:5 › checkout default flow with digital product (12.1s)[1E     4 [chromium] › c1/default/checkout.spec.ts:109:5 › checkout default flow with free digital product
+_bk;t=1706575165823[1A[2K_bk;t=1706575165823[0G  ✓  4 [chromium] › c1/default/checkout.spec.ts:109:5 › checkout default flow with free digital product (9.5s)[1E     5 [chromium] › c1/default/checkout.spec.ts:133:5 › checkout default flow with free physical product
+_bk;t=1706575177303[1A[2K_bk;t=1706575177303[0G  ✓  5 [chromium] › c1/default/checkout.spec.ts:133:5 › checkout default flow with free physical product (11.6s)[1E     6 [chromium] › c1/default/checkout.spec.ts:162:5 › checkout default flow with a manual payment
+_bk;t=1706575193194[1A[2K_bk;t=1706575193194[0G  ✓  6 [chromium] › c1/default/checkout.spec.ts:162:5 › checkout default flow with a manual payment (15.9s)[1E     7 [chromium] › c1/default/checkout.spec.ts:197:5 › checkout default flow with a custom payment
+_bk;t=1706575205691[1A[2K_bk;t=1706575205691[0G  ✓  7 [chromium] › c1/default/checkout.spec.ts:197:5 › checkout default flow with a custom payment (12.5s)[1E     8 [chromium] › c1/default/duplicate-tabs.spec.ts:4:6 › checkout with duplicate tabs
+_bk;t=1706575205691[1A[2K_bk;t=1706575205691[0G  -  8 [chromium] › c1/default/duplicate-tabs.spec.ts:4:6 › checkout with duplicate tabs[1EFinished test run: passed
+_bk;t=1706575205958
+_bk;t=1706575205958  1 skipped
+_bk;t=1706575205958  7 passed (1.6m)
+_bk;t=1706575205978
+Done in 96.34s.
