@@ -201,12 +201,32 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 	}
 
 	switch code {
-	case 'M':
-		s.color(instructions)
-	case 'G':
+	case 'A': // Cursor Up: go up n
+		s.up(instructions[0])
+
+	case 'B': // Cursor Down: go down n
+		s.down(instructions[0])
+
+	case 'C': // Cursor Forward: go right n
+		s.forward(instructions[0])
+
+	case 'D': // Cursor Back: go left n
+		s.backward(instructions[0])
+
+	case 'E': // Cursor Next Line: Go to beginning of line n down
 		s.x = 0
-	// "Erase in Display"
-	case 'J':
+		s.down(instructions[0])
+
+	case 'F': // Cursor Previous Line: Go to beginning of line n up
+		s.x = 0
+		s.up(instructions[0])
+
+	case 'G': // Cursor Horizontal Absolute: Go to column n (default 1)
+		s.x = max(0, ansiInt(instructions[0])-1)
+
+	// NOTE: H (Cursor Position) is not yet implemented
+
+	case 'J': // Erase in Display: Clears part of the screen.
 		switch instructions[0] {
 		// "erase from current position to end (inclusive)"
 		case "0", "":
@@ -233,8 +253,8 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 			s.x = 0
 			s.y = 0
 		}
-	// "Erase in Line"
-	case 'K':
+
+	case 'K': // Erase in Line: erases part of the line.
 		switch instructions[0] {
 		case "0", "":
 			s.clear(s.y, s.x, screenEndOfLine)
@@ -243,14 +263,9 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 		case "2":
 			s.clear(s.y, screenStartOfLine, screenEndOfLine)
 		}
-	case 'A':
-		s.up(instructions[0])
-	case 'B':
-		s.down(instructions[0])
-	case 'C':
-		s.forward(instructions[0])
-	case 'D':
-		s.backward(instructions[0])
+
+	case 'M':
+		s.color(instructions)
 	}
 }
 

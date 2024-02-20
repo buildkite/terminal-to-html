@@ -16,6 +16,7 @@ var TestFiles = []string{
 	"homer.sh",
 	"npm.sh",
 	"pikachu.sh",
+	"playwright.sh",
 	"rustfmt.sh",
 	"weather.sh",
 }
@@ -377,29 +378,15 @@ func TestScreenWriteToXY(t *testing.T) {
 	}
 }
 
-func BenchmarkRendererControl(b *testing.B) {
-	benchmark("control.sh", b)
-}
-
-func BenchmarkRendererCurl(b *testing.B) {
-	benchmark("curl.sh", b)
-}
-
-func BenchmarkRendererHomer(b *testing.B) {
-	benchmark("homer.sh", b)
-}
-
-func BenchmarkRendererDockerPull(b *testing.B) {
-	benchmark("docker-pull.sh", b)
-}
-
-func BenchmarkRendererPikachu(b *testing.B) {
-	benchmark("pikachu.sh", b)
-}
-
-func BenchmarkRendererNpm(b *testing.B) {
-	benchmark("npm.sh", b)
-}
+func BenchmarkRendererControl(b *testing.B)    { benchmark("control.sh", b) }
+func BenchmarkRendererCurl(b *testing.B)       { benchmark("curl.sh", b) }
+func BenchmarkRendererHomer(b *testing.B)      { benchmark("homer.sh", b) }
+func BenchmarkRendererDockerPull(b *testing.B) { benchmark("docker-pull.sh", b) }
+func BenchmarkRendererPikachu(b *testing.B)    { benchmark("pikachu.sh", b) }
+func BenchmarkRendererPlaywright(b *testing.B) { benchmark("playwright.sh", b) }
+func BenchmarkRendererRustFmt(b *testing.B)    { benchmark("rustfmt.sh", b) }
+func BenchmarkRendererWeather(b *testing.B)    { benchmark("weather.sh", b) }
+func BenchmarkRendererNpm(b *testing.B)        { benchmark("npm.sh", b) }
 
 func benchmark(filename string, b *testing.B) {
 	raw := loadFixture(b, filename, "raw")
