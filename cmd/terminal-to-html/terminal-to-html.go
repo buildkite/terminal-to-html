@@ -2,15 +2,19 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"runtime"
+	"time"
 
 	"github.com/buildkite/terminal-to-html/v3"
 	"github.com/buildkite/terminal-to-html/v3/internal/assets"
+	"github.com/buildkite/terminal-to-html/v3/internal/rusage"
 	"github.com/urfave/cli/v2"
 )
 
@@ -90,7 +94,7 @@ func webservice(listen string) {
 	log.Fatal(http.ListenAndServe(listen, nil))
 }
 
-func stdin() {
+func stdin() (in, out int) {
 	var input []byte
 	var err error
 	if len(flag.Arg(0)) > 0 {
@@ -103,6 +107,54 @@ func stdin() {
 	output, err := wrapPreview(terminal.Render(input))
 	check("could not wrap preview", err)
 	fmt.Printf("%s", output)
+	return len(input), len(output)
+}
+
+func logResourceStats(start time.Time, in, out int) {
+	var fullStats struct {
+		// Wall-clock time
+		Rtime time.Duration
+
+		// OS-reported statistics
+		*rusage.Resources
+
+		// Total input and output bytes processed
+		InputBytes, OutputBytes int
+
+		// Other useful memory statistics (see runtime.MemStats)
+		TotalAlloc    uint64
+		HeapAlloc     uint64
+		HeapInuse     uint64
+		Mallocs       uint64
+		Frees         uint64
+		PauseTotalNs  uint64
+		NumGC         uint32
+		GCCPUFraction float64
+	}
+	fullStats.Rtime = time.Since(start)
+	fullStats.InputBytes = in
+	fullStats.OutputBytes = out
+
+	ru, err := rusage.Stats()
+	if err != nil {
+		log.Printf("Could not read OS resource usage: %v", err)
+	}
+	fullStats.Resources = ru
+
+	var memStats runtime.MemStats
+	runtime.ReadMemStats(&memStats)
+	fullStats.TotalAlloc = memStats.TotalAlloc
+	fullStats.HeapAlloc = memStats.HeapAlloc
+	fullStats.HeapInuse = memStats.HeapInuse
+	fullStats.Mallocs = memStats.Mallocs
+	fullStats.Frees = memStats.Frees
+	fullStats.PauseTotalNs = memStats.PauseTotalNs
+	fullStats.NumGC = memStats.NumGC
+	fullStats.GCCPUFraction = memStats.GCCPUFraction
+
+	if err := json.NewEncoder(os.Stderr).Encode(&fullStats); err != nil {
+		log.Fatalf("Could not encode resource usage: %v", err)
+	}
 }
 
 func main() {
@@ -123,13 +175,22 @@ func main() {
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
+		&cli.BoolFlag{
+			Name:  "log-resource-stats",
+			Usage: "Log resource statistics to stderr after successfully processing",
+		},
 	}
 	app.Action = func(c *cli.Context) error {
 		PreviewMode = c.Bool("preview")
 		if c.String("http") != "" {
 			webservice(c.String("http"))
 		} else {
-			stdin()
+			start := time.Now()
+			in, out := stdin()
+
+			if c.Bool("log-resource-stats") {
+				logResourceStats(start, in, out)
+			}
 		}
 		return nil
 	}
