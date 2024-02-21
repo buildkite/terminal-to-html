@@ -25,6 +25,11 @@ type Screen struct {
 	// Optional callback. If not nil, as each line is scrolled out of the top of
 	// the buffer, this func is called with the HTML.
 	ScrollOutFunc func(lineHTML string)
+
+	// Processing statistics
+	LinesScrolledOut int // count of lines that scrolled off the top
+	CursorUpOOB      int // count of times ESC [A or ESC [F tried to move y < 0
+	CursorBackOOB    int // count of times ESC [D tried to move x < 0
 }
 
 type screenLine struct {
@@ -89,7 +94,10 @@ func ansiInt(s string) int {
 // Move the cursor up, if we can
 func (s *Screen) up(i string) {
 	s.y -= ansiInt(i)
-	s.y = max(0, s.y)
+	if s.y < 0 {
+		s.CursorUpOOB++
+		s.y = 0
+	}
 }
 
 // Move the cursor down
@@ -105,7 +113,10 @@ func (s *Screen) forward(i string) {
 // Move the cursor backward, if we can
 func (s *Screen) backward(i string) {
 	s.x -= ansiInt(i)
-	s.x = max(0, s.x)
+	if s.x < 0 {
+		s.CursorBackOOB++
+		s.x = 0
+	}
 }
 
 func (s *Screen) getCurrentLineForWriting() *screenLine {
@@ -122,6 +133,7 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 				s.ScrollOutFunc(outputLineAsHTML(l))
 			}
 		}
+		s.LinesScrolledOut += baseY
 		s.screen = s.screen[baseY:]
 		s.y -= baseY
 	}

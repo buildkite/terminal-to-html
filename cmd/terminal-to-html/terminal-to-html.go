@@ -94,7 +94,7 @@ func webservice(listen string) {
 	log.Fatal(http.ListenAndServe(listen, nil))
 }
 
-func stdin() (in, out int) {
+func stdin() (in, out int, s *terminal.Screen) {
 	var input []byte
 	var err error
 	if len(flag.Arg(0)) > 0 {
@@ -104,13 +104,19 @@ func stdin() (in, out int) {
 		input, err = io.ReadAll(os.Stdin)
 		check("could not read stdin", err)
 	}
-	output, err := wrapPreview(terminal.Render(input))
+
+	// Like terminal.Render, but we get access to *terminal.Screen afterwards
+	screen := &terminal.Screen{}
+	screen.Parse(input)
+	outputPlain := bytes.Replace(screen.AsHTML(), []byte("\n\n"), []byte("\n&nbsp;\n"), -1)
+
+	output, err := wrapPreview(outputPlain)
 	check("could not wrap preview", err)
 	fmt.Printf("%s", output)
-	return len(input), len(output)
+	return len(input), len(output), screen
 }
 
-func logResourceStats(start time.Time, in, out int) {
+func logStats(start time.Time, in, out int, s *terminal.Screen) {
 	var fullStats struct {
 		// Wall-clock time
 		Rtime time.Duration
@@ -120,6 +126,11 @@ func logResourceStats(start time.Time, in, out int) {
 
 		// Total input and output bytes processed
 		InputBytes, OutputBytes int
+
+		// Screen processing statistics (see terminal.Screen)
+		LinesScrolledOut int
+		CursorUpOOB      int
+		CursorBackOOB    int
 
 		// Other useful memory statistics (see runtime.MemStats)
 		TotalAlloc    uint64
@@ -134,6 +145,10 @@ func logResourceStats(start time.Time, in, out int) {
 	fullStats.Rtime = time.Since(start)
 	fullStats.InputBytes = in
 	fullStats.OutputBytes = out
+
+	fullStats.LinesScrolledOut = s.LinesScrolledOut
+	fullStats.CursorUpOOB = s.CursorUpOOB
+	fullStats.CursorBackOOB = s.CursorBackOOB
 
 	ru, err := rusage.Stats()
 	if err != nil {
@@ -176,8 +191,8 @@ func main() {
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
 		&cli.BoolFlag{
-			Name:  "log-resource-stats",
-			Usage: "Log resource statistics to stderr after successfully processing",
+			Name:  "log-stats-to-stderr",
+			Usage: "Logs a JSON object to stderr containing resource and processing statistics after successfully processing",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
@@ -186,10 +201,10 @@ func main() {
 			webservice(c.String("http"))
 		} else {
 			start := time.Now()
-			in, out := stdin()
+			in, out, screen := stdin()
 
-			if c.Bool("log-resource-stats") {
-				logResourceStats(start, in, out)
+			if c.Bool("log-stats-to-stderr") {
+				logStats(start, in, out, screen)
 			}
 		}
 		return nil
