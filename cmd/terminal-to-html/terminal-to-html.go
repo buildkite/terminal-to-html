@@ -244,7 +244,7 @@ func main() {
 		input := os.Stdin
 		if args := c.Args(); args.Len() > 0 {
 			fpath := args.Get(0)
-			f, err := os.Open(args.Get(0))
+			f, err := os.Open(fpath)
 			if err != nil {
 				return fmt.Errorf("read %s: %w", fpath, err)
 			}
