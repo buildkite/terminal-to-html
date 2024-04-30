@@ -20,9 +20,9 @@ type position struct {
 
 // Stateful ANSI parser
 type parser struct {
-	mode                 int
 	screen               *Screen
-	ansi                 []byte
+	buffer               []byte
+	mode                 int
 	cursor               int
 	escapeStartedAt      int
 	instructions         []string
@@ -45,12 +45,14 @@ type parser struct {
  * MODE_ESCAPE. The following character could start an escape sequence, a
  * control sequence, an operating system command, or be invalid or not understood.
  *
- * If we're in MODE_ESCAPE we look for three possible characters:
+ * If we're in MODE_ESCAPE we look for ~~three~~ eight possible characters:
  *
  * 1. For `[` we enter MODE_CONTROL and start looking for a control sequence.
  * 2. For `]` we enter MODE_OSC and look for an operating system command.
  * 3. For `(` or ')' we enter MODE_CHARSET and look for a character set name.
  * 4. For `_` we enter MODE_APC and parse the rest of the custom control sequence
+ * 5. For `M`, `7`, or `8`, we run an instruction directly (reverse newline,
+ *    or save/restore cursor).
  *
  * In all cases we start our instruction buffer. The instruction buffer is used
  * to store the individual characters that make up ANSI instructions before
@@ -74,12 +76,15 @@ type parser struct {
  * normally designate the character set.
  */
 
-func parseANSIToScreen(s *Screen, ansi []byte) {
-	p := parser{mode: MODE_NORMAL, ansi: ansi, screen: s}
-	p.mode = MODE_NORMAL
-	length := len(p.ansi)
-	for p.cursor = 0; p.cursor < length; {
-		char, charLen := utf8.DecodeRune(p.ansi[p.cursor:])
+func (p *parser) parseToScreen(input []byte) {
+	if len(p.buffer) == 0 {
+		p.buffer = input
+	} else {
+		p.buffer = append(p.buffer, input...)
+	}
+
+	for p.cursor < len(p.buffer) {
+		char, charLen := utf8.DecodeRune(p.buffer[p.cursor:])
 
 		switch p.mode {
 		case MODE_ESCAPE:
@@ -104,12 +109,30 @@ func parseANSIToScreen(s *Screen, ansi []byte) {
 
 		p.cursor += charLen
 	}
+
+	// If we're in normal mode, everything up to the cursor has been procesed.
+	// If we're in the middle of an escape, everything up to p.escapeStartedAt
+	// has been processed.
+	done := p.escapeStartedAt
+	if p.mode == MODE_NORMAL {
+		done = p.cursor
+	}
+
+	// Drop the completed portion of the buffer.
+	p.buffer = p.buffer[done:]
+	p.cursor -= done
+	p.instructionStartedAt -= done
+	p.escapeStartedAt -= done
 }
 
-func (p *parser) handleCharset(char rune) {
+// handleCharset is called for each character consumed while in MODE_CHARSET.
+// It ignores the character and transitions back to MODE_NORMAL.
+func (p *parser) handleCharset(rune) {
 	p.mode = MODE_NORMAL
 }
 
+// handleOperatingSystemCommand is called for each character consumed while in
+// MODE_OSC. It does nothing until the OSC is terminated with an '\a'.
 func (p *parser) handleOperatingSystemCommand(char rune) {
 	if char != '\a' {
 		return
@@ -117,7 +140,7 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 	p.mode = MODE_NORMAL
 
 	// Bell received, stop parsing our potential image
-	image, err := parseElementSequence(string(p.ansi[p.instructionStartedAt:p.cursor]))
+	image, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:p.cursor]))
 
 	if image == nil && err == nil {
 		// No image & no error, nothing to render
@@ -170,7 +193,7 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 
 	// APC terminator has been received; return to normal mode and handle the APC...
 	p.mode = MODE_NORMAL
-	sequence := string(p.ansi[p.instructionStartedAt:p.cursor])
+	sequence := string(p.buffer[p.instructionStartedAt:p.cursor])
 
 	// this might be a Buildkite Application Program Command sequence...
 	data, err := p.parseBuildkiteAPC(sequence)
@@ -186,6 +209,8 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 	p.screen.setLineMetadata(bkNamespace, data)
 }
 
+// handleControlSequence is called for each character consumed while in
+// MODE_CONTROL.
 func (p *parser) handleControlSequence(char rune) {
 	char = unicode.ToUpper(char)
 	switch char {
@@ -208,6 +233,7 @@ func (p *parser) handleControlSequence(char rune) {
 	}
 }
 
+// handleNormal is called for each character consumed while in MODE_NORMAL.
 func (p *parser) handleNormal(char rune) {
 	switch char {
 	case '\n':
@@ -224,6 +250,7 @@ func (p *parser) handleNormal(char rune) {
 	}
 }
 
+// handleEscape is called for each character consumed while in MODE_ESCAPE.
 func (p *parser) handleEscape(char rune) {
 	switch char {
 	case '[':
@@ -256,8 +283,10 @@ func (p *parser) handleEscape(char rune) {
 	}
 }
 
+// addInstruction appends an instruction to p.instructions, if the current
+// instruction is nonempty.
 func (p *parser) addInstruction() {
-	instruction := string(p.ansi[p.instructionStartedAt:p.cursor])
+	instruction := string(p.buffer[p.instructionStartedAt:p.cursor])
 	if instruction != "" {
 		p.instructions = append(p.instructions, instruction)
 	}

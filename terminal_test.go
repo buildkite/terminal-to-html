@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 var TestFiles = []string{
@@ -113,7 +115,7 @@ var rendererTestCases = []struct {
 	}, {
 		`clears everything after the \x1b[0K`,
 		"hello\nfriend!\x1b[A\r\x1b[0K",
-		"\nfriend!",
+		"&nbsp;\nfriend!",
 	}, {
 		`handles \x1b[0G ghetto style`,
 		"hello friend\x1b[Ggoodbye buddy!",
@@ -336,9 +338,11 @@ var rendererTestCases = []struct {
 func TestRendererAgainstCases(t *testing.T) {
 	for _, c := range rendererTestCases {
 		t.Run(c.name, func(t *testing.T) {
-			output := string(Render([]byte(c.input)))
-			if output != c.expected {
-				t.Errorf("%s\ninput\t\t%q\nexpected\t%q\nreceived\t%q", c.name, c.input, c.expected, output)
+			got := Render([]byte(c.input))
+			want := c.expected
+
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("Render(%q) diff (-got +want):\n%s", c.input, diff)
 			}
 		})
 	}
@@ -348,12 +352,53 @@ func TestRendererAgainstFixtures(t *testing.T) {
 	for _, base := range TestFiles {
 		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
 			raw := loadFixture(t, base, "raw")
-			expected := string(loadFixture(t, base, "rendered"))
+			want := string(loadFixture(t, base, "rendered"))
 
-			output := string(Render(raw))
+			got := Render(raw)
 
-			if output != expected {
-				t.Errorf("%s did not match, got len %d and expected len %d", base, len(output), len(expected))
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("Render diff (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func streamingRender(raw []byte) string {
+	var buf strings.Builder
+	s := &Screen{
+		MaxLines: 300,
+		ScrollOutFunc: func(line string) {
+			fmt.Fprintln(&buf, line)
+		},
+	}
+	s.Write(raw)
+	buf.WriteString(s.AsHTML())
+	return buf.String()
+}
+
+func TestStreamingRendererAgainstCases(t *testing.T) {
+	for _, c := range rendererTestCases {
+		t.Run(c.name, func(t *testing.T) {
+			got := streamingRender([]byte(c.input))
+			want := c.expected
+
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("streamingRender(%q) diff (-got +want):\n%s", c.input, diff)
+			}
+		})
+	}
+}
+
+func TestStreamingRendererAgainstFixtures(t *testing.T) {
+	for _, base := range TestFiles {
+		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
+			raw := loadFixture(t, base, "raw")
+			want := string(loadFixture(t, base, "rendered"))
+
+			got := streamingRender(raw)
+
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Errorf("streamingRender diff (-got +want):\n%s", diff)
 			}
 		})
 	}
@@ -371,27 +416,50 @@ func TestScreenWriteToXY(t *testing.T) {
 	s.y = 2
 	s.write('c')
 
-	output := string(s.AsHTML())
+	output := s.AsHTML()
 	expected := "a\n b\n  c"
 	if output != expected {
 		t.Errorf("got %q, wanted %q", output, expected)
 	}
 }
 
-func BenchmarkRendererControl(b *testing.B)    { benchmark("control.sh", b) }
-func BenchmarkRendererCurl(b *testing.B)       { benchmark("curl.sh", b) }
-func BenchmarkRendererHomer(b *testing.B)      { benchmark("homer.sh", b) }
-func BenchmarkRendererDockerPull(b *testing.B) { benchmark("docker-pull.sh", b) }
-func BenchmarkRendererPikachu(b *testing.B)    { benchmark("pikachu.sh", b) }
-func BenchmarkRendererPlaywright(b *testing.B) { benchmark("playwright.sh", b) }
-func BenchmarkRendererRustFmt(b *testing.B)    { benchmark("rustfmt.sh", b) }
-func BenchmarkRendererWeather(b *testing.B)    { benchmark("weather.sh", b) }
-func BenchmarkRendererNpm(b *testing.B)        { benchmark("npm.sh", b) }
+func BenchmarkRendererControl(b *testing.B)    { benchmarkRender("control.sh", b) }
+func BenchmarkRendererCurl(b *testing.B)       { benchmarkRender("curl.sh", b) }
+func BenchmarkRendererHomer(b *testing.B)      { benchmarkRender("homer.sh", b) }
+func BenchmarkRendererDockerPull(b *testing.B) { benchmarkRender("docker-pull.sh", b) }
+func BenchmarkRendererPikachu(b *testing.B)    { benchmarkRender("pikachu.sh", b) }
+func BenchmarkRendererPlaywright(b *testing.B) { benchmarkRender("playwright.sh", b) }
+func BenchmarkRendererRustFmt(b *testing.B)    { benchmarkRender("rustfmt.sh", b) }
+func BenchmarkRendererWeather(b *testing.B)    { benchmarkRender("weather.sh", b) }
+func BenchmarkRendererNpm(b *testing.B)        { benchmarkRender("npm.sh", b) }
 
-func benchmark(filename string, b *testing.B) {
+func benchmarkRender(filename string, b *testing.B) {
 	raw := loadFixture(b, filename, "raw")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Render(raw)
+	}
+}
+
+func BenchmarkStreamingControl(b *testing.B)    { benchmarkStreaming("control.sh", b) }
+func BenchmarkStreamingCurl(b *testing.B)       { benchmarkStreaming("curl.sh", b) }
+func BenchmarkStreamingHomer(b *testing.B)      { benchmarkStreaming("homer.sh", b) }
+func BenchmarkStreamingDockerPull(b *testing.B) { benchmarkStreaming("docker-pull.sh", b) }
+func BenchmarkStreamingPikachu(b *testing.B)    { benchmarkStreaming("pikachu.sh", b) }
+func BenchmarkStreamingPlaywright(b *testing.B) { benchmarkStreaming("playwright.sh", b) }
+func BenchmarkStreamingRustFmt(b *testing.B)    { benchmarkStreaming("rustfmt.sh", b) }
+func BenchmarkStreamingWeather(b *testing.B)    { benchmarkStreaming("weather.sh", b) }
+func BenchmarkStreamingNpm(b *testing.B)        { benchmarkStreaming("npm.sh", b) }
+
+func benchmarkStreaming(filename string, b *testing.B) {
+	raw := loadFixture(b, filename, "raw")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := &Screen{
+			MaxLines:      300,
+			ScrollOutFunc: func(string) {},
+		}
+		s.Write(raw)
+		_ = s.AsHTML()
 	}
 }

@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"bytes"
 	"math"
 	"strconv"
 	"strings"
@@ -17,6 +16,9 @@ type Screen struct {
 
 	// Current style
 	style style
+
+	// Parser to use for streaming processing
+	parser *parser
 
 	// Optional maximum amount of backscroll to retain in the buffer.
 	// Setting to 0 or negative makes the screen buffer unlimited.
@@ -120,22 +122,31 @@ func (s *Screen) backward(i string) {
 }
 
 func (s *Screen) getCurrentLineForWriting() *screenLine {
-	// Add rows to our screen if necessary
-	for i := len(s.screen); i <= s.y; i++ {
-		s.screen = append(s.screen, screenLine{nodes: make([]node, 0, 80)})
-	}
-
-	// Remove old lines from the top of the screen if MaxLines is set
-	if s.MaxLines > 0 && len(s.screen) > s.MaxLines {
-		baseY := len(s.screen) - s.MaxLines
-		if s.ScrollOutFunc != nil {
-			for _, l := range s.screen[:baseY] {
-				s.ScrollOutFunc(outputLineAsHTML(l))
-			}
+	// Ensure there are enough lines on screen for the cursor's Y position.
+	for s.y >= len(s.screen) {
+		// If MaxLines is not in use, or adding a new line would not make it
+		// larger than MaxLines, then just allocate a new line.
+		if s.MaxLines <= 0 || len(s.screen)+1 <= s.MaxLines {
+			// nodes is preallocated with space for 80 columns, which is
+			// arbitrary, but also the traditional terminal width.
+			newLine := screenLine{nodes: make([]node, 0, 80)}
+			s.screen = append(s.screen, newLine)
+			continue
 		}
-		s.LinesScrolledOut += baseY
-		s.screen = s.screen[baseY:]
-		s.y -= baseY
+
+		// MaxLines is in effect, and adding a new line would make the screen
+		// larger than MaxLines.
+		// Pass the line being scrolled out to ScrollOutFunc if it exists.
+		if s.ScrollOutFunc != nil {
+			s.ScrollOutFunc(s.screen[0].asHTML())
+		}
+		s.LinesScrolledOut++
+
+		// Trim the first line off the top of the screen.
+		// Recycle its nodes slice to make a new line on the bottom.
+		newLine := screenLine{nodes: s.screen[0].nodes[:0]}
+		s.screen = append(s.screen[1:], newLine)
+		s.y--
 	}
 
 	line := &s.screen[s.y]
@@ -281,37 +292,38 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 	}
 }
 
-// Parse ANSI input, populate our screen buffer with nodes
-func (s *Screen) Parse(ansi []byte) {
-	s.style = 0
-
-	parseANSIToScreen(s, ansi)
+// Write writes ANSI text to the screen.
+func (s *Screen) Write(input []byte) (int, error) {
+	if s.parser == nil {
+		s.parser = &parser{
+			mode:   MODE_NORMAL,
+			screen: s,
+		}
+	}
+	s.parser.parseToScreen(input)
+	return len(input), nil
 }
 
-func (s *Screen) AsHTML() []byte {
-	var lines []string
+// AsHTML returns the contents of the current screen buffer as HTML.
+func (s *Screen) AsHTML() string {
+	lines := make([]string, 0, len(s.screen))
 
 	for _, line := range s.screen {
-		lines = append(lines, outputLineAsHTML(line))
+		lines = append(lines, line.asHTML())
 	}
 
-	return []byte(strings.Join(lines, "\n"))
+	return strings.Join(lines, "\n")
 }
 
-// asPlainText renders the screen without any ANSI style etc.
-func (s *Screen) asPlainText() string {
-	var buf bytes.Buffer
-	for i, line := range s.screen {
-		for _, node := range line.nodes {
-			if !node.style.element() {
-				buf.WriteRune(node.blob)
-			}
-		}
-		if i < len(s.screen)-1 {
-			buf.WriteRune('\n')
-		}
+// AsPlainText renders the screen without any ANSI style etc.
+func (s *Screen) AsPlainText() string {
+	lines := make([]string, 0, len(s.screen))
+
+	for _, line := range s.screen {
+		lines = append(lines, line.asPlain())
 	}
-	return strings.TrimRight(buf.String(), " \t")
+
+	return strings.Join(lines, "\n")
 }
 
 func (s *Screen) newLine() {
