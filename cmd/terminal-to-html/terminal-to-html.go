@@ -76,7 +76,7 @@ func writePreviewEnd(w io.Writer) error {
 	return err
 }
 
-func webservice(listen string, preview bool, maxLines int) {
+func webservice(listen string, preview bool, maxLines int, format, timeFmt string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		// Process the request body, but write to a buffer before serving it.
 		// Consuming the body before any writes is necessary because of HTTP
@@ -86,7 +86,7 @@ func webservice(listen string, preview bool, maxLines int) {
 		// > Request.Body.
 		// However, it lets us provide Content-Length in all cases.
 		b := bytes.NewBuffer(nil)
-		if _, _, _, err := process(b, r.Body, preview, maxLines, "html", ""); err != nil {
+		if _, _, _, err := process(b, r.Body, preview, maxLines, format, timeFmt); err != nil {
 			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
@@ -251,7 +251,7 @@ func main() {
 		&cli.StringFlag{
 			Name:  "timestamp-format",
 			Value: "rfc3339milli",
-			Usage: "Either 'none', 'rfc3339', 'rfc3339milli', or a custom Go time format string, used to format line timestamps for plain output (see https://pkg.go.dev/time#pkg-constants)",
+			Usage: "Changes how timestamps are formatted (in plain format). Either 'none' (no timestamps), 'raw' (milliseconds since Unix epoch), 'rfc3339', 'rfc3339milli', or a custom Go time format string, used to format line timestamps for plain output (see https://pkg.go.dev/time#pkg-constants)",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
@@ -275,7 +275,7 @@ func main() {
 
 		// Run a web server?
 		if addr := c.String("http"); addr != "" {
-			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"))
+			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"), format, timeFmt)
 			return nil
 		}
 

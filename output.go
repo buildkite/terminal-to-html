@@ -118,15 +118,8 @@ func (l *ScreenLine) AsPlain(timestampFormat string) string {
 	var buf strings.Builder
 
 	if timestampFormat != "" {
-		ts := l.metadata["bk"]["t"]
-		tsint, err := strconv.ParseInt(ts, 10, 64)
-		if err != nil {
-			// TODO
-		} else {
-			tstime := time.UnixMilli(tsint)
-			buf.WriteString(tstime.Format(timestampFormat))
-			buf.WriteRune(' ')
-		}
+		buf.WriteString(bkTimestamp(l.metadata["bk"]["t"], timestampFormat))
+		buf.WriteRune('\t')
 	}
 
 	for _, node := range l.nodes {
@@ -136,4 +129,18 @@ func (l *ScreenLine) AsPlain(timestampFormat string) string {
 	}
 
 	return strings.TrimRight(buf.String(), " \t")
+}
+
+func bkTimestamp(ts, timeFmt string) string {
+	if timeFmt == "raw" {
+		return ts
+	}
+
+	tsint, err := strconv.ParseInt(ts, 10, 64)
+	if err != nil {
+		return err.Error()
+	}
+
+	tstime := time.UnixMilli(tsint)
+	return tstime.Format(timeFmt)
 }
