@@ -367,8 +367,8 @@ func streamingRender(raw []byte) string {
 	var buf strings.Builder
 	s := &Screen{
 		MaxLines: 300,
-		ScrollOutFunc: func(line string) {
-			fmt.Fprintln(&buf, line)
+		ScrollOutFunc: func(line *ScreenLine) {
+			fmt.Fprintln(&buf, line.AsHTML())
 		},
 	}
 	s.Write(raw)
@@ -457,7 +457,7 @@ func benchmarkStreaming(filename string, b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		s := &Screen{
 			MaxLines:      300,
-			ScrollOutFunc: func(string) {},
+			ScrollOutFunc: func(*ScreenLine) {},
 		}
 		s.Write(raw)
 		_ = s.AsHTML()

@@ -12,7 +12,7 @@ type Screen struct {
 	x, y int
 
 	// Screen contents
-	screen []screenLine
+	screen []ScreenLine
 
 	// Current style
 	style style
@@ -25,8 +25,10 @@ type Screen struct {
 	MaxLines int
 
 	// Optional callback. If not nil, as each line is scrolled out of the top of
-	// the buffer, this func is called with the HTML.
-	ScrollOutFunc func(lineHTML string)
+	// the buffer, this func is called with the line. The screen recycles
+	// storage used for old lines when creating new ones, so the callback should
+	// avoid using the line after returning.
+	ScrollOutFunc func(line *ScreenLine)
 
 	// Processing statistics
 	LinesScrolledOut int // count of lines that scrolled off the top
@@ -34,7 +36,7 @@ type Screen struct {
 	CursorBackOOB    int // count of times ESC [D tried to move x < 0
 }
 
-type screenLine struct {
+type ScreenLine struct {
 	nodes []node
 
 	// metadata is { namespace => { key => value, ... }, ... }
@@ -121,7 +123,7 @@ func (s *Screen) backward(i string) {
 	}
 }
 
-func (s *Screen) getCurrentLineForWriting() *screenLine {
+func (s *Screen) getCurrentLineForWriting() *ScreenLine {
 	// Ensure there are enough lines on screen for the cursor's Y position.
 	for s.y >= len(s.screen) {
 		// If MaxLines is not in use, or adding a new line would not make it
@@ -129,7 +131,7 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 		if s.MaxLines <= 0 || len(s.screen)+1 <= s.MaxLines {
 			// nodes is preallocated with space for 80 columns, which is
 			// arbitrary, but also the traditional terminal width.
-			newLine := screenLine{nodes: make([]node, 0, 80)}
+			newLine := ScreenLine{nodes: make([]node, 0, 80)}
 			s.screen = append(s.screen, newLine)
 			continue
 		}
@@ -138,13 +140,13 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 		// larger than MaxLines.
 		// Pass the line being scrolled out to ScrollOutFunc if it exists.
 		if s.ScrollOutFunc != nil {
-			s.ScrollOutFunc(s.screen[0].asHTML())
+			s.ScrollOutFunc(&s.screen[0])
 		}
 		s.LinesScrolledOut++
 
 		// Trim the first line off the top of the screen.
 		// Recycle its nodes slice to make a new line on the bottom.
-		newLine := screenLine{nodes: s.screen[0].nodes[:0]}
+		newLine := ScreenLine{nodes: s.screen[0].nodes[:0]}
 		s.screen = append(s.screen[1:], newLine)
 		s.y--
 	}
@@ -309,18 +311,21 @@ func (s *Screen) AsHTML() string {
 	lines := make([]string, 0, len(s.screen))
 
 	for _, line := range s.screen {
-		lines = append(lines, line.asHTML())
+		lines = append(lines, line.AsHTML())
 	}
 
 	return strings.Join(lines, "\n")
 }
 
 // AsPlainText renders the screen without any ANSI style etc.
-func (s *Screen) AsPlainText() string {
+// If timestampFormat is empty, then timestamps are not included. Otherwise,
+// it is used to format the bk.t metadata for the line as a timestamp at the
+// start of the line.
+func (s *Screen) AsPlainText(timestampFormat string) string {
 	lines := make([]string, 0, len(s.screen))
 
 	for _, line := range s.screen {
-		lines = append(lines, line.asPlain())
+		lines = append(lines, line.AsPlain(timestampFormat))
 	}
 
 	return strings.Join(lines, "\n")

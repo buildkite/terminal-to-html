@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"html"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type outputBuffer struct {
@@ -66,8 +68,8 @@ func (b *outputBuffer) appendChar(char rune) {
 	}
 }
 
-// asHTML returns the line with HTML formatting.
-func (l *screenLine) asHTML() string {
+// AsHTML returns the line with HTML formatting.
+func (l *ScreenLine) AsHTML() string {
 	var spanOpen bool
 	var lineBuf outputBuffer
 
@@ -111,9 +113,21 @@ func (l *screenLine) asHTML() string {
 	return line
 }
 
-// asPlain returns the line contents without any added HTML.
-func (l *screenLine) asPlain() string {
+// AsPlain returns the line contents without any added HTML.
+func (l *ScreenLine) AsPlain(timestampFormat string) string {
 	var buf strings.Builder
+
+	if timestampFormat != "" {
+		ts := l.metadata["bk"]["t"]
+		tsint, err := strconv.ParseInt(ts, 10, 64)
+		if err != nil {
+			// TODO
+		} else {
+			tstime := time.UnixMilli(tsint)
+			buf.WriteString(tstime.Format(timestampFormat))
+			buf.WriteRune(' ')
+		}
+	}
 
 	for _, node := range l.nodes {
 		if !node.style.element() {

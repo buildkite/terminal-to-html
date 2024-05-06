@@ -86,7 +86,7 @@ func webservice(listen string, preview bool, maxLines int) {
 		// > Request.Body.
 		// However, it lets us provide Content-Length in all cases.
 		b := bytes.NewBuffer(nil)
-		if _, _, _, err := process(b, r.Body, preview, maxLines); err != nil {
+		if _, _, _, err := process(b, r.Body, preview, maxLines, "html", ""); err != nil {
 			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
@@ -172,7 +172,7 @@ func (wc *writeCounter) Write(b []byte) (int, error) {
 
 // process streams the src through a terminal renderer to the dst. If preview is
 // true, the preview wrapper is added.
-func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out int, screen *terminal.Screen, err error) {
+func process(dst io.Writer, src io.Reader, preview bool, maxLines int, format, timeFmt string) (in, out int, screen *terminal.Screen, err error) {
 	// Wrap dst in writeCounter to count bytes written
 	wc := &writeCounter{out: dst}
 
@@ -182,9 +182,17 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 		}
 	}
 
+	var scrollOutFunc func(*terminal.ScreenLine)
+	switch format {
+	case "html":
+		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsHTML()) }
+	case "plain":
+		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsPlain(timeFmt)) }
+	}
+
 	screen = &terminal.Screen{
 		MaxLines:      maxLines,
-		ScrollOutFunc: func(line string) { fmt.Fprintln(wc, line) },
+		ScrollOutFunc: scrollOutFunc,
 	}
 	inBytes, err := io.Copy(screen, src)
 	if err != nil {
@@ -193,7 +201,12 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 
 	// Write what remains in the screen buffer (everything that didn't scroll
 	// out of the top).
-	fmt.Fprint(wc, screen.AsHTML())
+	switch format {
+	case "html":
+		fmt.Fprint(wc, screen.AsHTML())
+	case "plain":
+		fmt.Fprint(wc, screen.AsPlainText(timeFmt))
+	}
 
 	if preview {
 		if err := writePreviewEnd(wc); err != nil {
@@ -230,8 +243,36 @@ func main() {
 			Value: 300,
 			Usage: "Sets a limit on the number of lines to hold in the screen buffer, allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs. Setting to 0 disables the limit, causing the renderer to buffer the entire screen before producing any output",
 		},
+		&cli.StringFlag{
+			Name:  "format",
+			Value: "html",
+			Usage: "Configures output format. Must be either 'plain' or 'html'",
+		},
+		&cli.StringFlag{
+			Name:  "timestamp-format",
+			Value: "rfc3339milli",
+			Usage: "Either 'none', 'rfc3339', 'rfc3339milli', or a custom Go time format string, used to format line timestamps for plain output (see https://pkg.go.dev/time#pkg-constants)",
+		},
 	}
 	app.Action = func(c *cli.Context) error {
+		format := c.String("format")
+		switch format {
+		case "plain", "html":
+			// Allowed
+		default:
+			return fmt.Errorf("invalid format %q - must be either 'plain' or 'html'", format)
+		}
+
+		timeFmt := c.String("timestamp-format")
+		switch timeFmt {
+		case "none":
+			timeFmt = ""
+		case "rfc3339":
+			timeFmt = time.RFC3339
+		case "rfc3339milli":
+			timeFmt = "2006-01-02T15:04:05.999Z07:00"
+		}
+
 		// Run a web server?
 		if addr := c.String("http"); addr != "" {
 			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"))
@@ -251,7 +292,14 @@ func main() {
 			input = f
 		}
 
-		in, out, screen, err := process(os.Stdout, input, c.Bool("preview"), c.Int("buffer-max-lines"))
+		in, out, screen, err := process(
+			os.Stdout,
+			input,
+			c.Bool("preview"),
+			c.Int("buffer-max-lines"),
+			format,
+			timeFmt,
+		)
 		if err != nil {
 			return err
 		}
