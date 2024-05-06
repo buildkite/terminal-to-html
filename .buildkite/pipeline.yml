@@ -1,3 +1,6 @@
+agents:
+  queue: hosted
+
 steps:
   - name: ":bomb: Test"
     command: make test
