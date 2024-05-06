@@ -136,6 +136,10 @@ func bkTimestamp(ts, timeFmt string) string {
 		return ts
 	}
 
+	if ts == "" {
+		return "(no timestamp)"
+	}
+
 	tsint, err := strconv.ParseInt(ts, 10, 64)
 	if err != nil {
 		return err.Error()
