@@ -365,55 +365,55 @@ var rendererTestCases = []struct {
 		name:      `renders external images`,
 		input:     "\x1b]1338;url=http://foo.com/foobar.gif;alt=foo bar\a",
 		wantHTML:  `<img alt="foo bar" src="http://foo.com/foobar.gif">`,
-		wantPlain: "", // TODO: render the alt text for images in plain mode?
+		wantPlain: "foo bar",
 	},
 	{
 		name:      `disallows non-allow-listed schemes for images`,
 		input:     "before\x1b]1338;url=javascript:alert(1);alt=hello\x07after",
 		wantHTML:  "before\n&nbsp;\nafter", // don't really care about the middle, as long as it's white-spacey
-		wantPlain: "before\n\nafter",
+		wantPlain: "before\nhello\nafter",
 	},
 	{
 		name:      `renders links, and renders them inline on other content`,
 		input:     "a link to \x1b]1339;url=http://google.com;content=google\a.",
 		wantHTML:  `a link to <a href="http://google.com">google</a>.`,
-		wantPlain: "a link to .", // TODO: render the link text in plain mode
+		wantPlain: "a link to google.",
 	},
 	{
 		name:      `uses URL as link content if missing`,
 		input:     "\x1b]1339;url=http://google.com\a",
 		wantHTML:  `<a href="http://google.com">http://google.com</a>`,
-		wantPlain: "", // TODO: render the link text in plain mode
+		wantPlain: "http://google.com",
 	},
 	{
 		name:      `protects inline images against XSS by escaping HTML during rendering`,
 		input:     "hi\x1b]1337;File=name=" + base64Encode("<script>.pdf") + ";inline=1:AA==\ahello",
 		wantHTML:  "hi\n" + `<img alt="&lt;script&gt;.pdf" src="data:application/pdf;base64,AA==">` + "\nhello",
-		wantPlain: "hi\n\nhello", // TODO: render the alt text for images in plain mode?
+		wantPlain: "hi\n\nhello",
 	},
 	{
 		name:      `protects external images against XSS by escaping HTML during rendering`,
 		input:     "\x1b]1338;url=\"https://example.com/a.gif&a=<b>&c='d'\";alt=foo&bar;width=\"<wat>\";height=2px\a",
 		wantHTML:  `<img alt="foo&amp;bar" src="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27" width="&lt;wat&gt;em" height="2px">`,
-		wantPlain: "", // TODO: render the alt text for images in plain mode?
+		wantPlain: "foo&bar",
 	},
 	{
 		name:      `protects links against XSS by escaping HTML during rendering`,
 		input:     "\x1b]1339;url=\"https://example.com/a.gif&a=<b>&c='d'\";content=<h1>hello</h1>\a",
 		wantHTML:  `<a href="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27">&lt;h1&gt;hello&lt;/h1&gt;</a>`,
-		wantPlain: "", // TODO: render the alt text for images in plain mode?
+		wantPlain: "<h1>hello</h1>",
 	},
 	{
 		name:      `disallows javascript: scheme URLs`,
 		input:     "\x1b]1339;url=javascript:alert(1);content=hello\x07",
 		wantHTML:  `<a href="#">hello</a>`,
-		wantPlain: "", // TODO: render the link text in plain mode
+		wantPlain: "hello",
 	},
 	{
 		name:      `allows artifact: scheme URLs`,
 		input:     "\x1b]1339;url=artifact://hello.txt\x07\n",
 		wantHTML:  `<a href="artifact://hello.txt">artifact://hello.txt</a>`,
-		wantPlain: "", // TODO: render the link text in plain mode
+		wantPlain: "artifact://hello.txt",
 	},
 	{
 		name:      `renders bk APC escapes as processing instructions`,

@@ -123,7 +123,28 @@ func (l *ScreenLine) AsPlain(timestampFormat string) string {
 	}
 
 	for _, node := range l.nodes {
-		if !node.style.element() {
+		if node.style.element() {
+			element := l.elements[node.blob]
+			switch element.elementType {
+			case ELEMENT_LINK:
+				content := element.content
+				if content == "" {
+					content = element.url
+				}
+				buf.WriteString(content)
+
+			case ELEMENT_IMAGE:
+				content := element.alt
+				if content == "" {
+					content = element.url
+				}
+				buf.WriteString(content)
+
+			case ELEMENT_ITERM_IMAGE:
+
+			}
+
+		} else {
 			buf.WriteRune(node.blob)
 		}
 	}
