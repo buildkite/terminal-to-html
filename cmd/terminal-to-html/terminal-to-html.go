@@ -54,6 +54,9 @@ const (
 `
 )
 
+// Like [time.RFC3339], but with 3 more digits of precision.
+const rfc3339milli = "2006-01-02T15:04:05.999Z07:00"
+
 func writePreviewStart(w io.Writer) error {
 	styleSheet, err := assets.TerminalCSS()
 	if err != nil {
@@ -76,7 +79,7 @@ func writePreviewEnd(w io.Writer) error {
 	return err
 }
 
-func webservice(listen string, preview bool, maxLines int, format, timeFmt string) {
+func webservice(listen string, preview bool, maxLines int) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		// Process the request body, but write to a buffer before serving it.
 		// Consuming the body before any writes is necessary because of HTTP
@@ -86,7 +89,7 @@ func webservice(listen string, preview bool, maxLines int, format, timeFmt strin
 		// > Request.Body.
 		// However, it lets us provide Content-Length in all cases.
 		b := bytes.NewBuffer(nil)
-		if _, _, _, err := process(b, r.Body, preview, maxLines, format, timeFmt); err != nil {
+		if _, _, _, err := process(b, r.Body, preview, maxLines, "html", ""); err != nil {
 			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
@@ -246,12 +249,12 @@ func main() {
 		&cli.StringFlag{
 			Name:  "format",
 			Value: "html",
-			Usage: "Configures output format. Must be either 'plain' or 'html'",
+			Usage: "Configures output format when outputting to stdout. Must be either 'plain' or 'html'. NOTE: 'plain' format does NOT perform HTML escaping! For this reason, if -http is set, -format is ignored and the web service always uses 'html' format in order to correctly escape output",
 		},
 		&cli.StringFlag{
 			Name:  "timestamp-format",
-			Value: "rfc3339milli",
-			Usage: "Changes how timestamps are formatted (in plain format). Either 'none' (no timestamps), 'raw' (milliseconds since Unix epoch), 'rfc3339', 'rfc3339milli', or a custom Go time format string, used to format line timestamps for plain output (see https://pkg.go.dev/time#pkg-constants)",
+			Value: rfc3339milli,
+			Usage: "Changes how timestamps are formatted in 'plain' format. The default is RFC3339 timestamps with milliseconds. Accepted values are 'none' (disable timestamps), 'raw' (milliseconds since Unix epoch), 'rfc3339', 'rfc3339milli', or a custom Go time format string (see https://pkg.go.dev/time#pkg-constants). In 'html' format timestamps and any other metadata is included inside a '<?bk t=... ?>' XML processing instruction at the start of each line",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
@@ -270,12 +273,12 @@ func main() {
 		case "rfc3339":
 			timeFmt = time.RFC3339
 		case "rfc3339milli":
-			timeFmt = "2006-01-02T15:04:05.999Z07:00"
+			timeFmt = rfc3339milli
 		}
 
 		// Run a web server?
 		if addr := c.String("http"); addr != "" {
-			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"), format, timeFmt)
+			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"))
 			return nil
 		}
 
