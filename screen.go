@@ -12,7 +12,7 @@ type Screen struct {
 	x, y int
 
 	// Screen contents
-	screen []ScreenLine
+	Screen []ScreenLine
 
 	// Current style
 	style style
@@ -39,9 +39,9 @@ type Screen struct {
 type ScreenLine struct {
 	nodes []node
 
-	// metadata is { namespace => { key => value, ... }, ... }
+	// Metadata is { namespace => { key => value, ... }, ... }
 	// e.g. { "bk" => { "t" => "1234" } }
-	metadata map[string]map[string]string
+	Metadata map[string]map[string]string
 
 	// element nodes refer to elements in this slice by index
 	// (if node.style.element(), then elements[node.blob] is the element)
@@ -56,7 +56,7 @@ const (
 // Clear part (or all) of a line on the screen. The range to clear is inclusive
 // of xStart and xEnd.
 func (s *Screen) clear(y, xStart, xEnd int) {
-	if y < 0 || y >= len(s.screen) {
+	if y < 0 || y >= len(s.Screen) {
 		return
 	}
 
@@ -68,7 +68,7 @@ func (s *Screen) clear(y, xStart, xEnd int) {
 		return
 	}
 
-	line := &s.screen[y]
+	line := &s.Screen[y]
 
 	if xStart >= len(line.nodes) {
 		// Clearing part of a line starting after the end of the current line...
@@ -125,14 +125,14 @@ func (s *Screen) backward(i string) {
 
 func (s *Screen) getCurrentLineForWriting() *ScreenLine {
 	// Ensure there are enough lines on screen for the cursor's Y position.
-	for s.y >= len(s.screen) {
+	for s.y >= len(s.Screen) {
 		// If MaxLines is not in use, or adding a new line would not make it
 		// larger than MaxLines, then just allocate a new line.
-		if s.MaxLines <= 0 || len(s.screen)+1 <= s.MaxLines {
+		if s.MaxLines <= 0 || len(s.Screen)+1 <= s.MaxLines {
 			// nodes is preallocated with space for 80 columns, which is
 			// arbitrary, but also the traditional terminal width.
 			newLine := ScreenLine{nodes: make([]node, 0, 80)}
-			s.screen = append(s.screen, newLine)
+			s.Screen = append(s.Screen, newLine)
 			continue
 		}
 
@@ -140,18 +140,18 @@ func (s *Screen) getCurrentLineForWriting() *ScreenLine {
 		// larger than MaxLines.
 		// Pass the line being scrolled out to ScrollOutFunc if it exists.
 		if s.ScrollOutFunc != nil {
-			s.ScrollOutFunc(&s.screen[0])
+			s.ScrollOutFunc(&s.Screen[0])
 		}
 		s.LinesScrolledOut++
 
 		// Trim the first line off the top of the screen.
 		// Recycle its nodes slice to make a new line on the bottom.
-		newLine := ScreenLine{nodes: s.screen[0].nodes[:0]}
-		s.screen = append(s.screen[1:], newLine)
+		newLine := ScreenLine{nodes: s.Screen[0].nodes[:0]}
+		s.Screen = append(s.Screen[1:], newLine)
 		s.y--
 	}
 
-	line := &s.screen[s.y]
+	line := &s.Screen[s.y]
 
 	// Add columns if currently shorter than the cursor's x position
 	for i := len(line.nodes); i <= s.x; i++ {
@@ -193,17 +193,17 @@ func (s *Screen) appendElement(i *element) {
 // metadata for the current line, overwriting data when keys collide.
 func (s *Screen) setLineMetadata(namespace string, data map[string]string) {
 	line := s.getCurrentLineForWriting()
-	if line.metadata == nil {
-		line.metadata = map[string]map[string]string{
+	if line.Metadata == nil {
+		line.Metadata = map[string]map[string]string{
 			namespace: data,
 		}
 		return
 	}
 
-	ns := line.metadata[namespace]
+	ns := line.Metadata[namespace]
 	if ns == nil {
 		// namespace did not exist, set all data
-		line.metadata[namespace] = data
+		line.Metadata[namespace] = data
 		return
 	}
 
@@ -258,23 +258,23 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 			// This line should be equivalent to K0
 			s.clear(s.y, s.x, screenEndOfLine)
 			// Truncate the screen below the current line
-			if len(s.screen) > s.y {
-				s.screen = s.screen[:s.y+1]
+			if len(s.Screen) > s.y {
+				s.Screen = s.Screen[:s.y+1]
 			}
 		// "erase from beginning to current position (inclusive)"
 		case "1":
 			// This line should be equivalent to K1
 			s.clear(s.y, screenStartOfLine, s.x)
 			// Truncate the screen above the current line
-			if len(s.screen) > s.y {
-				s.screen = s.screen[s.y+1:]
+			if len(s.Screen) > s.y {
+				s.Screen = s.Screen[s.y+1:]
 			}
 			// Adjust the cursor position to compensate
 			s.y = 0
 		// 2: "erase entire display", 3: "erase whole display including scroll-back buffer"
 		// Given we don't have a scrollback of our own, we treat these as equivalent
 		case "2", "3":
-			s.screen = nil
+			s.Screen = nil
 			s.x = 0
 			s.y = 0
 		}
@@ -307,11 +307,11 @@ func (s *Screen) Write(input []byte) (int, error) {
 }
 
 // AsHTML returns the contents of the current screen buffer as HTML.
-func (s *Screen) AsHTML() string {
-	lines := make([]string, 0, len(s.screen))
+func (s *Screen) AsHTML(withMetadata bool) string {
+	lines := make([]string, 0, len(s.Screen))
 
-	for _, line := range s.screen {
-		lines = append(lines, line.AsHTML())
+	for _, line := range s.Screen {
+		lines = append(lines, line.AsHTML(withMetadata))
 	}
 
 	return strings.Join(lines, "\n")
@@ -322,9 +322,9 @@ func (s *Screen) AsHTML() string {
 // it is used to format the bk.t metadata for the line as a timestamp at the
 // start of the line.
 func (s *Screen) AsPlainText(timestampFormat string) string {
-	lines := make([]string, 0, len(s.screen))
+	lines := make([]string, 0, len(s.Screen))
 
-	for _, line := range s.screen {
+	for _, line := range s.Screen {
 		lines = append(lines, line.AsPlain(timestampFormat))
 	}
 

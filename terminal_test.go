@@ -519,11 +519,11 @@ func streamingRender(raw []byte) string {
 	s := &Screen{
 		MaxLines: 300,
 		ScrollOutFunc: func(line *ScreenLine) {
-			fmt.Fprintln(&buf, line.AsHTML())
+			fmt.Fprintln(&buf, line.AsHTML(true))
 		},
 	}
 	s.Write(raw)
-	buf.WriteString(s.AsHTML())
+	buf.WriteString(s.AsHTML(true))
 	return buf.String()
 }
 
@@ -567,7 +567,7 @@ func TestScreenWriteToXY(t *testing.T) {
 	s.y = 2
 	s.write('c')
 
-	output := s.AsHTML()
+	output := s.AsHTML(true)
 	expected := "a\n b\n  c"
 	if output != expected {
 		t.Errorf("got %q, wanted %q", output, expected)
@@ -611,6 +611,6 @@ func benchmarkStreaming(filename string, b *testing.B) {
 			ScrollOutFunc: func(*ScreenLine) {},
 		}
 		s.Write(raw)
-		_ = s.AsHTML()
+		_ = s.AsHTML(true)
 	}
 }

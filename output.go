@@ -69,11 +69,11 @@ func (b *outputBuffer) appendChar(char rune) {
 }
 
 // AsHTML returns the line with HTML formatting.
-func (l *ScreenLine) AsHTML() string {
+func (l *ScreenLine) AsHTML(withMetadata bool) string {
 	var spanOpen bool
 	var lineBuf outputBuffer
 
-	if data, ok := l.metadata[bkNamespace]; ok {
+	if data, ok := l.Metadata[bkNamespace]; ok && withMetadata {
 		lineBuf.appendMeta(bkNamespace, data)
 	}
 
@@ -118,7 +118,7 @@ func (l *ScreenLine) AsPlain(timestampFormat string) string {
 	var buf strings.Builder
 
 	if timestampFormat != "" {
-		buf.WriteString(bkTimestamp(l.metadata["bk"]["t"], timestampFormat))
+		buf.WriteString(bkTimestamp(l.Metadata["bk"]["t"], timestampFormat))
 		buf.WriteRune('\t')
 	}
 

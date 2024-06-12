@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"slices"
 	"strconv"
 	"time"
 
@@ -185,9 +186,25 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int, format, t
 	var scrollOutFunc func(*terminal.ScreenLine)
 	switch format {
 	case "html":
-		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsHTML()) }
+		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsHTML(true)) }
 	case "plain":
 		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsPlain(timeFmt)) }
+	case "json":
+		enc := json.NewEncoder(wc)
+		scrollOutFunc = func(line *terminal.ScreenLine) {
+			_ = enc.Encode(map[string]any{
+				"metadata": line.Metadata,
+				"content":  line.AsHTML(false), // don't include timestamp in content, it's metadata
+			})
+		}
+	case "json-plain":
+		enc := json.NewEncoder(wc)
+		scrollOutFunc = func(line *terminal.ScreenLine) {
+			_ = enc.Encode(map[string]any{
+				"metadata": line.Metadata,
+				"content":  line.AsPlain(""), // don't include timestamp in content, it's metadata
+			})
+		}
 	}
 
 	screen = &terminal.Screen{
@@ -203,9 +220,13 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int, format, t
 	// out of the top).
 	switch format {
 	case "html":
-		fmt.Fprint(wc, screen.AsHTML())
+		fmt.Fprint(wc, screen.AsHTML(true))
 	case "plain":
 		fmt.Fprint(wc, screen.AsPlainText(timeFmt))
+	case "json", "json-plain":
+		for _, line := range screen.Screen {
+			scrollOutFunc(&line)
+		}
 	}
 
 	if preview {
@@ -215,6 +236,8 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int, format, t
 	}
 	return int(inBytes), wc.counter, screen, nil
 }
+
+var allowedFormats = []string{"html", "plain", "json", "json-plain"}
 
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
@@ -246,7 +269,7 @@ func main() {
 		&cli.StringFlag{
 			Name:  "format",
 			Value: "html",
-			Usage: "Configures output format. Must be either 'plain' or 'html'",
+			Usage: fmt.Sprintf("Configures output format. Must be one of %v", allowedFormats),
 		},
 		&cli.StringFlag{
 			Name:  "timestamp-format",
@@ -257,16 +280,15 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 
 		format := c.String("format")
-		switch format {
-		case "plain", "html":
-			// Allowed
-		default:
-			return fmt.Errorf("invalid format %q - must be either 'plain' or 'html'", format)
+		if !slices.Contains(allowedFormats, format) {
+			return fmt.Errorf("invalid format %q - must be one of %v", format, allowedFormats)
 		}
 
 		// The preview HTML should only be added if the output format is HTML
+		// All other formats do not support being surrounded by extra HTML
 		preview := c.Bool("preview") && format == "html"
 
+		// Timestamp format only applies to plain output.
 		timeFmt := c.String("timestamp-format")
 		switch timeFmt {
 		case "none":
