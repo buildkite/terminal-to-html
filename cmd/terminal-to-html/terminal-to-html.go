@@ -93,7 +93,14 @@ func webservice(listen string, preview bool, maxLines int, format, timeFmt strin
 			fmt.Fprint(w, "Error creating preview.")
 		}
 
-		w.Header().Set("Content-Type", "text/html")
+		switch format {
+		case "html":
+			w.Header().Set("Content-Type", "text/html")
+		case "plain":
+			w.Header().Set("Content-Type", "text/plain")
+		case "json", "json-plain":
+			w.Header().Set("Content-Type", "application/json")
+		}
 		w.Header().Set("Content-Length", strconv.Itoa(b.Len()))
 		if _, err := w.Write(b.Bytes()); err != nil {
 			log.Printf("error writing response: %v", err)
