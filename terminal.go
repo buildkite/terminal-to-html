@@ -14,5 +14,5 @@ package terminal
 func Render(input []byte) string {
 	screen := Screen{}
 	screen.Write(input)
-	return screen.AsHTML()
+	return screen.AsHTML(true)
 }

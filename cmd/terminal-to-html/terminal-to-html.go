@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"slices"
 	"strconv"
 	"time"
 
@@ -76,7 +77,7 @@ func writePreviewEnd(w io.Writer) error {
 	return err
 }
 
-func webservice(listen string, preview bool, maxLines int) {
+func webservice(listen string, preview bool, maxLines int, format, timeFmt string) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		// Process the request body, but write to a buffer before serving it.
 		// Consuming the body before any writes is necessary because of HTTP
@@ -86,13 +87,20 @@ func webservice(listen string, preview bool, maxLines int) {
 		// > Request.Body.
 		// However, it lets us provide Content-Length in all cases.
 		b := bytes.NewBuffer(nil)
-		if _, _, _, err := process(b, r.Body, preview, maxLines); err != nil {
+		if _, _, _, err := process(b, r.Body, preview, maxLines, format, timeFmt); err != nil {
 			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
 		}
 
-		w.Header().Set("Content-Type", "text/html")
+		switch format {
+		case "html":
+			w.Header().Set("Content-Type", "text/html")
+		case "plain":
+			w.Header().Set("Content-Type", "text/plain")
+		case "json", "json-plain":
+			w.Header().Set("Content-Type", "application/json")
+		}
 		w.Header().Set("Content-Length", strconv.Itoa(b.Len()))
 		if _, err := w.Write(b.Bytes()); err != nil {
 			log.Printf("error writing response: %v", err)
@@ -172,7 +180,7 @@ func (wc *writeCounter) Write(b []byte) (int, error) {
 
 // process streams the src through a terminal renderer to the dst. If preview is
 // true, the preview wrapper is added.
-func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out int, screen *terminal.Screen, err error) {
+func process(dst io.Writer, src io.Reader, preview bool, maxLines int, format, timeFmt string) (in, out int, screen *terminal.Screen, err error) {
 	// Wrap dst in writeCounter to count bytes written
 	wc := &writeCounter{out: dst}
 
@@ -182,9 +190,33 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 		}
 	}
 
+	var scrollOutFunc func(*terminal.ScreenLine)
+	switch format {
+	case "html":
+		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsHTML(true)) }
+	case "plain":
+		scrollOutFunc = func(line *terminal.ScreenLine) { fmt.Fprintln(wc, line.AsPlain(timeFmt)) }
+	case "json":
+		enc := json.NewEncoder(wc)
+		scrollOutFunc = func(line *terminal.ScreenLine) {
+			_ = enc.Encode(map[string]any{
+				"metadata": line.Metadata,
+				"content":  line.AsHTML(false), // don't include timestamp in content, it's metadata
+			})
+		}
+	case "json-plain":
+		enc := json.NewEncoder(wc)
+		scrollOutFunc = func(line *terminal.ScreenLine) {
+			_ = enc.Encode(map[string]any{
+				"metadata": line.Metadata,
+				"content":  line.AsPlain(""), // don't include timestamp in content, it's metadata
+			})
+		}
+	}
+
 	screen = &terminal.Screen{
 		MaxLines:      maxLines,
-		ScrollOutFunc: func(line string) { fmt.Fprintln(wc, line) },
+		ScrollOutFunc: scrollOutFunc,
 	}
 	inBytes, err := io.Copy(screen, src)
 	if err != nil {
@@ -193,7 +225,16 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 
 	// Write what remains in the screen buffer (everything that didn't scroll
 	// out of the top).
-	fmt.Fprint(wc, screen.AsHTML())
+	switch format {
+	case "html":
+		fmt.Fprint(wc, screen.AsHTML(true))
+	case "plain":
+		fmt.Fprint(wc, screen.AsPlainText(timeFmt))
+	case "json", "json-plain":
+		for _, line := range screen.Screen {
+			scrollOutFunc(&line)
+		}
+	}
 
 	if preview {
 		if err := writePreviewEnd(wc); err != nil {
@@ -202,6 +243,8 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 	}
 	return int(inBytes), wc.counter, screen, nil
 }
+
+var allowedFormats = []string{"html", "plain", "json", "json-plain"}
 
 func main() {
 	cli.AppHelpTemplate = appHelpTemplate
@@ -230,11 +273,42 @@ func main() {
 			Value: 300,
 			Usage: "Sets a limit on the number of lines to hold in the screen buffer, allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs. Setting to 0 disables the limit, causing the renderer to buffer the entire screen before producing any output",
 		},
+		&cli.StringFlag{
+			Name:  "format",
+			Value: "html",
+			Usage: fmt.Sprintf("Configures output format. Must be one of %v", allowedFormats),
+		},
+		&cli.StringFlag{
+			Name:  "timestamp-format",
+			Value: "rfc3339milli",
+			Usage: "Changes how timestamps are formatted (in plain format). Either 'none' (no timestamps), 'raw' (milliseconds since Unix epoch), 'rfc3339', 'rfc3339milli', or a custom Go time format string, used to format line timestamps for plain output (see https://pkg.go.dev/time#pkg-constants)",
+		},
 	}
 	app.Action = func(c *cli.Context) error {
+
+		format := c.String("format")
+		if !slices.Contains(allowedFormats, format) {
+			return fmt.Errorf("invalid format %q - must be one of %v", format, allowedFormats)
+		}
+
+		// The preview HTML should only be added if the output format is HTML
+		// All other formats do not support being surrounded by extra HTML
+		preview := c.Bool("preview") && format == "html"
+
+		// Timestamp format only applies to plain output.
+		timeFmt := c.String("timestamp-format")
+		switch timeFmt {
+		case "none":
+			timeFmt = ""
+		case "rfc3339":
+			timeFmt = time.RFC3339
+		case "rfc3339milli":
+			timeFmt = "2006-01-02T15:04:05.999Z07:00"
+		}
+
 		// Run a web server?
 		if addr := c.String("http"); addr != "" {
-			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"))
+			webservice(addr, preview, c.Int("buffer-max-lines"), format, timeFmt)
 			return nil
 		}
 
@@ -251,7 +325,14 @@ func main() {
 			input = f
 		}
 
-		in, out, screen, err := process(os.Stdout, input, c.Bool("preview"), c.Int("buffer-max-lines"))
+		in, out, screen, err := process(
+			os.Stdout,
+			input,
+			preview,
+			c.Int("buffer-max-lines"),
+			format,
+			timeFmt,
+		)
 		if err != nil {
 			return err
 		}

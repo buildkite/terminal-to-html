@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"html"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type outputBuffer struct {
@@ -66,12 +68,12 @@ func (b *outputBuffer) appendChar(char rune) {
 	}
 }
 
-// asHTML returns the line with HTML formatting.
-func (l *screenLine) asHTML() string {
+// AsHTML returns the line with HTML formatting.
+func (l *ScreenLine) AsHTML(withMetadata bool) string {
 	var spanOpen bool
 	var lineBuf outputBuffer
 
-	if data, ok := l.metadata[bkNamespace]; ok {
+	if data, ok := l.Metadata[bkNamespace]; ok && withMetadata {
 		lineBuf.appendMeta(bkNamespace, data)
 	}
 
@@ -111,15 +113,59 @@ func (l *screenLine) asHTML() string {
 	return line
 }
 
-// asPlain returns the line contents without any added HTML.
-func (l *screenLine) asPlain() string {
+// AsPlain returns the line contents without any added HTML.
+func (l *ScreenLine) AsPlain(timestampFormat string) string {
 	var buf strings.Builder
 
+	if timestampFormat != "" {
+		buf.WriteString(bkTimestamp(l.Metadata["bk"]["t"], timestampFormat))
+		buf.WriteRune('\t')
+	}
+
 	for _, node := range l.nodes {
-		if !node.style.element() {
+		if node.style.element() {
+			element := l.elements[node.blob]
+			switch element.elementType {
+			case ELEMENT_LINK:
+				content := element.content
+				if content == "" {
+					content = element.url
+				}
+				buf.WriteString(content)
+
+			case ELEMENT_IMAGE:
+				content := element.alt
+				if content == "" {
+					content = element.url
+				}
+				buf.WriteString(content)
+
+			case ELEMENT_ITERM_IMAGE:
+
+			}
+
+		} else {
 			buf.WriteRune(node.blob)
 		}
 	}
 
 	return strings.TrimRight(buf.String(), " \t")
+}
+
+func bkTimestamp(ts, timeFmt string) string {
+	if timeFmt == "raw" {
+		return ts
+	}
+
+	if ts == "" {
+		return "(no timestamp)"
+	}
+
+	tsint, err := strconv.ParseInt(ts, 10, 64)
+	if err != nil {
+		return err.Error()
+	}
+
+	tstime := time.UnixMilli(tsint)
+	return tstime.Format(timeFmt)
 }
