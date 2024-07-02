@@ -44,10 +44,34 @@ func TestParseAPCPrefix(t *testing.T) {
 	}
 }
 
+// Application Program Command can be terminated with ESC \
+func TestParseAPCWithSTPrefix(t *testing.T) {
+	s := parsedScreen("\x1b_bk;t=0\x1b\\hello")
+	if err := assertTextXY(t, s, "hello", 5, 0); err != nil {
+		t.Error(err)
+	}
+}
+
 // Application Program Command should be zero-width for cursor movement
 func TestParseXYAfterCursorMovementThroughBuildkiteTimestampAPC(t *testing.T) {
 	s := parsedScreen("hel\x1b_bk;t=0\x07lo\x1b[4D3")
 	if err := assertTextXY(t, s, "h3llo", 2, 0); err != nil {
+		t.Error(err)
+	}
+}
+
+// Operating System Command can be terminated with BEL
+func TestParseOSCHyperlink(t *testing.T) {
+	s := parsedScreen("\x1b]8;;http://example.com/\x07hello")
+	if err := assertTextXY(t, s, "hello", 5, 0); err != nil {
+		t.Error(err)
+	}
+}
+
+// Operating System Command can be terminated with ESC \
+func TestParseOSCWithST(t *testing.T) {
+	s := parsedScreen("\x1b]8;;http://example.com/\x1b\\hello")
+	if err := assertTextXY(t, s, "hello", 5, 0); err != nil {
 		t.Error(err)
 	}
 }

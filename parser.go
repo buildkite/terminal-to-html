@@ -6,12 +6,14 @@ import (
 )
 
 const (
-	MODE_NORMAL  = iota
-	MODE_ESCAPE  = iota
-	MODE_CONTROL = iota
-	MODE_OSC     = iota
-	MODE_CHARSET = iota
-	MODE_APC     = iota
+	parserModeNormal = iota
+	parserModeEscape
+	parserModeControl
+	parserModeOSC
+	parserModeOSCEsc // within OSC and just read an escape
+	parserModeCharset
+	parserModeAPC
+	parserModeAPCEsc // within APC and just read an escape
 )
 
 type position struct {
@@ -36,43 +38,46 @@ type parser struct {
 /*
  * How this state machine works:
  *
- * We start in MODE_NORMAL. We're not inside an escape sequence. In this mode
+ * We start in parserModeNormal. We're not inside an escape sequence. In this mode
  * most input is written directly to the screen. If we receive a newline,
  * backspace or other cursor-moving signal, we let the screen know so that it
  * can change the location of its cursor accordingly.
  *
- * If we're in MODE_NORMAL and we receive an escape character (\x1b) we enter
- * MODE_ESCAPE. The following character could start an escape sequence, a
+ * If we're in parserModeNormal and we receive an escape character (\x1b) we enter
+ * parserModeEscape. The following character could start an escape sequence, a
  * control sequence, an operating system command, or be invalid or not understood.
  *
- * If we're in MODE_ESCAPE we look for ~~three~~ eight possible characters:
+ * If we're in parserModeEscape we look for ~~three~~ eight possible characters:
  *
- * 1. For `[` we enter MODE_CONTROL and start looking for a control sequence.
- * 2. For `]` we enter MODE_OSC and look for an operating system command.
- * 3. For `(` or ')' we enter MODE_CHARSET and look for a character set name.
- * 4. For `_` we enter MODE_APC and parse the rest of the custom control sequence
+ * 1. For `[` we enter parserModeControl and start looking for a control sequence.
+ * 2. For `]` we enter parserModeOSC and look for an operating system command.
+ * 3. For `(` or ')' we enter parserModeCharset and look for a character set name.
+ * 4. For `_` we enter parserModeAPC and parse the rest of the custom control sequence
  * 5. For `M`, `7`, or `8`, we run an instruction directly (reverse newline,
  *    or save/restore cursor).
  *
  * In all cases we start our instruction buffer. The instruction buffer is used
  * to store the individual characters that make up ANSI instructions before
  * sending them to the screen. If we receive neither of these characters, we
- * treat this as an invalid or unknown escape and return to MODE_NORMAL.
+ * treat this as an invalid or unknown escape and return to parserModeNormal.
  *
- * If we're in MODE_CONTROL, we expect to receive a sequence of parameters and
+ * If we're in parserModeControl, we expect to receive a sequence of parameters and
  * then a terminal alphabetic character looking like 1;30;42m. That's an
  * instruction to turn on bold, set the foreground colour to black and the
  * background colour to green. We receive these characters one by one turning
  * the parameters into instruction parts (1, 30, 42) followed by an instruction
  * type (m). Once the instruction type is received we send it and its parts to
- * the screen and return to MODE_NORMAL.
+ * the screen and return to parserModeNormal.
  *
- * If we're in MODE_OSC, we expect to receive a sequence of characters up to
- * and including a bell (\a). We skip forward until this bell is reached, then
- * send everything from when we entered MODE_OSC up to the bell to
- * parseElementSequence and return to MODE_NORMAL.
+ * If we're in parserModeOSC, we expect to receive a sequence of characters up to
+ * and including a bell (\a) or ESC-\ string terminator. We skip forward until
+ * the terminator is reached, then send everything from when we entered parserModeOSC
+ * up to the terminator to parseElementSequence and return to parserModeNormal.
  *
- * If we're in MODE_CHARSET we simply discard the next character which would
+ * parserModeAPC is just like parserModeOSC, except the contents should be processed
+ * differently.
+ *
+ * If we're in parserModeCharset we simply discard the next character which would
  * normally designate the character set.
  */
 
@@ -87,22 +92,35 @@ func (p *parser) parseToScreen(input []byte) {
 		char, charLen := utf8.DecodeRune(p.buffer[p.cursor:])
 
 		switch p.mode {
-		case MODE_ESCAPE:
+		case parserModeEscape:
 			// We've received an escape character but aren't inside an escape sequence yet
 			p.handleEscape(char)
-		case MODE_CONTROL:
+
+		case parserModeControl:
 			// We're inside a control sequence - figure out its code and its instructions.
 			p.handleControlSequence(char)
-		case MODE_OSC:
-			// We're inside an operating system command, capture until we hit a bell character
+
+		case parserModeOSC:
+			// We're inside an operating system command, capture until we hit BEL or ESC \ (ST)
 			p.handleOperatingSystemCommand(char)
-		case MODE_CHARSET:
+
+		case parserModeOSCEsc:
+			// We're inside an operating system command, and just hit an ESC (might be ST)
+			p.handleOSCEscape(char)
+
+		case parserModeCharset:
 			// We're inside a charset sequence, capture the next character.
 			p.handleCharset(char)
-		case MODE_APC:
-			// We're inside a custom escape sequence
+
+		case parserModeAPC:
+			// We're inside a custom escape sequence, capture until we hit BEL or ESC \ (ST)
 			p.handleApplicationProgramCommand(char)
-		case MODE_NORMAL:
+
+		case parserModeAPCEsc:
+			// We're inside an APC, and just hit an ESC (which might be ST)
+			p.handleAPCEscape(char)
+
+		case parserModeNormal:
 			// Outside of an escape sequence entirely, normal input
 			p.handleNormal(char)
 		}
@@ -114,7 +132,7 @@ func (p *parser) parseToScreen(input []byte) {
 	// If we're in the middle of an escape, everything up to p.escapeStartedAt
 	// has been processed.
 	done := p.escapeStartedAt
-	if p.mode == MODE_NORMAL {
+	if p.mode == parserModeNormal {
 		done = p.cursor
 	}
 
@@ -125,22 +143,48 @@ func (p *parser) parseToScreen(input []byte) {
 	p.escapeStartedAt -= done
 }
 
-// handleCharset is called for each character consumed while in MODE_CHARSET.
-// It ignores the character and transitions back to MODE_NORMAL.
+// handleCharset is called for each character consumed while in parserModeCharset.
+// It ignores the character and transitions back to parserModeNormal.
 func (p *parser) handleCharset(rune) {
-	p.mode = MODE_NORMAL
+	p.mode = parserModeNormal
+}
+
+// handleOSCEscape is called for the character after an ESC when reading an OSC.
+// It either returns to OSC mode, or terminates the OSC and processes it.
+func (p *parser) handleOSCEscape(char rune) {
+	switch char {
+	case '\\': // ESC + \ = string terminator
+		// Don't include the ESC in the OSC contents.
+		p.processOperatingSystemCommand(p.cursor - 1)
+
+	default:
+		// ESC + anything else = not a string terminator.
+		// OSC continues...
+		p.mode = parserModeOSC
+	}
 }
 
 // handleOperatingSystemCommand is called for each character consumed while in
-// MODE_OSC. It does nothing until the OSC is terminated with an '\a'.
+// parserModeOSC. It does nothing until the OSC is terminated with either BEL or
+// ESC \ (ST).
 func (p *parser) handleOperatingSystemCommand(char rune) {
-	if char != '\a' {
-		return
-	}
-	p.mode = MODE_NORMAL
+	switch char {
+	case '\x07': // BEL terminates the APC
+		p.processOperatingSystemCommand(p.cursor)
 
-	// Bell received, stop parsing our potential image
-	image, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:p.cursor]))
+	case '\x1b': // ESC
+		// Next char _could_ be \ which makes the combination a string terminator
+		p.mode = parserModeOSCEsc
+
+	default:
+		// OSC continues...
+	}
+}
+
+// processOperatingSystemCommand processes the contents of the OSC that was just read.
+func (p *parser) processOperatingSystemCommand(end int) {
+	p.mode = parserModeNormal
+	image, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:end]))
 
 	if image == nil && err == nil {
 		// No image & no error, nothing to render
@@ -169,10 +213,26 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 	}
 }
 
+// handleAPCEscape is called for the character after an ESC when reading an APC.
+// It either returns to APC mode, or terminates the APC and processes it.
+func (p *parser) handleAPCEscape(char rune) {
+	switch char {
+	case '\\': // ESC + \ = string terminator
+		// Don't include the ESC in the APC contents.
+		p.processApplicationProgramCommand(p.cursor - 1)
+
+	default:
+		// ESC + anything else = not a string terminator.
+		// APC continues...
+		p.mode = parserModeAPC
+	}
+}
+
 // handleApplicationProgramCommand is called for each character consumed while
-// in MODE_APC, but does nothing until the APC is terminated with BEL (0x07).
+// in parserModeAPC, but does nothing until the APC is terminated with BEL (0x07)
+// or the two-byte form of ST (ESC \).
 //
-// Technically an APC sequence is terminated by String Terminator (ST; 0x9C):
+// Technically an APC sequence is terminated by String Terminator (ST; 0x9C or ESC \):
 // https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls
 //
 // But:
@@ -184,16 +244,26 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 // https://iterm2.com/documentation-images.html
 //
 // Buildkite's ansi timestamper does the same, and we don't _expect_ to be
-// seeing any other APCs that could be ST-terminated... 🤞🏼
+// seeing any other APCs that could be ST-terminated. But we've seen ESC \
+// in some bug reports.
 func (p *parser) handleApplicationProgramCommand(char rune) {
-	// check for APC terminator (\a = 0x07 = \x07 = BEL)
-	if char != '\x07' {
-		return // APC continues...
-	}
+	switch char {
+	case '\x07': // BEL terminates the APC
+		p.processApplicationProgramCommand(p.cursor)
 
-	// APC terminator has been received; return to normal mode and handle the APC...
-	p.mode = MODE_NORMAL
-	sequence := string(p.buffer[p.instructionStartedAt:p.cursor])
+	case '\x1b': // ESC
+		// Next char _could_ be \ which makes the combination ST
+		p.mode = parserModeAPCEsc
+
+	default:
+		// APC continues...
+	}
+}
+
+// processApplicationProgramCommand process the contents of the APC that was just read.
+func (p *parser) processApplicationProgramCommand(end int) {
+	p.mode = parserModeNormal
+	sequence := string(p.buffer[p.instructionStartedAt:end])
 
 	// this might be a Buildkite Application Program Command sequence...
 	data, err := p.parseBuildkiteAPC(sequence)
@@ -210,7 +280,7 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 }
 
 // handleControlSequence is called for each character consumed while in
-// MODE_CONTROL.
+// parserModeControl.
 func (p *parser) handleControlSequence(char rune) {
 	char = unicode.ToUpper(char)
 	switch char {
@@ -222,18 +292,18 @@ func (p *parser) handleControlSequence(char rune) {
 	case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'J', 'K', 'M', 'Q':
 		p.addInstruction()
 		p.screen.applyEscape(char, p.instructions)
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	case 'H', 'L':
 		// Set/reset mode (SM/RM), ignore and continue
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	default:
 		// unrecognized character, abort the escapeCode
 		p.cursor = p.escapeStartedAt
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	}
 }
 
-// handleNormal is called for each character consumed while in MODE_NORMAL.
+// handleNormal is called for each character consumed while in parserModeNormal.
 func (p *parser) handleNormal(char rune) {
 	switch char {
 	case '\n':
@@ -244,42 +314,42 @@ func (p *parser) handleNormal(char rune) {
 		p.screen.backspace()
 	case '\x1b':
 		p.escapeStartedAt = p.cursor
-		p.mode = MODE_ESCAPE
+		p.mode = parserModeEscape
 	default:
 		p.screen.append(char)
 	}
 }
 
-// handleEscape is called for each character consumed while in MODE_ESCAPE.
+// handleEscape is called for each character consumed while in parserModeEscape.
 func (p *parser) handleEscape(char rune) {
 	switch char {
 	case '[':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.instructions = make([]string, 0, 1)
-		p.mode = MODE_CONTROL
+		p.mode = parserModeControl
 	case ']':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
-		p.mode = MODE_OSC
+		p.mode = parserModeOSC
 	case ')', '(':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('(')
-		p.mode = MODE_CHARSET
+		p.mode = parserModeCharset
 	case '_':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
-		p.mode = MODE_APC
+		p.mode = parserModeAPC
 	case 'M':
 		p.screen.revNewLine()
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	case '7':
 		p.savePosition = position{x: p.screen.x, y: p.screen.y}
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	case '8':
 		p.screen.x = p.savePosition.x
 		p.screen.y = p.savePosition.y
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt
-		p.mode = MODE_NORMAL
+		p.mode = parserModeNormal
 	}
 }
 
