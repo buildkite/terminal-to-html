@@ -296,7 +296,7 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 func (s *Screen) Write(input []byte) (int, error) {
 	if s.parser == nil {
 		s.parser = &parser{
-			mode:   MODE_NORMAL,
+			mode:   parserModeNormal,
 			screen: s,
 		}
 	}
