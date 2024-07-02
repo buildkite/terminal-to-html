@@ -151,7 +151,8 @@ func (p *parser) handleCharset(rune) {
 func (p *parser) handleOSCEscape(char rune) {
 	switch char {
 	case '\\': // ESC + \ = string terminator
-		p.processOperatingSystemCommand()
+		// Don't include the ESC in the OSC contents.
+		p.processOperatingSystemCommand(p.cursor - 1)
 
 	default:
 		// ESC + anything else = not a string terminator.
@@ -166,7 +167,7 @@ func (p *parser) handleOSCEscape(char rune) {
 func (p *parser) handleOperatingSystemCommand(char rune) {
 	switch char {
 	case '\x07': // BEL terminates the APC
-		p.processOperatingSystemCommand()
+		p.processOperatingSystemCommand(p.cursor)
 
 	case '\x1b': // ESC
 		// Next char _could_ be \ which makes the combination a string terminator
@@ -178,9 +179,9 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 }
 
 // processOperatingSystemCommand processes the contents of the OSC that was just read.
-func (p *parser) processOperatingSystemCommand() {
+func (p *parser) processOperatingSystemCommand(end int) {
 	p.mode = parserModeNormal
-	image, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:p.cursor]))
+	image, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:end]))
 
 	if image == nil && err == nil {
 		// No image & no error, nothing to render
@@ -209,12 +210,13 @@ func (p *parser) processOperatingSystemCommand() {
 	}
 }
 
-// handleOSCEscape is called for the character after an ESC when reading an APC.
+// handleAPCEscape is called for the character after an ESC when reading an APC.
 // It either returns to APC mode, or terminates the APC and processes it.
 func (p *parser) handleAPCEscape(char rune) {
 	switch char {
 	case '\\': // ESC + \ = string terminator
-		p.processApplicationProgramCommand()
+		// Don't include the ESC in the APC contents.
+		p.processApplicationProgramCommand(p.cursor - 1)
 
 	default:
 		// ESC + anything else = not a string terminator.
@@ -244,7 +246,7 @@ func (p *parser) handleAPCEscape(char rune) {
 func (p *parser) handleApplicationProgramCommand(char rune) {
 	switch char {
 	case '\x07': // BEL terminates the APC
-		p.processApplicationProgramCommand()
+		p.processApplicationProgramCommand(p.cursor)
 
 	case '\x1b': // ESC
 		// Next char _could_ be \ which makes the combination ST
@@ -256,9 +258,9 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 }
 
 // processApplicationProgramCommand process the contents of the APC that was just read.
-func (p *parser) processApplicationProgramCommand() {
+func (p *parser) processApplicationProgramCommand(end int) {
 	p.mode = parserModeNormal
-	sequence := string(p.buffer[p.instructionStartedAt:p.cursor])
+	sequence := string(p.buffer[p.instructionStartedAt:end])
 
 	// this might be a Buildkite Application Program Command sequence...
 	data, err := p.parseBuildkiteAPC(sequence)
