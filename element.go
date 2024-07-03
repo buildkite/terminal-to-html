@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	ELEMENT_ITERM_IMAGE = iota
-	ELEMENT_IMAGE
-	ELEMENT_LINK
+	elementITermImage = iota
+	elementImage
+	elementLink
 )
 
 type element struct {
@@ -30,7 +30,7 @@ var errUnsupportedElementSequence = errors.New("Unsupported element sequence")
 func (i *element) asHTML() string {
 	h := html.EscapeString
 
-	if i.elementType == ELEMENT_LINK {
+	if i.elementType == elementLink {
 		content := i.content
 		if content == "" {
 			content = i.url
@@ -46,10 +46,11 @@ func (i *element) asHTML() string {
 	parts := []string{fmt.Sprintf(`alt="%s"`, h(alt))}
 
 	switch i.elementType {
-	case ELEMENT_ITERM_IMAGE:
+	case elementITermImage:
 		src := fmt.Sprintf(`src="data:%s;base64,%s"`, h(i.contentType), h(i.content))
 		parts = append(parts, src)
-	case ELEMENT_IMAGE:
+
+	case elementImage:
 		url := sanitizeURL(i.url)
 		if url == "" || url == unsafeURLSubstitution {
 			// don't emit an <img> at all if the URL is empty or didn't sanitize
@@ -57,6 +58,7 @@ func (i *element) asHTML() string {
 		}
 		src := fmt.Sprintf(`src="%s"`, h(url))
 		parts = append(parts, src)
+
 	default:
 		// unreachable, but…
 		return ""
@@ -125,7 +127,7 @@ func parseElementSequence(sequence string) (*element, error) {
 		}
 	}
 
-	if elem.elementType == ELEMENT_ITERM_IMAGE {
+	if elem.elementType == elementITermImage {
 		if elem.url == "" {
 			return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
 		}
@@ -138,7 +140,7 @@ func parseElementSequence(sequence string) (*element, error) {
 		}
 	}
 
-	if elem.elementType == ELEMENT_ITERM_IMAGE && !imageInline {
+	if elem.elementType == elementITermImage && !imageInline {
 		// in iTerm2, if you don't specify inline=1, the image is merely downloaded
 		// and not displayed.
 		elem = nil
@@ -165,10 +167,10 @@ func parseImageDimension(s string) string {
 
 func splitAndVerifyElementSequence(s string) (arguments string, elementType int, content string, err error) {
 	if strings.HasPrefix(s, "1338;") {
-		return s[len("1338;"):], ELEMENT_IMAGE, "", nil
+		return s[len("1338;"):], elementImage, "", nil
 	}
 	if strings.HasPrefix(s, "1339;") {
-		return s[len("1339;"):], ELEMENT_LINK, "", nil
+		return s[len("1339;"):], elementLink, "", nil
 	}
 
 	prefixLen := len("1337;File=")
@@ -182,7 +184,7 @@ func splitAndVerifyElementSequence(s string) (arguments string, elementType int,
 		return "", 0, "", fmt.Errorf("expected sequence to have one arguments part and one content part, got %d part(s)", len(parts))
 	}
 
-	elementType = ELEMENT_ITERM_IMAGE
+	elementType = elementITermImage
 	arguments = parts[0]
 	content = parts[1]
 	if len(content) == 0 {
