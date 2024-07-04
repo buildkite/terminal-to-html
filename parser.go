@@ -184,14 +184,15 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 // processOperatingSystemCommand processes the contents of the OSC that was just read.
 func (p *parser) processOperatingSystemCommand(end int) {
 	p.mode = parserModeNormal
-	image, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:end]))
+	element, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:end]))
+	// Errors are rendered into the screen (see below).
 
-	if image == nil && err == nil {
-		// No image & no error, nothing to render
+	if element == nil && err == nil {
+		// No element & no error, nothing to render
 		return
 	}
 
-	ownLine := image == nil || image.elementType != ELEMENT_LINK
+	ownLine := element == nil || element.elementType == elementImage || element.elementType == elementITermImage
 
 	if ownLine {
 		// Images (or the error encountered) should appear on their own line
@@ -204,9 +205,20 @@ func (p *parser) processOperatingSystemCommand(end int) {
 	if err != nil {
 		p.screen.appendMany([]rune("*** Error parsing custom element escape sequence: "))
 		p.screen.appendMany([]rune(err.Error()))
-	} else {
-		p.screen.appendElement(image)
+		p.screen.newLine()
+		return
 	}
+
+	if element != nil && element.elementType == elementITermLink {
+		// OSC 8 (iTerm-style) links work like a style. iTerm2 behaves this way.
+		// Instead of appending an "element" node, store the URL to apply like a
+		// colour. If the URL is empty, the text is no longer linked.
+		p.screen.urlBrush = element.url
+		p.screen.style.setHyperlink(element.url != "")
+		return
+	}
+
+	p.screen.appendElement(element)
 
 	if ownLine {
 		p.screen.newLine()

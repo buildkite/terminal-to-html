@@ -11,6 +11,7 @@ import (
 
 const (
 	elementITermImage = iota
+	elementITermLink
 	elementImage
 	elementLink
 )
@@ -76,6 +77,7 @@ func (i *element) asHTML() string {
 
 func parseElementSequence(sequence string) (*element, error) {
 	// Expect:
+	// - iTerm style hyperlink:    8;(params);(url)
 	// - iTerm style inline image: 1337;File=name=1.gif;inline=1:BASE64
 	// - Buildkite external image: 1338;url=…;alt=…;width=…;height=…
 	// - Buildkite hyperlink:      1339;url=…;content=…
@@ -93,9 +95,22 @@ func parseElementSequence(sequence string) (*element, error) {
 		return nil, err
 	}
 
-	imageInline := false
-
 	elem := &element{content: content, elementType: elementType}
+
+	if elementType == elementITermLink {
+		// For "iTerm" links (OSC 8), the tokens[0] is params and tokens[1] is the URL.
+		// We ignore params. The link "content" comes after the element and is stored
+		// as regular text in the screen line, because they are designed to gracefully
+		// degrade to plain text if the sequence isn't supported.
+		if len(tokens) != 2 {
+			// Probably malformed
+			return nil, nil
+		}
+		elem.url = tokens[1]
+		return elem, nil
+	}
+
+	imageInline := false
 
 	for _, token := range tokens {
 		parts := strings.SplitN(token, "=", 2)
@@ -166,18 +181,21 @@ func parseImageDimension(s string) string {
 }
 
 func splitAndVerifyElementSequence(s string) (arguments string, elementType int, content string, err error) {
-	if strings.HasPrefix(s, "1338;") {
-		return s[len("1338;"):], elementImage, "", nil
+	if rem, has := strings.CutPrefix(s, "8;"); has {
+		return rem, elementITermLink, "", nil
 	}
-	if strings.HasPrefix(s, "1339;") {
-		return s[len("1339;"):], elementLink, "", nil
+	if rem, has := strings.CutPrefix(s, "1338;"); has {
+		return rem, elementImage, "", nil
+	}
+	if rem, has := strings.CutPrefix(s, "1339;"); has {
+		return rem, elementLink, "", nil
 	}
 
-	prefixLen := len("1337;File=")
-	if !strings.HasPrefix(s, "1337;File=") {
+	rem, has := strings.CutPrefix(s, "1337;File=")
+	if !has {
 		return "", 0, "", errUnsupportedElementSequence
 	}
-	s = s[prefixLen:]
+	s = rem
 
 	parts := strings.Split(s, ":")
 	if len(parts) != 2 {

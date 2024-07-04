@@ -3,7 +3,7 @@ package terminal
 import (
 	"fmt"
 	"html"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -26,21 +26,27 @@ func (b *outputBuffer) closeStyle() {
 	b.buf.WriteString("</span>")
 }
 
+func (b *outputBuffer) appendAnchor(url string) {
+	b.buf.WriteString(`<a href="`)
+	b.buf.WriteString(html.EscapeString(sanitizeURL(url)))
+	b.buf.WriteString(`">`)
+}
+
+func (b *outputBuffer) closeAnchor() {
+	b.buf.WriteString("</a>")
+}
+
 func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
 	// We pre-sort the keys to guarantee alphabetical output,
-	// because Golang `map`s have guaranteed disorder
-	keys := make([]string, len(data))
-	// Make a list of the map's keys
-	i := 0
+	// because Go's maps have guaranteed disorder.
+	keys := make([]string, 0, len(data))
 	for key := range data {
-		keys[i] = key
-		i++
+		keys = append(keys, key)
 	}
-	sort.Strings(keys)
+	slices.Sort(keys)
 
 	b.buf.WriteString("<?" + namespace)
-	for i := range keys {
-		key := keys[i]
+	for _, key := range keys {
 		fmt.Fprintf(&b.buf, ` %s="%s"`, key, html.EscapeString(data[key]))
 	}
 	b.buf.WriteString("?>")
@@ -68,30 +74,54 @@ func (b *outputBuffer) appendChar(char rune) {
 
 // asHTML returns the line with HTML formatting.
 func (l *screenLine) asHTML() string {
-	var spanOpen bool
+	var spanOpen, anchorOpen bool
 	var lineBuf outputBuffer
 
 	if data, ok := l.metadata[bkNamespace]; ok {
 		lineBuf.appendMeta(bkNamespace, data)
 	}
 
-	for idx, node := range l.nodes {
-		if idx == 0 {
+	for x, node := range l.nodes {
+		// First node on line?
+		if x == 0 {
+			// Open anchors before spans, as needed.
+			if node.style.hyperlink() {
+				lineBuf.appendAnchor(l.hyperlinks[x])
+				anchorOpen = true
+			}
 			if !node.style.isPlain() {
 				lineBuf.appendNodeStyle(node)
 				spanOpen = true
 			}
-		} else {
-			previous := l.nodes[idx-1]
-			if !node.hasSameStyle(previous) {
-				if spanOpen {
-					lineBuf.closeStyle()
-					spanOpen = false
+		} else { // not the first node
+			// Close span tags before closing anchor tags.
+			previous := l.nodes[x-1]
+			sameStyle := node.hasSameStyle(previous)
+			if !sameStyle && spanOpen {
+				lineBuf.closeStyle()
+				spanOpen = false
+			}
+
+			sameLink := node.style.hyperlink() == previous.style.hyperlink()
+			if sameLink && node.style.hyperlink() {
+				sameLink = l.hyperlinks[x-1] == l.hyperlinks[x]
+			}
+			if !sameLink {
+				// Close the old anchor tag.
+				if anchorOpen {
+					lineBuf.closeAnchor()
+					anchorOpen = false
 				}
-				if !node.style.isPlain() {
-					lineBuf.appendNodeStyle(node)
-					spanOpen = true
+				// Open a new anchor tag (if this node is hyperlinked).
+				if node.style.hyperlink() {
+					lineBuf.appendAnchor(l.hyperlinks[x])
+					anchorOpen = true
 				}
+			}
+			// Open a new span tag if this node has style.
+			if !sameStyle && !node.style.isPlain() {
+				lineBuf.appendNodeStyle(node)
+				spanOpen = true
 			}
 		}
 
@@ -103,6 +133,9 @@ func (l *screenLine) asHTML() string {
 	}
 	if spanOpen {
 		lineBuf.closeStyle()
+	}
+	if anchorOpen {
+		lineBuf.closeAnchor()
 	}
 	line := strings.TrimRight(lineBuf.buf.String(), " \t")
 	if line == "" {
