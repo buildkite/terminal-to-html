@@ -114,7 +114,8 @@ func (s style) asClasses() []string {
 // Add colours to an existing style, returning a new style.
 func (s style) color(colors []string) style {
 	if len(colors) == 1 && (colors[0] == "0" || colors[0] == "") {
-		return 0
+		// s with all normal styles masked out
+		return s &^ styleComparisonMask
 	}
 
 	colorMode := COLOR_NORMAL
@@ -158,7 +159,7 @@ func (s style) color(colors []string) style {
 		switch cc {
 		case 0:
 			// Reset all styles
-			s = 0
+			s &^= styleComparisonMask
 		case 1:
 			s.setBold(true)
 			s.setFaint(false)
