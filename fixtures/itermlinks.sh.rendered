@@ -1,0 +1,20 @@
+   1: A reference on <a href="https://en.wikipedia.org/wiki/ANSI_escape_codes">ANSI escape codes</a>
+   2: Some overlapping links:
+   3:                         <a href="https://google.com/">Goo</a><a href="https://yahoo.com/">Yahoo!</a>gle
+   4: Up and down:              <a href="https://google.com/">og</a>
+   5:                         <a href="https://google.com/">Go</a>  <a href="https://google.com/">le</a>
+   6: Down and up:
+   7:                         <a href="https://google.com/">Go</a>  <a href="https://google.com/">le</a>
+   8:                           <a href="https://google.com/">og</a>
+   9: Cursor left&#47;right:
+  10:                         <a href="https://google.com/">Goo</a> <a href="https://google.com/">gle</a>
+  11:                         <a href="https://google.com/">Gogle</a>
+  12: Overwrite:
+  13:                         Yahoo!
+  14:
+  15: Newline?
+  16:                         <a href="https://google.com/">Goo</a>
+<a href="https://google.com/">  17:                         gle</a>
+  18: Colour!
+  19:                         <a href="https://google.com/"><span class="term-fg34">G</span><span class="term-fg31">o</span><span class="term-fg33">o</span><span class="term-fg34">g</span><span class="term-fg32">l</span><span class="term-fg31">e</span></a>
+  20:                         <a href="https://yahoo.com/"><span class="term-fg35">Yahoo!</span></a>

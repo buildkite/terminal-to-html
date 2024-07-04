@@ -77,7 +77,7 @@ func (i *element) asHTML() string {
 
 func parseElementSequence(sequence string) (*element, error) {
 	// Expect:
-	// - iTerm style hyperlink:    8;(params);(url)
+	// - iTerm style hyperlink:    8;id=1234;http://example.com/
 	// - iTerm style inline image: 1337;File=name=1.gif;inline=1:BASE64
 	// - Buildkite external image: 1338;url=…;alt=…;width=…;height=…
 	// - Buildkite hyperlink:      1339;url=…;content=…
@@ -90,24 +90,26 @@ func parseElementSequence(sequence string) (*element, error) {
 		return nil, err
 	}
 
-	tokens, err := tokenizeString(args, ';', '\\')
-	if err != nil {
-		return nil, err
-	}
-
 	elem := &element{content: content, elementType: elementType}
 
 	if elementType == elementITermLink {
-		// For "iTerm" links (OSC 8), the tokens[0] is params and tokens[1] is the URL.
-		// We ignore params. The link "content" comes after the element and is stored
+		// For "iTerm" links (OSC 8), tokens[0] is params and tokens[1] is the URL.
+		// Aside from not quoting the URL, we ignore params.
+		// The link "content" comes after the element and is stored
 		// as regular text in the screen line, because they are designed to gracefully
 		// degrade to plain text if the sequence isn't supported.
+		tokens := strings.Split(args, ";")
 		if len(tokens) != 2 {
 			// Probably malformed
 			return nil, nil
 		}
 		elem.url = tokens[1]
 		return elem, nil
+	}
+
+	tokens, err := tokenizeString(args, ';', '\\')
+	if err != nil {
+		return nil, err
 	}
 
 	imageInline := false

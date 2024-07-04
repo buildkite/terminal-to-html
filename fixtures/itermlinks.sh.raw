@@ -1,0 +1,20 @@
+   1: A reference on ]8;;https://en.wikipedia.org/wiki/ANSI_escape_codes\ANSI escape codes]8;;\
+   2: Some overlapping links:
+   3:                         ]8;;https://google.com/\Goo]8;;https://yahoo.com/\Yahoo!]8;;\gle]8;;\
+   4: Up and down:
+   5:                         ]8;;https://google.com/\Go[Aog[Ble]8;;\
+   6: Down and up:
+   7:                         ]8;;https://google.com/\Go[Bog[Ale]8;;\
+   8:
+   9: Cursor left/right:
+  10:                         ]8;;https://google.com/\Goo[Cgle]8;;\
+  11:                         ]8;;https://google.com/\Goo[Dgle]8;;\
+  12: Overwrite:
+  13:                         ]8;;https://google.com/\Google]8;;\
+  14:                         [AYahoo![B
+  15: Newline?
+  16:                         ]8;;https://google.com/\Goo
+  17:                         gle]8;;\
+  18: Colour!
+  19:                         ]8;;https://google.com/\[34mG[31mo[33mo[34mg[32ml[31me[0m]8;;\
+  20:                         ]8;;https://yahoo.com/\[35mYahoo![0m]8;;\
