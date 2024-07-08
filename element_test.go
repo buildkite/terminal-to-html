@@ -77,7 +77,7 @@ var validCases = []struct {
 	}, {
 		`1337: image with name, content & inline`,
 		`1337;File=name=Zm9vLmdpZg==;inline=1:AA==`,
-		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", elementType: elementITermImage},
 	}, {
 		`1337: image without inline=1 does not render`,
 		`1337;File=name=Zm9vLmdpZg==:AA==`,
@@ -85,59 +85,59 @@ var validCases = []struct {
 	}, {
 		`1337: adapts content type based on image name`,
 		`1337;File=name=` + base64Encode("foo.jpg") + `;inline=1:AA==`,
-		&element{url: "foo.jpg", content: "AA==", contentType: "image/jpeg", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: "foo.jpg", content: "AA==", contentType: "image/jpeg", elementType: elementITermImage},
 	}, {
 		`1337: handles width & height`,
 		`1337;File=name=Zm9vLmdpZg==;width=100%;height=50px;inline=1:AA==`,
-		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "100%", height: "50px", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "100%", height: "50px", elementType: elementITermImage},
 	}, {
 		`1337: parsing is NOT concerned with XSS in image name, width & height by stripping brackets, because that's protected at render time`,
 		`1337;File=name=` + base64Encode(`foo".gif`) + `;width="100%";height='50px'>;inline=1:AA==`,
-		&element{url: `foo".gif`, content: "AA==", contentType: "image/gif", width: "100%", height: "50px>em", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: `foo".gif`, content: "AA==", contentType: "image/gif", width: "100%", height: "50px>em", elementType: elementITermImage},
 	}, {
 		`1337: converts width & height without percent or px to em`,
 		`1337;File=name=Zm9vLmdpZg==;width=1;height=5;inline=1:AA==`,
-		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "1em", height: "5em", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", width: "1em", height: "5em", elementType: elementITermImage},
 	}, {
 		`1337: malfored arguments are silently ignored`,
 		`1337;File=name=Zm9vLmdpZg==;inline=1;sdfsdfs;====ddd;herp=derps:AA==`,
-		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", elementType: ELEMENT_ITERM_IMAGE},
+		&element{url: "foo.gif", content: "AA==", contentType: "image/gif", elementType: elementITermImage},
 	}, {
 		`1338: image with filename`,
 		"1338;url=tmp/foo.gif",
-		&element{url: "tmp/foo.gif", elementType: ELEMENT_IMAGE},
+		&element{url: "tmp/foo.gif", elementType: elementImage},
 	}, {
 		`1338: image with filename containing an escaped ;`,
 		"1338;url=tmp/foo\\;bar.gif",
-		&element{url: "tmp/foo;bar.gif", elementType: ELEMENT_IMAGE},
+		&element{url: "tmp/foo;bar.gif", elementType: elementImage},
 	}, {
 		`1338: image with filename, width, height & alt tag`,
 		"1338;url=foo.gif;width=50px;height=50px;alt=foo gif",
-		&element{url: "foo.gif", width: "50px", height: "50px", alt: "foo gif", elementType: ELEMENT_IMAGE},
+		&element{url: "foo.gif", width: "50px", height: "50px", alt: "foo gif", elementType: elementImage},
 	}, {
 		`1339: link with url only`,
 		"1339;url=foo.gif",
-		&element{url: "foo.gif", elementType: ELEMENT_LINK},
+		&element{url: "foo.gif", elementType: elementLink},
 	}, {
 		`1339: link with url and content`,
 		"1339;url=foo.gif;content=bar",
-		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
+		&element{url: "foo.gif", content: "bar", elementType: elementLink},
 	}, {
 		`1339: link in quotes with url only`,
 		"1339;url='foo.gif'",
-		&element{url: "foo.gif", elementType: ELEMENT_LINK},
+		&element{url: "foo.gif", elementType: elementLink},
 	}, {
 		`1339: link in quotes with url and content`,
 		"1339;url='foo.gif';content=bar",
-		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
+		&element{url: "foo.gif", content: "bar", elementType: elementLink},
 	}, {
 		`1339: link with url and content in quotes`,
 		"1339;url='foo.gif';content='bar'",
-		&element{url: "foo.gif", content: "bar", elementType: ELEMENT_LINK},
+		&element{url: "foo.gif", content: "bar", elementType: elementLink},
 	}, {
 		`1339: link in quotes with semicolon in url`,
 		"1339;url='foo.gif?weirdparams=something;somethingelse'",
-		&element{url: "foo.gif?weirdparams=something;somethingelse", elementType: ELEMENT_LINK},
+		&element{url: "foo.gif?weirdparams=something;somethingelse", elementType: elementLink},
 	}, {
 		`1339: link with HTML special characters in attributes`,
 		`1339;url=https://example.com/a?b=<c>&d=e#f;height="<hello>";width=<world%>;alt=&;content=<h1>heading</h1>`,
@@ -147,7 +147,7 @@ var validCases = []struct {
 			content:     "<h1>heading</h1>",
 			height:      "<hello>em",
 			width:       "<world%>em",
-			elementType: ELEMENT_LINK,
+			elementType: elementLink,
 		},
 	},
 }
@@ -173,7 +173,7 @@ var asHTMLCases = []struct {
 	{
 		"inline image (simple)",
 		element{
-			elementType: ELEMENT_ITERM_IMAGE,
+			elementType: elementITermImage,
 			url:         "test.png",
 			contentType: "image/png",
 			content:     "AA==",
@@ -182,7 +182,7 @@ var asHTMLCases = []struct {
 	}, {
 		"inline image (HTML minefield)",
 		element{
-			elementType: ELEMENT_ITERM_IMAGE,
+			elementType: elementITermImage,
 			url:         "<script>.pdf",
 			contentType: "application/pdf",
 			content:     "<script>",
@@ -192,12 +192,12 @@ var asHTMLCases = []struct {
 		`<img alt="&lt;script&gt;.pdf" src="data:application/pdf;base64,&lt;script&gt;" width="&lt;&#39;&amp;&#39;&gt;%" height="&lt;&#39;&amp;&#39;&gt;px">`,
 	}, {
 		"external image (simple)",
-		element{elementType: ELEMENT_IMAGE, url: "https://example.com/a.png"},
+		element{elementType: elementImage, url: "https://example.com/a.png"},
 		`<img alt="https://example.com/a.png" src="https://example.com/a.png">`,
 	}, {
 		"external image (HTML minefield)",
 		element{
-			elementType: ELEMENT_IMAGE,
+			elementType: elementImage,
 			url:         "https://example.com/?tag=<script>&a=b",
 			alt:         "<script>'hello & world'</script>",
 			width:       "<'&'>%",
@@ -206,12 +206,12 @@ var asHTMLCases = []struct {
 		`<img alt="&lt;script&gt;&#39;hello &amp; world&#39;&lt;/script&gt;" src="https://example.com/?tag=&lt;script&gt;&amp;a=b" width="&lt;&#39;&amp;&#39;&gt;%" height="&lt;&#39;&amp;&#39;&gt;px">`,
 	}, {
 		"link (simple)",
-		element{elementType: ELEMENT_LINK, url: "https://example.com/"},
+		element{elementType: elementLink, url: "https://example.com/"},
 		`<a href="https://example.com/">https://example.com/</a>`,
 	}, {
 		"link (HTML minefield)",
 		element{
-			elementType: ELEMENT_LINK,
+			elementType: elementLink,
 			url:         "https://example.com/?tag=<script>&a=b",
 			content:     "<script>'hello & world'</script>",
 		},

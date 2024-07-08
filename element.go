@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	ELEMENT_ITERM_IMAGE = iota
-	ELEMENT_IMAGE
-	ELEMENT_LINK
+	elementITermImage = iota
+	elementITermLink
+	elementImage
+	elementLink
 )
 
 type element struct {
@@ -30,7 +31,7 @@ var errUnsupportedElementSequence = errors.New("Unsupported element sequence")
 func (i *element) asHTML() string {
 	h := html.EscapeString
 
-	if i.elementType == ELEMENT_LINK {
+	if i.elementType == elementLink {
 		content := i.content
 		if content == "" {
 			content = i.url
@@ -46,10 +47,11 @@ func (i *element) asHTML() string {
 	parts := []string{fmt.Sprintf(`alt="%s"`, h(alt))}
 
 	switch i.elementType {
-	case ELEMENT_ITERM_IMAGE:
+	case elementITermImage:
 		src := fmt.Sprintf(`src="data:%s;base64,%s"`, h(i.contentType), h(i.content))
 		parts = append(parts, src)
-	case ELEMENT_IMAGE:
+
+	case elementImage:
 		url := sanitizeURL(i.url)
 		if url == "" || url == unsafeURLSubstitution {
 			// don't emit an <img> at all if the URL is empty or didn't sanitize
@@ -57,6 +59,7 @@ func (i *element) asHTML() string {
 		}
 		src := fmt.Sprintf(`src="%s"`, h(url))
 		parts = append(parts, src)
+
 	default:
 		// unreachable, but…
 		return ""
@@ -74,6 +77,7 @@ func (i *element) asHTML() string {
 
 func parseElementSequence(sequence string) (*element, error) {
 	// Expect:
+	// - iTerm style hyperlink:    8;id=1234;http://example.com/
 	// - iTerm style inline image: 1337;File=name=1.gif;inline=1:BASE64
 	// - Buildkite external image: 1338;url=…;alt=…;width=…;height=…
 	// - Buildkite hyperlink:      1339;url=…;content=…
@@ -86,14 +90,29 @@ func parseElementSequence(sequence string) (*element, error) {
 		return nil, err
 	}
 
+	elem := &element{content: content, elementType: elementType}
+
+	if elementType == elementITermLink {
+		// For "iTerm" links (OSC 8), tokens[0] is params and tokens[1] is the URL.
+		// Aside from not quoting the URL, we ignore params.
+		// The link "content" comes after the element and is stored
+		// as regular text in the screen line, because they are designed to gracefully
+		// degrade to plain text if the sequence isn't supported.
+		tokens := strings.Split(args, ";")
+		if len(tokens) != 2 {
+			// Probably malformed
+			return nil, nil
+		}
+		elem.url = tokens[1]
+		return elem, nil
+	}
+
 	tokens, err := tokenizeString(args, ';', '\\')
 	if err != nil {
 		return nil, err
 	}
 
 	imageInline := false
-
-	elem := &element{content: content, elementType: elementType}
 
 	for _, token := range tokens {
 		parts := strings.SplitN(token, "=", 2)
@@ -125,7 +144,7 @@ func parseElementSequence(sequence string) (*element, error) {
 		}
 	}
 
-	if elem.elementType == ELEMENT_ITERM_IMAGE {
+	if elem.elementType == elementITermImage {
 		if elem.url == "" {
 			return nil, fmt.Errorf("name= argument not supplied, required to determine content type")
 		}
@@ -138,7 +157,7 @@ func parseElementSequence(sequence string) (*element, error) {
 		}
 	}
 
-	if elem.elementType == ELEMENT_ITERM_IMAGE && !imageInline {
+	if elem.elementType == elementITermImage && !imageInline {
 		// in iTerm2, if you don't specify inline=1, the image is merely downloaded
 		// and not displayed.
 		elem = nil
@@ -164,25 +183,28 @@ func parseImageDimension(s string) string {
 }
 
 func splitAndVerifyElementSequence(s string) (arguments string, elementType int, content string, err error) {
-	if strings.HasPrefix(s, "1338;") {
-		return s[len("1338;"):], ELEMENT_IMAGE, "", nil
+	if rem, has := strings.CutPrefix(s, "8;"); has {
+		return rem, elementITermLink, "", nil
 	}
-	if strings.HasPrefix(s, "1339;") {
-		return s[len("1339;"):], ELEMENT_LINK, "", nil
+	if rem, has := strings.CutPrefix(s, "1338;"); has {
+		return rem, elementImage, "", nil
+	}
+	if rem, has := strings.CutPrefix(s, "1339;"); has {
+		return rem, elementLink, "", nil
 	}
 
-	prefixLen := len("1337;File=")
-	if !strings.HasPrefix(s, "1337;File=") {
+	rem, has := strings.CutPrefix(s, "1337;File=")
+	if !has {
 		return "", 0, "", errUnsupportedElementSequence
 	}
-	s = s[prefixLen:]
+	s = rem
 
 	parts := strings.Split(s, ":")
 	if len(parts) != 2 {
 		return "", 0, "", fmt.Errorf("expected sequence to have one arguments part and one content part, got %d part(s)", len(parts))
 	}
 
-	elementType = ELEMENT_ITERM_IMAGE
+	elementType = elementITermImage
 	arguments = parts[0]
 	content = parts[1]
 	if len(content) == 0 {

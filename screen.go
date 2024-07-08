@@ -17,6 +17,9 @@ type Screen struct {
 	// Current style
 	style style
 
+	// Current URL for OSC 8 (iTerm-style) hyperlinking
+	urlBrush string
+
 	// Parser to use for streaming processing
 	parser *parser
 
@@ -44,6 +47,13 @@ type screenLine struct {
 	// element nodes refer to elements in this slice by index
 	// (if node.style.element(), then elements[node.blob] is the element)
 	elements []*element
+
+	// hyperlinks stores the URL targets for OSC 8 (iTerm-style) links
+	// by X position. URLs are too big to fit in every node, most lines won't
+	// have links and most nodes in a line won't be linked.
+	// So a map is used for sparse storage, only lazily created when text with
+	// a link style is written.
+	hyperlinks map[int]string
 }
 
 const (
@@ -162,6 +172,14 @@ func (s *Screen) getCurrentLineForWriting() *screenLine {
 func (s *Screen) write(data rune) {
 	line := s.getCurrentLineForWriting()
 	line.nodes[s.x] = node{blob: data, style: s.style}
+
+	// OSC 8 links work like a style.
+	if s.style.hyperlink() {
+		if line.hyperlinks == nil {
+			line.hyperlinks = make(map[int]string)
+		}
+		line.hyperlinks[s.x] = s.urlBrush
+	}
 }
 
 // Append a character to the screen

@@ -16,6 +16,7 @@ var TestFiles = []string{
 	"cursor-save-restore.sh",
 	"docker-pull.sh",
 	"homer.sh",
+	"itermlinks.sh",
 	"npm.sh",
 	"pikachu.sh",
 	"playwright.sh",
@@ -269,6 +270,10 @@ var rendererTestCases = []struct {
 		"a link to \x1b]1339;url=http://google.com;content=google\a.",
 		`a link to <a href="http://google.com">google</a>.`,
 	}, {
+		"renders OSC 8 links",
+		"a link to \x1b]8;;http://google.com\x1b\\google\x1b]8;;\x1b\\.",
+		`a link to <a href="http://google.com">google</a>.`,
+	}, {
 		`uses URL as link content if missing`,
 		"\x1b]1339;url=http://google.com\a",
 		`<a href="http://google.com">http://google.com</a>`,
@@ -285,13 +290,25 @@ var rendererTestCases = []struct {
 		"\x1b]1339;url=\"https://example.com/a.gif&a=<b>&c='d'\";content=<h1>hello</h1>\a",
 		`<a href="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27">&lt;h1&gt;hello&lt;/h1&gt;</a>`,
 	}, {
+		"protects OSC 8 links against XSS by escaping HTML during rendering",
+		"a link to \x1b]8;;https://example.com/a.gif&a=<b>&c='d'\x1b\\<h1>hello</h1>\x1b]8;;\x1b\\.",
+		`a link to <a href="https://example.com/a.gif&amp;a=%3Cb%3E&amp;c=%27d%27">&lt;h1&gt;hello&lt;&#47;h1&gt;</a>.`,
+	}, {
 		`disallows javascript: scheme URLs`,
 		"\x1b]1339;url=javascript:alert(1);content=hello\x07",
 		`<a href="#">hello</a>`,
 	}, {
+		`disallows javascript: scheme URLs in OSC 8 links`,
+		"\x1b]8;;javascript:alert(1)\x07XSS!\x1b]8;;\x1b\\",
+		`<a href="#">XSS!</a>`,
+	}, {
 		`allows artifact: scheme URLs`,
 		"\x1b]1339;url=artifact://hello.txt\x07\n",
 		`<a href="artifact://hello.txt">artifact://hello.txt</a>`,
+	}, {
+		`allows artifact: scheme URLs in OSC 8 links`,
+		"\x1b]8;;artifact://hello.txt\x07the hello.txt artifact\x1b]8;;\x07\n",
+		`<a href="artifact://hello.txt">the hello.txt artifact</a>`,
 	}, {
 		`renders bk APC escapes as processing instructions`,
 		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
@@ -426,6 +443,7 @@ func TestScreenWriteToXY(t *testing.T) {
 func BenchmarkRendererControl(b *testing.B)    { benchmarkRender("control.sh", b) }
 func BenchmarkRendererCurl(b *testing.B)       { benchmarkRender("curl.sh", b) }
 func BenchmarkRendererHomer(b *testing.B)      { benchmarkRender("homer.sh", b) }
+func BenchmarkRendererITermLinks(b *testing.B) { benchmarkRender("itermlinks.sh", b) }
 func BenchmarkRendererDockerPull(b *testing.B) { benchmarkRender("docker-pull.sh", b) }
 func BenchmarkRendererPikachu(b *testing.B)    { benchmarkRender("pikachu.sh", b) }
 func BenchmarkRendererPlaywright(b *testing.B) { benchmarkRender("playwright.sh", b) }
@@ -444,6 +462,7 @@ func benchmarkRender(filename string, b *testing.B) {
 func BenchmarkStreamingControl(b *testing.B)    { benchmarkStreaming("control.sh", b) }
 func BenchmarkStreamingCurl(b *testing.B)       { benchmarkStreaming("curl.sh", b) }
 func BenchmarkStreamingHomer(b *testing.B)      { benchmarkStreaming("homer.sh", b) }
+func BenchmarkStreamingITermLinks(b *testing.B) { benchmarkStreaming("itermlinks.sh", b) }
 func BenchmarkStreamingDockerPull(b *testing.B) { benchmarkStreaming("docker-pull.sh", b) }
 func BenchmarkStreamingPikachu(b *testing.B)    { benchmarkStreaming("pikachu.sh", b) }
 func BenchmarkStreamingPlaywright(b *testing.B) { benchmarkStreaming("playwright.sh", b) }
