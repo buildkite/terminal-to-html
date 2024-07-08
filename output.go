@@ -74,69 +74,95 @@ func (b *outputBuffer) appendChar(char rune) {
 
 // asHTML returns the line with HTML formatting.
 func (l *screenLine) asHTML() string {
-	var spanOpen, anchorOpen bool
 	var lineBuf outputBuffer
 
 	if data, ok := l.metadata[bkNamespace]; ok {
 		lineBuf.appendMeta(bkNamespace, data)
 	}
 
-	for x, node := range l.nodes {
-		// First node on line?
-		if x == 0 {
-			// Open anchors before spans, as needed.
-			if node.style.hyperlink() {
-				lineBuf.appendAnchor(l.hyperlinks[x])
-				anchorOpen = true
-			}
-			if !node.style.isPlain() {
-				lineBuf.appendNodeStyle(node)
-				spanOpen = true
-			}
-		} else { // not the first node
-			// Close span tags before closing anchor tags.
-			previous := l.nodes[x-1]
-			sameStyle := node.hasSameStyle(previous)
-			if !sameStyle && spanOpen {
+	// tagStack is used as a stack of open tags, so they can be closed in the
+	// right order. We only have two kinds of tag, so the stack should be tiny,
+	// but the algorithm can be extended later if needed.
+	tagStack := make([]int, 0, 2)
+	const (
+		tagAnchor = iota
+		tagSpan
+	)
+
+	// Close tags in the stack, starting at idx. They're closed in the reverse
+	// order they were opened.
+	closeFrom := func(idx int) {
+		for i := len(tagStack) - 1; i >= idx; i-- {
+			switch tagStack[i] {
+			case tagAnchor:
+				lineBuf.closeAnchor()
+			case tagSpan:
 				lineBuf.closeStyle()
-				spanOpen = false
 			}
+		}
+		tagStack = tagStack[:idx]
+	}
 
-			sameLink := node.style.hyperlink() == previous.style.hyperlink()
-			if sameLink && node.style.hyperlink() {
-				sameLink = l.hyperlinks[x-1] == l.hyperlinks[x]
-			}
-			if !sameLink {
-				// Close the old anchor tag.
-				if anchorOpen {
-					lineBuf.closeAnchor()
-					anchorOpen = false
-				}
-				// Open a new anchor tag (if this node is hyperlinked).
-				if node.style.hyperlink() {
-					lineBuf.appendAnchor(l.hyperlinks[x])
-					anchorOpen = true
-				}
-			}
-			// Open a new span tag if this node has style.
-			if !sameStyle && !node.style.isPlain() {
-				lineBuf.appendNodeStyle(node)
-				spanOpen = true
+	for x, current := range l.nodes {
+		// The zero value for node has a plain style and no hyperlink.
+		var previous node
+		// If we're past the first node in the line, there is a previous node
+		// to the left.
+		if x > 0 {
+			previous = l.nodes[x-1]
+		}
+
+		// A set of flags for which tags need changing.
+		tagChanged := []bool{
+			// The anchor tag needs changing if the link "style" has changed,
+			// or if they are both links the link URLs are different.
+			// (Note that the x-1 index into the hyperlinks map returns "".)
+			tagAnchor: current.style.hyperlink() != previous.style.hyperlink() ||
+				(current.style.hyperlink() && l.hyperlinks[x-1] != l.hyperlinks[x]),
+
+			// The span tag needs changing if the style has changed.
+			tagSpan: !current.hasSameStyle(previous),
+		}
+
+		// Go forward through the stack of open tags, looking for the first
+		// tag we need to close (because it changed).
+		// If none are found, closeFromIdx will be past the end of the stack.
+		closeFromIdx := len(tagStack)
+		for i, ot := range tagStack {
+			if tagChanged[ot] {
+				closeFromIdx = i
+				break
 			}
 		}
 
-		if node.style.element() {
-			lineBuf.buf.WriteString(l.elements[node.blob].asHTML())
+		// Close everything from that stack index onwards.
+		closeFrom(closeFromIdx)
+
+		// Now open new tags as needed.
+		// Open a new anchor tag, if one is not already open and this node is
+		// hyperlinked.
+		if !slices.Contains(tagStack, tagAnchor) && current.style.hyperlink() {
+			lineBuf.appendAnchor(l.hyperlinks[x])
+			tagStack = append(tagStack, tagAnchor)
+		}
+		// Open a new span tag, if one is not already open and this node has
+		// style.
+		if !slices.Contains(tagStack, tagSpan) && !current.style.isPlain() {
+			lineBuf.appendNodeStyle(current)
+			tagStack = append(tagStack, tagSpan)
+		}
+
+		// Write a standalone element or a rune.
+		if current.style.element() {
+			lineBuf.buf.WriteString(l.elements[current.blob].asHTML())
 		} else {
-			lineBuf.appendChar(node.blob)
+			lineBuf.appendChar(current.blob)
 		}
 	}
-	if spanOpen {
-		lineBuf.closeStyle()
-	}
-	if anchorOpen {
-		lineBuf.closeAnchor()
-	}
+
+	// Close any that are open, in reverse order that they were opened.
+	closeFrom(0)
+
 	line := strings.TrimRight(lineBuf.buf.String(), " \t")
 	if line == "" {
 		return "&nbsp;"
