@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/google/go-cmp v0.6.0
-	github.com/urfave/cli/v2 v2.27.3
+	github.com/urfave/cli/v2 v2.27.4
 )
 
 require (
