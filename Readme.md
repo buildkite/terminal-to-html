@@ -8,6 +8,11 @@ It provides a single command, `terminal-to-html`, that can be used to convert te
 
 ## Usage
 
+> [!WARNING]
+> `terminal-to-html` is **not** hardened against cross-site scripting (XSS) or other attacks. When
+> run on user-generated content, output should be passed through a HTML sanitizer prior to
+> displaying in a browser.
+
 Piping in terminal output via the command line:
 
 ``` bash
