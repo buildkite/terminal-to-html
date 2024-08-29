@@ -1,19 +1,19 @@
 $ npx playwright test --config=app&#47;tests&#47;e2e&#47;config&#47;playwright.config.prod.ts --project=chromium -g c1
-<?bk t="1706575117741"?>Starting the run with 8 tests
-<?bk t="1706575117741"?>
-<?bk t="1706575117741"?>Running 8 tests using 1 worker, shard 1 of 2
-<?bk t="1706575117741"?>
-<?bk t="1706575129980"?>  ✓  1 [chromium] › c1&#47;default&#47;checkout.spec.ts:3:5 › checkout default flow (11.7s)
-<?bk t="1706575144169"?>  ✓  2 [chromium] › c1&#47;default&#47;checkout.spec.ts:40:5 › checkout default flow with phone number (14.2s)
-<?bk t="1706575156277"?>  ✓  3 [chromium] › c1&#47;default&#47;checkout.spec.ts:77:5 › checkout default flow with digital product (12.1s)
-<?bk t="1706575165823"?>  ✓  4 [chromium] › c1&#47;default&#47;checkout.spec.ts:109:5 › checkout default flow with free digital product (9.5s)
-<?bk t="1706575177303"?>  ✓  5 [chromium] › c1&#47;default&#47;checkout.spec.ts:133:5 › checkout default flow with free physical product (11.6s)
-<?bk t="1706575193194"?>  ✓  6 [chromium] › c1&#47;default&#47;checkout.spec.ts:162:5 › checkout default flow with a manual payment (15.9s)
-<?bk t="1706575205691"?>  ✓  7 [chromium] › c1&#47;default&#47;checkout.spec.ts:197:5 › checkout default flow with a custom payment (12.5s)
-<?bk t="1706575205691"?>  -  8 [chromium] › c1&#47;default&#47;duplicate-tabs.spec.ts:4:6 › checkout with duplicate tabs
-<?bk t="1706575205691"?>Finished test run: passed
-<?bk t="1706575205958"?>
-<?bk t="1706575205958"?>  1 skipped
-<?bk t="1706575205958"?>  7 passed (1.6m)
-<?bk t="1706575205978"?>
+<time datetime="2024-01-30T00:38:37.741Z">2024-01-30T00:38:37.741Z</time>Starting the run with 8 tests
+<time datetime="2024-01-30T00:38:37.741Z">2024-01-30T00:38:37.741Z</time>
+<time datetime="2024-01-30T00:38:37.741Z">2024-01-30T00:38:37.741Z</time>Running 8 tests using 1 worker, shard 1 of 2
+<time datetime="2024-01-30T00:38:37.741Z">2024-01-30T00:38:37.741Z</time>
+<time datetime="2024-01-30T00:38:49.98Z">2024-01-30T00:38:49.98Z</time>  ✓  1 [chromium] › c1&#47;default&#47;checkout.spec.ts:3:5 › checkout default flow (11.7s)
+<time datetime="2024-01-30T00:39:04.169Z">2024-01-30T00:39:04.169Z</time>  ✓  2 [chromium] › c1&#47;default&#47;checkout.spec.ts:40:5 › checkout default flow with phone number (14.2s)
+<time datetime="2024-01-30T00:39:16.277Z">2024-01-30T00:39:16.277Z</time>  ✓  3 [chromium] › c1&#47;default&#47;checkout.spec.ts:77:5 › checkout default flow with digital product (12.1s)
+<time datetime="2024-01-30T00:39:25.823Z">2024-01-30T00:39:25.823Z</time>  ✓  4 [chromium] › c1&#47;default&#47;checkout.spec.ts:109:5 › checkout default flow with free digital product (9.5s)
+<time datetime="2024-01-30T00:39:37.303Z">2024-01-30T00:39:37.303Z</time>  ✓  5 [chromium] › c1&#47;default&#47;checkout.spec.ts:133:5 › checkout default flow with free physical product (11.6s)
+<time datetime="2024-01-30T00:39:53.194Z">2024-01-30T00:39:53.194Z</time>  ✓  6 [chromium] › c1&#47;default&#47;checkout.spec.ts:162:5 › checkout default flow with a manual payment (15.9s)
+<time datetime="2024-01-30T00:40:05.691Z">2024-01-30T00:40:05.691Z</time>  ✓  7 [chromium] › c1&#47;default&#47;checkout.spec.ts:197:5 › checkout default flow with a custom payment (12.5s)
+<time datetime="2024-01-30T00:40:05.691Z">2024-01-30T00:40:05.691Z</time>  -  8 [chromium] › c1&#47;default&#47;duplicate-tabs.spec.ts:4:6 › checkout with duplicate tabs
+<time datetime="2024-01-30T00:40:05.691Z">2024-01-30T00:40:05.691Z</time>Finished test run: passed
+<time datetime="2024-01-30T00:40:05.958Z">2024-01-30T00:40:05.958Z</time>
+<time datetime="2024-01-30T00:40:05.958Z">2024-01-30T00:40:05.958Z</time>  1 skipped
+<time datetime="2024-01-30T00:40:05.958Z">2024-01-30T00:40:05.958Z</time>  7 passed (1.6m)
+<time datetime="2024-01-30T00:40:05.978Z">2024-01-30T00:40:05.978Z</time>
 Done in 96.34s.

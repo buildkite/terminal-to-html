@@ -13,6 +13,8 @@
 
 .term-container img { max-width: 100%; }
 
+.term-container time { padding-right: 1ex; }
+
 .term a { color: inherit; text-decoration: underline; text-decoration-style: dashed; }
 .term a:hover { color: #2882F9 }
 

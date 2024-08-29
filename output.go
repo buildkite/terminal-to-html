@@ -1,10 +1,22 @@
 package terminal
 
 import (
-	"fmt"
 	"html"
+	"html/template"
 	"slices"
+	"strconv"
 	"strings"
+	"time"
+)
+
+var (
+	timeTagImpl = template.Must(template.New("time").Parse(
+		`<time datetime="{{.}}">{{.}}</time>`,
+	))
+
+	openSpanTagTmpl = template.Must(template.New("span").Parse(
+		`<span class="{{.}}">`,
+	))
 )
 
 type outputBuffer struct {
@@ -12,14 +24,7 @@ type outputBuffer struct {
 }
 
 func (b *outputBuffer) appendNodeStyle(n node) {
-	b.buf.WriteString(`<span class="`)
-	for idx, class := range n.style.asClasses() {
-		if idx > 0 {
-			b.buf.WriteString(" ")
-		}
-		b.buf.WriteString(class)
-	}
-	b.buf.WriteString(`">`)
+	openSpanTagTmpl.Execute(&b.buf, strings.Join(n.style.asClasses(), " "))
 }
 
 func (b *outputBuffer) closeStyle() {
@@ -37,19 +42,18 @@ func (b *outputBuffer) closeAnchor() {
 }
 
 func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
-	// We pre-sort the keys to guarantee alphabetical output,
-	// because Go's maps have guaranteed disorder.
-	keys := make([]string, 0, len(data))
-	for key := range data {
-		keys = append(keys, key)
+	// We only support the bk namespace and a well-formed millisecond epoch.
+	if namespace != bkNamespace {
+		return
 	}
-	slices.Sort(keys)
-
-	b.buf.WriteString("<?" + namespace)
-	for _, key := range keys {
-		fmt.Fprintf(&b.buf, ` %s="%s"`, key, html.EscapeString(data[key]))
+	millis, err := strconv.ParseInt(data["t"], 10, 64)
+	if err != nil {
+		return
 	}
-	b.buf.WriteString("?>")
+	time := time.Unix(millis/1000, (millis%1000)*1_000_000).UTC()
+	// One of the formats accepted by the <time> tag:
+	datetime := time.Format("2006-01-02T15:04:05.999Z")
+	timeTagImpl.Execute(&b.buf, datetime)
 }
 
 // Append a character to our outputbuffer, escaping HTML bits as necessary.
