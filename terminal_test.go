@@ -310,25 +310,17 @@ var rendererTestCases = []struct {
 		"\x1b]8;;artifact://hello.txt\x07the hello.txt artifact\x1b]8;;\x07\n",
 		`<a href="artifact://hello.txt">the hello.txt artifact</a>`,
 	}, {
-		`renders bk APC escapes as processing instructions`,
-		"\x1b_bk;x=llamas\\;;y=alpacas\x07",
-		`<?bk x="llamas;" y="alpacas"?>`,
-	}, {
-		`renders bk APC escapes as processing instructions`,
-		"\x1b" + `_bk;a='1 ("one")';b="2 ('two')"` + "\x07",
-		`<?bk a="1 (&#34;one&#34;)" b="2 (&#39;two&#39;)"?>`,
-	}, {
 		`renders bk APC escapes followed by text`,
 		"\x1b_bk;t=123\x07hello",
-		`<?bk t="123"?>hello`,
+		`<time datetime="1970-01-01T00:00:00.123Z">1970-01-01T00:00:00.123Z</time>hello`,
 	}, {
 		`handles bk APC escapes surrounded by text`,
 		"hello \x1b_bk;t=123\x07world",
-		`<?bk t="123"?>hello world`,
+		`<time datetime="1970-01-01T00:00:00.123Z">1970-01-01T00:00:00.123Z</time>hello world`,
 	}, {
 		`prefixes lines with the last timestamp seen`,
 		"hello\x1b_bk;t=123\x07 world\x1b_bk;t=456\x07!",
-		`<?bk t="456"?>hello world!`,
+		`<time datetime="1970-01-01T00:00:00.456Z">1970-01-01T00:00:00.456Z</time>hello world!`,
 	}, {
 		`handles timestamps across multiple lines`,
 		strings.Join([]string{
@@ -336,8 +328,8 @@ var rendererTestCases = []struct {
 			"another\x1b_bk;t=345\x07 line\x1b_bk;t=456\x07!",
 		}, "\n"),
 		strings.Join([]string{
-			`<?bk t="234"?>hello world!`,
-			`<?bk t="456"?>another line!`,
+			`<time datetime="1970-01-01T00:00:00.234Z">1970-01-01T00:00:00.234Z</time>hello world!`,
+			`<time datetime="1970-01-01T00:00:00.456Z">1970-01-01T00:00:00.456Z</time>another line!`,
 		}, "\n"),
 	}, {
 		`handles timestamps and delta timestamps`,
@@ -346,8 +338,8 @@ var rendererTestCases = []struct {
 			"another\x1b_bk;dt=111\x07 line\x1b_bk;dt=111\x07!",
 		}, "\n"),
 		strings.Join([]string{
-			`<?bk t="234"?>hello world!`,
-			`<?bk t="456"?>another line!`,
+			`<time datetime="1970-01-01T00:00:00.234Z">1970-01-01T00:00:00.234Z</time>hello world!`,
+			`<time datetime="1970-01-01T00:00:00.456Z">1970-01-01T00:00:00.456Z</time>another line!`,
 		}, "\n"),
 	},
 }
