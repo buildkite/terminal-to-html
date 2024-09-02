@@ -10,9 +10,15 @@ GO111MODULE=on go install github.com/buildkite/terminal-to-html/v3/cmd/terminal-
 */
 package terminal
 
+import "fmt"
+
 // Render converts ANSI to HTML and returns the result.
 func Render(input []byte) string {
-	screen := Screen{}
+	screen, err := NewScreen()
+	if err != nil {
+		// This shouldn't happen! (famous last words)
+		panic(fmt.Sprintf("NewScreen error: %v", err))
+	}
 	screen.Write(input)
 	return screen.AsHTML()
 }
