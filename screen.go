@@ -315,6 +315,17 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 		return instructions[i]
 	}
 
+	if strings.HasPrefix(inst(0), "?") {
+		// These are typically "private" control sequences, e.g.
+		// - show/hide cursor (not relevant)
+		// - enable/disable focus reporting (not relevant)
+		// - alternate screen buffer (not implemented)
+		// - bracketed paste mode (not relevant)
+		// Particularly, "show cursor" is CSI ?25h, which would be picked up
+		// below if we didn't handle it.
+		return
+	}
+
 	switch code {
 	case 'A': // Cursor Up: go up n
 		s.up(inst(0))

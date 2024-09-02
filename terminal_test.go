@@ -15,6 +15,7 @@ var TestFiles = []string{
 	"control.sh",
 	"curl.sh",
 	"cursor-save-restore.sh",
+	"docker-compose-pull.sh",
 	"docker-pull.sh",
 	"homer.sh",
 	"itermlinks.sh",
@@ -525,6 +526,10 @@ func BenchmarkRendererRustFmt(b *testing.B)    { benchmarkRender("rustfmt.sh", b
 func BenchmarkRendererWeather(b *testing.B)    { benchmarkRender("weather.sh", b) }
 func BenchmarkRendererNpm(b *testing.B)        { benchmarkRender("npm.sh", b) }
 
+func BenchmarkRendererDockerComposePull(b *testing.B) {
+	benchmarkRender("docker-compose-pull.sh", b)
+}
+
 func benchmarkRender(filename string, b *testing.B) {
 	raw := loadFixture(b, filename, "raw")
 	b.ResetTimer()
@@ -543,6 +548,10 @@ func BenchmarkStreamingPlaywright(b *testing.B) { benchmarkStreaming("playwright
 func BenchmarkStreamingRustFmt(b *testing.B)    { benchmarkStreaming("rustfmt.sh", b) }
 func BenchmarkStreamingWeather(b *testing.B)    { benchmarkStreaming("weather.sh", b) }
 func BenchmarkStreamingNpm(b *testing.B)        { benchmarkStreaming("npm.sh", b) }
+
+func BenchmarkStreamingDockerComposePull(b *testing.B) {
+	benchmarkStreaming("docker-compose-pull.sh", b)
+}
 
 func benchmarkStreaming(filename string, b *testing.B) {
 	raw := loadFixture(b, filename, "raw")
