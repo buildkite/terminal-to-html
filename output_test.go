@@ -29,7 +29,10 @@ func TestScreenLineAsHTML_Interleaving(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			s := &Screen{}
+			s, err := NewScreen()
+			if err != nil {
+				t.Fatalf("NewScreen() = %v", err)
+			}
 			s.Write([]byte(test.input))
 			if len(s.screen) != 1 {
 				t.Fatalf("len(s.screen) = %d, want 1", len(s.screen))

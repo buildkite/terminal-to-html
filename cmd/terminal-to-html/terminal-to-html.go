@@ -76,8 +76,12 @@ func writePreviewEnd(w io.Writer) error {
 	return err
 }
 
-func webservice(listen string, preview bool, maxLines int) {
+func webservice(listen string, preview bool, screen *terminal.Screen) {
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
+		// The main handler passes in an empty screen with an initial window
+		// size. Make a copy per request.
+		screen := *screen
+
 		// Process the request body, but write to a buffer before serving it.
 		// Consuming the body before any writes is necessary because of HTTP
 		// limitations (see http.ResponseWriter):
@@ -86,7 +90,7 @@ func webservice(listen string, preview bool, maxLines int) {
 		// > Request.Body.
 		// However, it lets us provide Content-Length in all cases.
 		b := bytes.NewBuffer(nil)
-		if _, _, _, err := process(b, r.Body, preview, maxLines); err != nil {
+		if _, _, err := process(b, r.Body, preview, &screen); err != nil {
 			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
@@ -117,6 +121,8 @@ func logStats(start time.Time, in, out int, s *terminal.Screen) {
 		// Screen processing statistics (see terminal.Screen)
 		LinesScrolledOut int
 		CursorUpOOB      int
+		CursorDownOOB    int
+		CursorFwdOOB     int
 		CursorBackOOB    int
 
 		// Other useful memory statistics (see runtime.MemStats)
@@ -135,6 +141,8 @@ func logStats(start time.Time, in, out int, s *terminal.Screen) {
 
 	fullStats.LinesScrolledOut = s.LinesScrolledOut
 	fullStats.CursorUpOOB = s.CursorUpOOB
+	fullStats.CursorDownOOB = s.CursorDownOOB
+	fullStats.CursorFwdOOB = s.CursorFwdOOB
 	fullStats.CursorBackOOB = s.CursorBackOOB
 
 	ru, err := rusage.Stats()
@@ -172,23 +180,22 @@ func (wc *writeCounter) Write(b []byte) (int, error) {
 
 // process streams the src through a terminal renderer to the dst. If preview is
 // true, the preview wrapper is added.
-func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out int, screen *terminal.Screen, err error) {
+func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen) (in, out int, err error) {
 	// Wrap dst in writeCounter to count bytes written
 	wc := &writeCounter{out: dst}
 
 	if preview {
 		if err := writePreviewStart(wc); err != nil {
-			return 0, wc.counter, nil, fmt.Errorf("write start of preview: %w", err)
+			return 0, wc.counter, fmt.Errorf("write start of preview: %w", err)
 		}
 	}
 
-	screen = &terminal.Screen{
-		MaxLines:      maxLines,
-		ScrollOutFunc: func(line string) { fmt.Fprintln(wc, line) },
-	}
+	// Attach the scrollout callback before streaming input.
+	screen.ScrollOutFunc = func(line string) { fmt.Fprintln(wc, line) }
+
 	inBytes, err := io.Copy(screen, src)
 	if err != nil {
-		return int(inBytes), wc.counter, screen, fmt.Errorf("read input into screen buffer: %w", err)
+		return int(inBytes), wc.counter, fmt.Errorf("read input into screen buffer: %w", err)
 	}
 
 	// Write what remains in the screen buffer (everything that didn't scroll
@@ -197,10 +204,10 @@ func process(dst io.Writer, src io.Reader, preview bool, maxLines int) (in, out 
 
 	if preview {
 		if err := writePreviewEnd(wc); err != nil {
-			return int(inBytes), wc.counter, screen, fmt.Errorf("write end of preview: %w", err)
+			return int(inBytes), wc.counter, fmt.Errorf("write end of preview: %w", err)
 		}
 	}
-	return int(inBytes), wc.counter, screen, nil
+	return int(inBytes), wc.counter, nil
 }
 
 func main() {
@@ -228,13 +235,36 @@ func main() {
 		&cli.IntFlag{
 			Name:  "buffer-max-lines",
 			Value: 300,
-			Usage: "Sets a limit on the number of lines to hold in the screen buffer, allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs. Setting to 0 disables the limit, causing the renderer to buffer the entire screen before producing any output",
+			Usage: "Sets a limit on the number of lines to hold in the screen buffer (and also limits the possible window height), allowing the renderer to operate in a streaming fashion and enabling the processing of large inputs. Setting to 0 disables the limit, causing the renderer to buffer the entire screen before producing any output",
+		},
+		&cli.IntFlag{
+			Name:  "window-max-cols",
+			Value: 400,
+			Usage: "Sets an upper bound on the window width (which may change based on input). Window size mainly affects cursor movement sequences",
+		},
+		&cli.IntFlag{
+			Name:  "window-cols",
+			Value: 160,
+			Usage: "Sets the initial window width. Window size mainly affects cursor movement sequences",
+		},
+		&cli.IntFlag{
+			Name:  "window-lines",
+			Value: 100,
+			Usage: "Sets the initial window height. Window size mainly affects cursor movement sequences",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
+		screen, err := terminal.NewScreen(
+			terminal.WithMaxSize(c.Int("window-max-cols"), c.Int("buffer-max-lines")),
+			terminal.WithSize(c.Int("window-cols"), c.Int("window-lines")),
+		)
+		if err != nil {
+			return fmt.Errorf("creating screen: %w", err)
+		}
+
 		// Run a web server?
 		if addr := c.String("http"); addr != "" {
-			webservice(addr, c.Bool("preview"), c.Int("buffer-max-lines"))
+			webservice(addr, c.Bool("preview"), screen)
 			return nil
 		}
 
@@ -251,7 +281,7 @@ func main() {
 			input = f
 		}
 
-		in, out, screen, err := process(os.Stdout, input, c.Bool("preview"), c.Int("buffer-max-lines"))
+		in, out, err := process(os.Stdout, input, c.Bool("preview"), screen)
 		if err != nil {
 			return err
 		}

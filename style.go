@@ -113,7 +113,7 @@ func (s style) asClasses() []string {
 
 // Add colours to an existing style, returning a new style.
 func (s style) color(colors []string) style {
-	if len(colors) == 1 && (colors[0] == "0" || colors[0] == "") {
+	if len(colors) == 0 || (len(colors) == 1 && (colors[0] == "0" || colors[0] == "")) {
 		// s with all normal styles masked out
 		return s &^ styleComparisonMask
 	}

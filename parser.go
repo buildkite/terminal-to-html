@@ -199,7 +199,7 @@ func (p *parser) processOperatingSystemCommand(end int) {
 		if p.screen.x != 0 {
 			p.screen.newLine()
 		}
-		p.screen.clear(p.screen.y, screenStartOfLine, screenEndOfLine)
+		p.screen.currentLine().clear(screenStartOfLine, screenEndOfLine)
 	}
 
 	if err != nil {
@@ -298,16 +298,20 @@ func (p *parser) handleControlSequence(char rune) {
 	switch char {
 	case '?', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		// Part of an instruction
+
 	case ';':
 		p.addInstruction()
 		p.instructionStartedAt = p.cursor + utf8.RuneLen(';')
-	case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'J', 'K', 'M', 'Q':
+
+	case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'Q':
 		p.addInstruction()
 		p.screen.applyEscape(char, p.instructions)
 		p.mode = parserModeNormal
-	case 'H', 'L':
+
+	case 'L':
 		// Set/reset mode (SM/RM), ignore and continue
 		p.mode = parserModeNormal
+
 	default:
 		// unrecognized character, abort the escapeCode
 		p.cursor = p.escapeStartedAt
