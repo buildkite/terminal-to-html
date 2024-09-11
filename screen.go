@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"fmt"
+	"maps"
 	"math"
 	"strconv"
 	"strings"
@@ -229,19 +230,13 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		s.y--
 	}
 
-	line := s.currentLine()
-
-	// Add columns if currently shorter than the cursor's x position
-	for i := len(line.nodes); i <= s.x; i++ {
-		line.nodes = append(line.nodes, emptyNode)
-	}
-	return line
+	return s.currentLine()
 }
 
 // Write a character to the screen's current X&Y, along with the current screen style
 func (s *Screen) write(data rune) {
 	line := s.currentLineForWriting()
-	line.nodes[s.x] = node{blob: data, style: s.style}
+	line.writeNode(s.x, node{blob: data, style: s.style})
 
 	// OSC 8 links work like a style.
 	if s.style.hyperlink() {
@@ -271,7 +266,8 @@ func (s *Screen) appendElement(i *element) {
 	line.elements = append(line.elements, i)
 	ns := s.style
 	ns.setElement(true)
-	line.nodes[s.x] = node{blob: rune(idx), style: ns}
+
+	line.writeNode(s.x, node{blob: rune(idx), style: ns})
 	s.x++
 }
 
@@ -353,12 +349,46 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 		s.x = min(s.x, s.cols-1)
 
 	case 'H': // Cursor Position Absolute: Go to row n and column m (default 1;1).
-		s.y = ansiInt(inst(0)) - 1
-		s.y = max(s.y, 0)
-		s.y = min(s.y, s.lines-1)
+		//
+		// There are a variety of agent versions still in use, which have
+		// different PTY window settings. Although we emulate a window size
+		// here, we can't know for sure which line CSI H is referring to until
+		// we have a mechanism to report the real window size that was used.
+		// If the program output CSI 1H, we don't know if that's the top of a
+		// 80x25 window or a 160x100 window, which could be either 24 lines or
+		// 99 lines above the current position.
+		//
+		// (Relative vertical movement isn't a problem, since the window size
+		// only bounds movement; if the program is on an older agent with a
+		// smaller window, the relative movement will fit within the larger
+		// window emulated here.)
+		//
+		// Absolute horizontal positioning is much easier. Most programs use
+		// CSI G or CSI H to move back to the first column.
+		//
+		// For now we can pretend that this code is equivalent to "\n" + CSI G
+		// (move to an absolute position on the next line). This should be
+		// slightly better than the pre-v3.16 behaviour, which completely
+		// ignored CSI H, by aligning new content as expected but preserving
+		// previous content.
+		//
+		// Because this "newline" is inserted by us, not the agent, the new line
+		// might not have BK metadata (timestamp), so copy it. Also, since the
+		// "newline" is only needed to preserve intermediate output, we only
+		// need to insert one - multiple CSI H codes without content in between
+		// only need one "newline".
+		var metadata map[string]string
+		if line := s.currentLine(); line != nil && len(line.nodes) > 0 {
+			// clone required since setLineMetadata assumes it can own the map
+			metadata = maps.Clone(line.metadata[bkNamespace])
+			s.y++
+		}
 		s.x = ansiInt(inst(1)) - 1
 		s.x = max(s.x, 0)
 		s.x = min(s.x, s.cols-1)
+		if metadata != nil {
+			s.setLineMetadata(bkNamespace, metadata)
+		}
 
 	case 'J': // Erase in Display: Clears part of the screen.
 		switch inst(0) {
@@ -520,4 +550,12 @@ func (l *screenLine) clear(xStart, xEnd int) {
 	for i := xStart; i <= xEnd; i++ {
 		l.nodes[i] = emptyNode
 	}
+}
+
+func (l *screenLine) writeNode(x int, n node) {
+	// Add columns if currently shorter than the cursor's x position
+	for i := len(l.nodes); i <= x; i++ {
+		l.nodes = append(l.nodes, emptyNode)
+	}
+	l.nodes[x] = n
 }
