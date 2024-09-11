@@ -308,8 +308,11 @@ func (p *parser) handleControlSequence(char rune) {
 		p.screen.applyEscape(char, p.instructions)
 		p.mode = parserModeNormal
 
-	case 'L':
-		// Set/reset mode (SM/RM), ignore and continue
+	case 'I', 'L', 'N':
+		// CSI i: Enable/disable AUX port
+		// CSI L: Set/reset mode (SM/RM)
+		// CSI n: Report cursor position
+		// All not relevant to us. Swallow the code and continue
 		p.mode = parserModeNormal
 
 	default:
@@ -343,25 +346,39 @@ func (p *parser) handleEscape(char rune) {
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.instructions = make([]string, 0, 1)
 		p.mode = parserModeControl
+
 	case ']':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.mode = parserModeOSC
+
 	case ')', '(':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('(')
 		p.mode = parserModeCharset
+
 	case '_':
 		p.instructionStartedAt = p.cursor + utf8.RuneLen('[')
 		p.mode = parserModeAPC
+
 	case 'M':
 		p.screen.revNewLine()
 		p.mode = parserModeNormal
+
 	case '7':
 		p.savePosition = position{x: p.screen.x, y: p.screen.y}
 		p.mode = parserModeNormal
+
 	case '8':
 		p.screen.x = p.savePosition.x
 		p.screen.y = p.savePosition.y
 		p.mode = parserModeNormal
+
+	case '=', '>': // DECKPAM, DECKPNM
+		// These change the keyboard numpad mode between cursor movement
+		// and plain digits.
+		// For some reason Powershell outputs ESC [?1h ESC =.
+		// Swallow and ignore these.
+		p.mode = parserModeNormal
+
 	default:
 		// Not an escape code, false alarm
 		p.cursor = p.escapeStartedAt

@@ -1,0 +1,42 @@
+<time datetime="2024-09-10T23:49:36.445Z">2024-09-10T23:49:36.445Z</time>~~~ Running global environment hook
+<time datetime="2024-09-10T23:49:36.446Z">2024-09-10T23:49:36.446Z</time><span class="term-fgi90">$</span> &#47;opt&#47;homebrew&#47;etc&#47;buildkite-agent&#47;hooks&#47;environment
+<time datetime="2024-09-10T23:49:36.481Z">2024-09-10T23:49:36.481Z</time><span class="term-fgi90"># PATH changed</span>
+<time datetime="2024-09-10T23:49:36.481Z">2024-09-10T23:49:36.481Z</time>~~~ Preparing working directory
+<time datetime="2024-09-10T23:49:36.481Z">2024-09-10T23:49:36.481Z</time><span class="term-fgi90">$</span> cd &#47;opt&#47;homebrew&#47;var&#47;buildkite-agent&#47;builds&#47;WorkBook-local-1&#47;stargoose&#47;pwsh
+<time datetime="2024-09-10T23:49:36.497Z">2024-09-10T23:49:36.497Z</time><span class="term-fgi90">$</span> git clean -ffxdq
+<time datetime="2024-09-10T23:49:36.511Z">2024-09-10T23:49:36.511Z</time><span class="term-fgi90"># Fetch and checkout remote branch HEAD commit</span>
+<time datetime="2024-09-10T23:49:36.511Z">2024-09-10T23:49:36.511Z</time><span class="term-fgi90">$</span> git fetch -v --prune -- origin main
+<time datetime="2024-09-10T23:49:36.913Z">2024-09-10T23:49:36.913Z</time>POST git-upload-pack (321 bytes)
+<time datetime="2024-09-10T23:49:37.233Z">2024-09-10T23:49:37.233Z</time>From https:&#47;&#47;github.com&#47;DrJosh9000&#47;nop
+<time datetime="2024-09-10T23:49:37.233Z">2024-09-10T23:49:37.233Z</time> * branch            main       -&gt; FETCH_HEAD
+<time datetime="2024-09-10T23:49:37.233Z">2024-09-10T23:49:37.233Z</time> = [up to date]      main       -&gt; origin&#47;main
+<time datetime="2024-09-10T23:49:37.245Z">2024-09-10T23:49:37.245Z</time><span class="term-fgi90">$</span> git checkout -f FETCH_HEAD
+<time datetime="2024-09-10T23:49:37.268Z">2024-09-10T23:49:37.268Z</time>HEAD is now at 93c55f8 Merge pull request #1 from parisba&#47;patch-1
+<time datetime="2024-09-10T23:49:37.268Z">2024-09-10T23:49:37.268Z</time><span class="term-fgi90"># Cleaning again to catch any post-checkout changes</span>
+<time datetime="2024-09-10T23:49:37.268Z">2024-09-10T23:49:37.268Z</time><span class="term-fgi90">$</span> git clean -ffxdq
+<time datetime="2024-09-10T23:49:37.285Z">2024-09-10T23:49:37.285Z</time><span class="term-fgi90"># Checking to see if git commit information needs to be sent to Buildkite...</span>
+<time datetime="2024-09-10T23:49:37.285Z">2024-09-10T23:49:37.285Z</time><span class="term-fgi90">$</span> buildkite-agent meta-data exists buildkite:git:commit
+<time datetime="2024-09-10T23:49:37.889Z">2024-09-10T23:49:37.889Z</time><span class="term-fgi90"># Sending Git commit information back to Buildkite</span>
+<time datetime="2024-09-10T23:49:37.924Z">2024-09-10T23:49:37.924Z</time><span class="term-fgi90">$</span> buildkite-agent meta-data set buildkite:git:commit &lt; &#47;dev&#47;stdin
+<time datetime="2024-09-10T23:49:37.943Z">2024-09-10T23:49:37.943Z</time><span class="term-fgx48">2024-09-11 09:49:37 INFO  </span> Reading meta-data value from STDIN
+<time datetime="2024-09-10T23:49:38.582Z">2024-09-10T23:49:38.582Z</time>~~~ Running commands
+<time datetime="2024-09-10T23:49:38.582Z">2024-09-10T23:49:38.582Z</time><span class="term-fgi90">$</span> pwsh -c &#39;Install-Module AWSPowerShell.NetCore -Force -AllowClobber&#39;
+<time datetime="2024-09-10T23:50:07.26Z">2024-09-10T23:50:07.26Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [                                                                         ]</span>
+<time datetime="2024-09-10T23:50:09.263Z">2024-09-10T23:50:09.263Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 0.00 MB out of 74.49 MB.                                      ]</span>
+<time datetime="2024-09-10T23:50:11.268Z">2024-09-10T23:50:11.268Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 7.45 MB out of 74.49 MB.                                      ]</span>
+<time datetime="2024-09-10T23:50:13.271Z">2024-09-10T23:50:13.271Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 14.91 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:15.274Z">2024-09-10T23:50:15.274Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 22.36 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:17.276Z">2024-09-10T23:50:17.276Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 29.81 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:19.279Z">2024-09-10T23:50:19.279Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 37.27 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:21.282Z">2024-09-10T23:50:21.282Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 44.72 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:23.284Z">2024-09-10T23:50:23.284Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 52.17 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:25.287Z">2024-09-10T23:50:25.287Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 59.62 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:27.29Z">2024-09-10T23:50:27.29Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 67.08 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:29.292Z">2024-09-10T23:50:29.292Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Downloaded 74.49 MB out of 74.49 MB.                                     ]</span>
+<time datetime="2024-09-10T23:50:31.294Z">2024-09-10T23:50:31.294Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Unzipping                                                                ]</span>
+<time datetime="2024-09-10T23:50:33.298Z">2024-09-10T23:50:33.298Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Copying unzipped package to &#39;&#47;var&#47;folders&#47;yt&#47;cnbd158d7bg3fl5_kh76xcbw000…]</span>
+<time datetime="2024-09-10T23:50:35.301Z">2024-09-10T23:50:35.301Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Process Package Manifest                                                 ]</span>
+<time datetime="2024-09-10T23:50:37.307Z">2024-09-10T23:50:37.307Z</time><span class="term-fg33 term-fg1">Installing package &#39;AWSPowerShell.NetCore&#39; [Finish installing package &#39;AWSPowerShell.NetCore&#39;                        ]</span>
+<time datetime="2024-09-10T23:50:37.307Z">2024-09-10T23:50:37.307Z</time>
+<time datetime="2024-09-10T23:50:37.307Z">2024-09-10T23:50:37.307Z</time>~~~ Running global post-command hook
+<time datetime="2024-09-10T23:50:37.426Z">2024-09-10T23:50:37.426Z</time><span class="term-fgi90">$</span> &#47;opt&#47;homebrew&#47;etc&#47;buildkite-agent&#47;hooks&#47;post-command
