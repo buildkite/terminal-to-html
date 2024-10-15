@@ -395,13 +395,13 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 		case "0", "": // "erase from current position to end (inclusive)"
 			s.currentLine().clear(s.x, screenEndOfLine) // same as ESC [0K
 
-			// The window is at the bottom of the screen buffer, so we can clear
-			// the rest of the screen using truncation.
-			yidx := s.top() + s.y
-			if yidx < 0 || yidx >= len(s.screen) {
-				return
+			// Rather than truncate s.screen, clear each following line.
+			// There's a good chance those lines will be used later, and it
+			// avoids having to do maths to fix the cursor position.
+			start := s.top() + s.y + 1
+			for i := start; i < len(s.screen); i++ {
+				s.screen[i].clearAll()
 			}
-			s.screen = s.screen[:yidx+1]
 
 		case "1": // "erase from beginning to current position (inclusive)"
 			s.currentLine().clear(screenStartOfLine, s.x) // same as ESC [1K
@@ -418,15 +418,15 @@ func (s *Screen) applyEscape(code rune, instructions []string) {
 			// 2: "erase entire display"
 			// Previous implementations performed this the same as ESC [3J,
 			// which also removes all "scroll-back".
-			s.screen = s.screen[:s.top()]
-			// Note: on real terminals this doesn't reset the cursor position.
-			s.x, s.y = 0, 0
+			for i := s.top(); i < len(s.screen); i++ {
+				s.screen[i].clearAll()
+			}
 
 		case "3":
 			// 3: "erase whole display including scroll-back buffer"
-			s.screen = s.screen[:0]
-			// Note: on real terminals this doesn't reset the cursor position.
-			s.x, s.y = 0, 0
+			for i := range s.screen {
+				s.screen[i].clearAll()
+			}
 		}
 
 	case 'K': // Erase in Line: erases part of the line.

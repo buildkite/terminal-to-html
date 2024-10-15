@@ -1,0 +1,317 @@
+_bk;t=1729032357206~~~ Preparing working directory
+_bk;t=1729032357206[90m# Creating "/home/josh/.buildkite-agent/builds/ubuntu-1/stargoose/metrics-docker"[0m
+_bk;t=1729032357206[90m$[0m cd /home/josh/.buildkite-agent/builds/ubuntu-1/stargoose/metrics-docker
+_bk;t=1729032357206[90m$[0m git clone -v -- https://github.com/buildkite/buildkite-agent-metrics .
+_bk;t=1729032357215Cloning into '.'...
+_bk;t=1729032357684POST git-upload-pack (175 bytes)
+_bk;t=1729032357941POST git-upload-pack (gzip 3202 to 1623 bytes)
+_bk;t=1729032358189remote: Enumerating objects: 5191, done.[K_bk;t=1729032358189
+_bk;t=1729032358189remote: Counting objects:   0% (1/1011)[K_bk;t=1729032358189remote: Counting objects:   1% (11/1011)[K_bk;t=1729032358189remote: Counting objects:   2% (21/1011)[K_bk;t=1729032358189remote: Counting objects:   3% (31/1011)[K_bk;t=1729032358189remote: Counting objects:   4% (41/1011)[K_bk;t=1729032358189remote: Counting objects:   5% (51/1011)[K_bk;t=1729032358189remote: Counting objects:   6% (61/1011)[K_bk;t=1729032358189remote: Counting objects:   7% (71/1011)[K_bk;t=1729032358189remote: Counting objects:   8% (81/1011)[K_bk;t=1729032358189remote: Counting objects:   9% (91/1011)[K_bk;t=1729032358189remote: Counting objects:  10% (102/1011)[K_bk;t=1729032358189remote: Counting objects:  11% (112/1011)[K_bk;t=1729032358189remote: Counting objects:  12% (122/1011)[K_bk;t=1729032358189remote: Counting objects:  13% (132/1011)[K_bk;t=1729032358189remote: Counting objects:  14% (142/1011)[K_bk;t=1729032358189remote: Counting objects:  15% (152/1011)[K_bk;t=1729032358189remote: Counting objects:  16% (162/1011)[K_bk;t=1729032358189remote: Counting objects:  17% (172/1011)[K_bk;t=1729032358189remote: Counting objects:  18% (182/1011)[K_bk;t=1729032358189remote: Counting objects:  19% (193/1011)[K_bk;t=1729032358189remote: Counting objects:  20% (203/1011)[K_bk;t=1729032358189remote: Counting objects:  21% (213/1011)[K_bk;t=1729032358189remote: Counting objects:  22% (223/1011)[K_bk;t=1729032358189remote: Counting objects:  23% (233/1011)[K_bk;t=1729032358189remote: Counting objects:  24% (243/1011)[K_bk;t=1729032358189remote: Counting objects:  25% (253/1011)[K_bk;t=1729032358189remote: Counting objects:  26% (263/1011)[K_bk;t=1729032358189remote: Counting objects:  27% (273/1011)[K_bk;t=1729032358189remote: Counting objects:  28% (284/1011)[K_bk;t=1729032358189remote: Counting objects:  29% (294/1011)[K_bk;t=1729032358189remote: Counting objects:  30% (304/1011)[K_bk;t=1729032358189remote: Counting objects:  31% (314/1011)[K_bk;t=1729032358189remote: Counting objects:  32% (324/1011)[K_bk;t=1729032358189remote: Counting objects:  33% (334/1011)[K_bk;t=1729032358189remote: Counting objects:  34% (344/1011)[K_bk;t=1729032358189remote: Counting objects:  35% (354/1011)[K_bk;t=1729032358189remote: Counting objects:  36% (364/1011)[K_bk;t=1729032358190remote: Counting objects:  37% (375/1011)[K_bk;t=1729032358190remote: Counting objects:  38% (385/1011)[K_bk;t=1729032358190remote: Counting objects:  39% (395/1011)[K_bk;t=1729032358190remote: Counting objects:  40% (405/1011)[K_bk;t=1729032358190remote: Counting objects:  41% (415/1011)[K_bk;t=1729032358190remote: Counting objects:  42% (425/1011)[K_bk;t=1729032358190remote: Counting objects:  43% (435/1011)[K_bk;t=1729032358190remote: Counting objects:  44% (445/1011)[K_bk;t=1729032358190remote: Counting objects:  45% (455/1011)[K_bk;t=1729032358190remote: Counting objects:  46% (466/1011)[K_bk;t=1729032358190remote: Counting objects:  47% (476/1011)[K_bk;t=1729032358190remote: Counting objects:  48% (486/1011)[K_bk;t=1729032358190remote: Counting objects:  49% (496/1011)[K_bk;t=1729032358190remote: Counting objects:  50% (506/1011)[K_bk;t=1729032358190remote: Counting objects:  51% (516/1011)[K_bk;t=1729032358190remote: Counting objects:  52% (526/1011)[K_bk;t=1729032358190remote: Counting objects:  53% (536/1011)[K_bk;t=1729032358190remote: Counting objects:  54% (546/1011)[K_bk;t=1729032358190remote: Counting objects:  55% (557/1011)[K_bk;t=1729032358190remote: Counting objects:  56% (567/1011)[K_bk;t=1729032358190remote: Counting objects:  57% (577/1011)[K_bk;t=1729032358190remote: Counting objects:  58% (587/1011)[K_bk;t=1729032358190remote: Counting objects:  59% (597/1011)[K_bk;t=1729032358190remote: Counting objects:  60% (607/1011)[K_bk;t=1729032358190remote: Counting objects:  61% (617/1011)[K_bk;t=1729032358190remote: Counting objects:  62% (627/1011)[K_bk;t=1729032358190remote: Counting objects:  63% (637/1011)[K_bk;t=1729032358190remote: Counting objects:  64% (648/1011)[K_bk;t=1729032358202remote: Counting objects:  65% (658/1011)[K_bk;t=1729032358202remote: Counting objects:  66% (668/1011)[K_bk;t=1729032358202remote: Counting objects:  67% (678/1011)[K_bk;t=1729032358202remote: Counting objects:  68% (688/1011)[K_bk;t=1729032358202remote: Counting objects:  69% (698/1011)[K_bk;t=1729032358202remote: Counting objects:  70% (708/1011)[K_bk;t=1729032358202remote: Counting objects:  71% (718/1011)[K_bk;t=1729032358202remote: Counting objects:  72% (728/1011)[K_bk;t=1729032358202remote: Counting objects:  73% (739/1011)[K_bk;t=1729032358202remote: Counting objects:  74% (749/1011)[K_bk;t=1729032358202remote: Counting objects:  75% (759/1011)[K_bk;t=1729032358202remote: Counting objects:  76% (769/1011)[K_bk;t=1729032358202remote: Counting objects:  77% (779/1011)[K_bk;t=1729032358202remote: Counting objects:  78% (789/1011)[K_bk;t=1729032358202remote: Counting objects:  79% (799/1011)[K_bk;t=1729032358202remote: Counting objects:  80% (809/1011)[K_bk;t=1729032358202remote: Counting objects:  81% (819/1011)[K_bk;t=1729032358202remote: Counting objects:  82% (830/1011)[K_bk;t=1729032358202remote: Counting objects:  83% (840/1011)[K_bk;t=1729032358202remote: Counting objects:  84% (850/1011)[K_bk;t=1729032358202remote: Counting objects:  85% (860/1011)[K_bk;t=1729032358202remote: Counting objects:  86% (870/1011)[K_bk;t=1729032358202remote: Counting objects:  87% (880/1011)[K_bk;t=1729032358202remote: Counting objects:  88% (890/1011)[K_bk;t=1729032358202remote: Counting objects:  89% (900/1011)[K_bk;t=1729032358202remote: Counting objects:  90% (910/1011)[K_bk;t=1729032358202remote: Counting objects:  91% (921/1011)[K_bk;t=1729032358202remote: Counting objects:  92% (931/1011)[K_bk;t=1729032358202remote: Counting objects:  93% (941/1011)[K_bk;t=1729032358202remote: Counting objects:  94% (951/1011)[K_bk;t=1729032358202remote: Counting objects:  95% (961/1011)[K_bk;t=1729032358202remote: Counting objects:  96% (971/1011)[K_bk;t=1729032358203remote: Counting objects:  97% (981/1011)[K_bk;t=1729032358203remote: Counting objects:  98% (991/1011)[K_bk;t=1729032358203remote: Counting objects:  99% (1001/1011)[K_bk;t=1729032358203remote: Counting objects: 100% (1011/1011)[K_bk;t=1729032358203remote: Counting objects: 100% (1011/1011), done.[K_bk;t=1729032358203
+_bk;t=1729032358203remote: Compressing objects:   0% (1/462)[K_bk;t=1729032358203remote: Compressing objects:   1% (5/462)[K_bk;t=1729032358203remote: Compressing objects:   2% (10/462)[K_bk;t=1729032358203remote: Compressing objects:   3% (14/462)[K_bk;t=1729032358203remote: Compressing objects:   4% (19/462)[K_bk;t=1729032358203remote: Compressing objects:   5% (24/462)[K_bk;t=1729032358203remote: Compressing objects:   6% (28/462)[K_bk;t=1729032358203remote: Compressing objects:   7% (33/462)[K_bk;t=1729032358203remote: Compressing objects:   8% (37/462)[K_bk;t=1729032358203remote: Compressing objects:   9% (42/462)[K_bk;t=1729032358203remote: Compressing objects:  10% (47/462)[K_bk;t=1729032358203remote: Compressing objects:  11% (51/462)[K_bk;t=1729032358240remote: Compressing objects:  12% (56/462)[K_bk;t=1729032358240remote: Compressing objects:  13% (61/462)[K_bk;t=1729032358240remote: Compressing objects:  14% (65/462)[K_bk;t=1729032358240remote: Compressing objects:  15% (70/462)[K_bk;t=1729032358240remote: Compressing objects:  16% (74/462)[K_bk;t=1729032358240remote: Compressing objects:  17% (79/462)[K_bk;t=1729032358240remote: Compressing objects:  18% (84/462)[K_bk;t=1729032358240remote: Compressing objects:  19% (88/462)[K_bk;t=1729032358240remote: Compressing objects:  20% (93/462)[K_bk;t=1729032358240remote: Compressing objects:  21% (98/462)[K_bk;t=1729032358240remote: Compressing objects:  22% (102/462)[K_bk;t=1729032358240remote: Compressing objects:  23% (107/462)[K_bk;t=1729032358240remote: Compressing objects:  24% (111/462)[K_bk;t=1729032358240remote: Compressing objects:  25% (116/462)[K_bk;t=1729032358240remote: Compressing objects:  26% (121/462)[K_bk;t=1729032358240remote: Compressing objects:  27% (125/462)[K_bk;t=1729032358240remote: Compressing objects:  28% (130/462)[K_bk;t=1729032358240remote: Compressing objects:  29% (134/462)[K_bk;t=1729032358240remote: Compressing objects:  30% (139/462)[K_bk;t=1729032358240remote: Compressing objects:  31% (144/462)[K_bk;t=1729032358240remote: Compressing objects:  32% (148/462)[K_bk;t=1729032358250remote: Compressing objects:  33% (153/462)[K_bk;t=1729032358250remote: Compressing objects:  34% (158/462)[K_bk;t=1729032358250remote: Compressing objects:  35% (162/462)[K_bk;t=1729032358250remote: Compressing objects:  36% (167/462)[K_bk;t=1729032358250remote: Compressing objects:  37% (171/462)[K_bk;t=1729032358250remote: Compressing objects:  38% (176/462)[K_bk;t=1729032358250remote: Compressing objects:  39% (181/462)[K_bk;t=1729032358250remote: Compressing objects:  40% (185/462)[K_bk;t=1729032358250remote: Compressing objects:  41% (190/462)[K_bk;t=1729032358250remote: Compressing objects:  42% (195/462)[K_bk;t=1729032358250remote: Compressing objects:  43% (199/462)[K_bk;t=1729032358250remote: Compressing objects:  44% (204/462)[K_bk;t=1729032358250remote: Compressing objects:  45% (208/462)[K_bk;t=1729032358250remote: Compressing objects:  46% (213/462)[K_bk;t=1729032358250remote: Compressing objects:  47% (218/462)[K_bk;t=1729032358250remote: Compressing objects:  48% (222/462)[K_bk;t=1729032358250remote: Compressing objects:  49% (227/462)[K_bk;t=1729032358250remote: Compressing objects:  50% (231/462)[K_bk;t=1729032358250remote: Compressing objects:  51% (236/462)[K_bk;t=1729032358250remote: Compressing objects:  52% (241/462)[K_bk;t=1729032358253remote: Compressing objects:  53% (245/462)[K_bk;t=1729032358253remote: Compressing objects:  54% (250/462)[K_bk;t=1729032358253remote: Compressing objects:  55% (255/462)[K_bk;t=1729032358253remote: Compressing objects:  56% (259/462)[K_bk;t=1729032358253remote: Compressing objects:  57% (264/462)[K_bk;t=1729032358253remote: Compressing objects:  58% (268/462)[K_bk;t=1729032358253remote: Compressing objects:  59% (273/462)[K_bk;t=1729032358253remote: Compressing objects:  60% (278/462)[K_bk;t=1729032358253remote: Compressing objects:  61% (282/462)[K_bk;t=1729032358253remote: Compressing objects:  62% (287/462)[K_bk;t=1729032358253remote: Compressing objects:  63% (292/462)[K_bk;t=1729032358253remote: Compressing objects:  64% (296/462)[K_bk;t=1729032358253remote: Compressing objects:  65% (301/462)[K_bk;t=1729032358253remote: Compressing objects:  66% (305/462)[K_bk;t=1729032358253remote: Compressing objects:  67% (310/462)[K_bk;t=1729032358253remote: Compressing objects:  68% (315/462)[K_bk;t=1729032358253remote: Compressing objects:  69% (319/462)[K_bk;t=1729032358253remote: Compressing objects:  70% (324/462)[K_bk;t=1729032358253remote: Compressing objects:  71% (329/462)[K_bk;t=1729032358253remote: Compressing objects:  72% (333/462)[K_bk;t=1729032358253remote: Compressing objects:  73% (338/462)[K_bk;t=1729032358253remote: Compressing objects:  74% (342/462)[K_bk;t=1729032358253remote: Compressing objects:  75% (347/462)[K_bk;t=1729032358262remote: Compressing objects:  76% (352/462)[K_bk;t=1729032358262remote: Compressing objects:  77% (356/462)[K_bk;t=1729032358262remote: Compressing objects:  78% (361/462)[K_bk;t=1729032358262remote: Compressing objects:  79% (365/462)[K_bk;t=1729032358262remote: Compressing objects:  80% (370/462)[K_bk;t=1729032358262remote: Compressing objects:  81% (375/462)[K_bk;t=1729032358262remote: Compressing objects:  82% (379/462)[K_bk;t=1729032358262remote: Compressing objects:  83% (384/462)[K_bk;t=1729032358262remote: Compressing objects:  84% (389/462)[K_bk;t=1729032358262remote: Compressing objects:  85% (393/462)[K_bk;t=1729032358262remote: Compressing objects:  86% (398/462)[K_bk;t=1729032358262remote: Compressing objects:  87% (402/462)[K_bk;t=1729032358262remote: Compressing objects:  88% (407/462)[K_bk;t=1729032358262remote: Compressing objects:  89% (412/462)[K_bk;t=1729032358262remote: Compressing objects:  90% (416/462)[K_bk;t=1729032358262remote: Compressing objects:  91% (421/462)[K_bk;t=1729032358262remote: Compressing objects:  92% (426/462)[K_bk;t=1729032358262remote: Compressing objects:  93% (430/462)[K_bk;t=1729032358262remote: Compressing objects:  94% (435/462)[K_bk;t=1729032358262remote: Compressing objects:  95% (439/462)[K_bk;t=1729032358262remote: Compressing objects:  96% (444/462)[K_bk;t=1729032358262remote: Compressing objects:  97% (449/462)[K_bk;t=1729032358262remote: Compressing objects:  98% (453/462)[K_bk;t=1729032358262remote: Compressing objects:  99% (458/462)[K_bk;t=1729032358262remote: Compressing objects: 100% (462/462)[K_bk;t=1729032358262remote: Compressing objects: 100% (462/462), done.[K_bk;t=1729032358262
+_bk;t=1729032358272Receiving objects:   0% (1/5191)Receiving objects:   1% (52/5191)Receiving objects:   2% (104/5191)Receiving objects:   3% (156/5191)Receiving objects:   4% (208/5191)Receiving objects:   5% (260/5191)Receiving objects:   6% (312/5191)Receiving objects:   7% (364/5191)Receiving objects:   8% (416/5191)Receiving objects:   9% (468/5191)Receiving objects:  10% (520/5191)Receiving objects:  11% (572/5191)Receiving objects:  12% (623/5191)Receiving objects:  13% (675/5191)Receiving objects:  14% (727/5191)Receiving objects:  15% (779/5191)Receiving objects:  16% (831/5191)Receiving objects:  17% (883/5191)Receiving objects:  18% (935/5191)Receiving objects:  19% (987/5191)Receiving objects:  20% (1039/5191)Receiving objects:  21% (1091/5191)Receiving objects:  22% (1143/5191)Receiving objects:  23% (1194/5191)Receiving objects:  24% (1246/5191)Receiving objects:  25% (1298/5191)Receiving objects:  26% (1350/5191)Receiving objects:  27% (1402/5191)Receiving objects:  28% (1454/5191)Receiving objects:  29% (1506/5191)Receiving objects:  30% (1558/5191)Receiving objects:  31% (1610/5191)Receiving objects:  32% (1662/5191)Receiving objects:  33% (1714/5191)Receiving objects:  34% (1765/5191)Receiving objects:  35% (1817/5191)Receiving objects:  36% (1869/5191)Receiving objects:  37% (1921/5191)Receiving objects:  38% (1973/5191)Receiving objects:  39% (2025/5191)Receiving objects:  40% (2077/5191)Receiving objects:  41% (2129/5191)Receiving objects:  42% (2181/5191)Receiving objects:  43% (2233/5191)Receiving objects:  44% (2285/5191)Receiving objects:  45% (2336/5191)Receiving objects:  46% (2388/5191)Receiving objects:  47% (2440/5191)Receiving objects:  48% (2492/5191)Receiving objects:  49% (2544/5191)Receiving objects:  50% (2596/5191)Receiving objects:  51% (2648/5191)Receiving objects:  52% (2700/5191)Receiving objects:  53% (2752/5191)Receiving objects:  54% (2804/5191)Receiving objects:  55% (2856/5191)Receiving objects:  56% (2907/5191)Receiving objects:  57% (2959/5191)Receiving objects:  58% (3011/5191)Receiving objects:  59% (3063/5191)Receiving objects:  60% (3115/5191)Receiving objects:  61% (3167/5191)Receiving objects:  62% (3219/5191)Receiving objects:  63% (3271/5191)Receiving objects:  64% (3323/5191)Receiving objects:  65% (3375/5191)Receiving objects:  66% (3427/5191)Receiving objects:  67% (3478/5191)Receiving objects:  68% (3530/5191)Receiving objects:  69% (3582/5191)Receiving objects:  70% (3634/5191)Receiving objects:  71% (3686/5191)Receiving objects:  72% (3738/5191)Receiving objects:  73% (3790/5191)Receiving objects:  74% (3842/5191)Receiving objects:  75% (3894/5191)Receiving objects:  76% (3946/5191)Receiving objects:  77% (3998/5191)Receiving objects:  78% (4049/5191)Receiving objects:  79% (4101/5191)Receiving objects:  80% (4153/5191)Receiving objects:  81% (4205/5191)Receiving objects:  82% (4257/5191)Receiving objects:  83% (4309/5191)Receiving objects:  84% (4361/5191)Receiving objects:  85% (4413/5191)Receiving objects:  86% (4465/5191)Receiving objects:  87% (4517/5191)Receiving objects:  88% (4569/5191)Receiving objects:  89% (4620/5191)Receiving objects:  90% (4672/5191)Receiving objects:  91% (4724/5191)Receiving objects:  92% (4776/5191)Receiving objects:  93% (4828/5191)Receiving objects:  94% (4880/5191)Receiving objects:  95% (4932/5191)Receiving objects:  96% (4984/5191)Receiving objects:  97% (5036/5191)Receiving objects:  98% (5088/5191)remote: Total 5191 (delta 674), reused 673 (delta 531), pack-reused 4180 (from 1)[K_bk;t=1729032358653
+_bk;t=1729032358653Receiving objects:  99% (5140/5191)Receiving objects: 100% (5191/5191)Receiving objects: 100% (5191/5191), 4.67 MiB | 12.27 MiB/s, done.
+_bk;t=1729032358654Resolving deltas:   0% (0/2035)Resolving deltas:   1% (21/2035)Resolving deltas:   2% (41/2035)Resolving deltas:   3% (62/2035)Resolving deltas:   4% (82/2035)Resolving deltas:   5% (102/2035)Resolving deltas:   6% (124/2035)Resolving deltas:   7% (143/2035)Resolving deltas:   8% (164/2035)Resolving deltas:   9% (184/2035)Resolving deltas:  10% (204/2035)Resolving deltas:  11% (224/2035)Resolving deltas:  12% (245/2035)Resolving deltas:  13% (265/2035)Resolving deltas:  14% (285/2035)Resolving deltas:  15% (306/2035)Resolving deltas:  16% (326/2035)Resolving deltas:  17% (346/2035)Resolving deltas:  18% (367/2035)Resolving deltas:  19% (387/2035)Resolving deltas:  20% (407/2035)Resolving deltas:  21% (429/2035)Resolving deltas:  22% (448/2035)Resolving deltas:  23% (469/2035)Resolving deltas:  24% (489/2035)Resolving deltas:  25% (509/2035)Resolving deltas:  26% (530/2035)Resolving deltas:  27% (550/2035)Resolving deltas:  28% (570/2035)Resolving deltas:  29% (591/2035)Resolving deltas:  30% (612/2035)Resolving deltas:  31% (631/2035)Resolving deltas:  32% (652/2035)Resolving deltas:  33% (673/2035)Resolving deltas:  34% (692/2035)Resolving deltas:  35% (713/2035)Resolving deltas:  36% (734/2035)Resolving deltas:  37% (753/2035)Resolving deltas:  38% (775/2035)Resolving deltas:  39% (794/2035)Resolving deltas:  40% (814/2035)Resolving deltas:  41% (835/2035)Resolving deltas:  42% (855/2035)Resolving deltas:  43% (876/2035)Resolving deltas:  44% (897/2035)Resolving deltas:  45% (916/2035)Resolving deltas:  46% (937/2035)Resolving deltas:  47% (957/2035)Resolving deltas:  48% (977/2035)Resolving deltas:  49% (998/2035)Resolving deltas:  50% (1018/2035)Resolving deltas:  51% (1038/2035)Resolving deltas:  52% (1059/2035)Resolving deltas:  53% (1079/2035)Resolving deltas:  54% (1099/2035)Resolving deltas:  55% (1120/2035)Resolving deltas:  56% (1140/2035)Resolving deltas:  57% (1160/2035)Resolving deltas:  58% (1181/2035)Resolving deltas:  59% (1201/2035)Resolving deltas:  60% (1221/2035)Resolving deltas:  61% (1242/2035)Resolving deltas:  62% (1262/2035)Resolving deltas:  63% (1283/2035)Resolving deltas:  64% (1304/2035)Resolving deltas:  65% (1323/2035)Resolving deltas:  66% (1344/2035)Resolving deltas:  67% (1364/2035)Resolving deltas:  68% (1384/2035)Resolving deltas:  69% (1405/2035)Resolving deltas:  70% (1425/2035)Resolving deltas:  71% (1445/2035)Resolving deltas:  72% (1466/2035)Resolving deltas:  73% (1486/2035)Resolving deltas:  74% (1506/2035)Resolving deltas:  75% (1527/2035)Resolving deltas:  76% (1547/2035)Resolving deltas:  77% (1567/2035)Resolving deltas:  78% (1588/2035)Resolving deltas:  79% (1608/2035)Resolving deltas:  80% (1628/2035)Resolving deltas:  81% (1649/2035)Resolving deltas:  82% (1669/2035)Resolving deltas:  83% (1690/2035)Resolving deltas:  84% (1710/2035)Resolving deltas:  85% (1730/2035)Resolving deltas:  86% (1751/2035)Resolving deltas:  87% (1772/2035)Resolving deltas:  88% (1791/2035)Resolving deltas:  89% (1812/2035)Resolving deltas:  90% (1832/2035)Resolving deltas:  91% (1852/2035)Resolving deltas:  92% (1873/2035)Resolving deltas:  93% (1893/2035)Resolving deltas:  94% (1913/2035)Resolving deltas:  95% (1935/2035)Resolving deltas:  96% (1954/2035)Resolving deltas:  97% (1974/2035)Resolving deltas:  98% (1996/2035)Resolving deltas:  99% (2015/2035)Resolving deltas: 100% (2035/2035)Resolving deltas: 100% (2035/2035), done.
+_bk;t=1729032358720[90m$[0m git clean -ffxdq
+_bk;t=1729032358721[90m$[0m git fetch -v --prune -- origin 72cd6c049caa8674907b3d518eccef010fb32574
+_bk;t=1729032359140POST git-upload-pack (102 bytes)
+_bk;t=1729032359441From https://github.com/buildkite/buildkite-agent-metrics
+_bk;t=1729032359441 * branch            72cd6c049caa8674907b3d518eccef010fb32574 -> FETCH_HEAD
+_bk;t=1729032359448[90m$[0m git checkout -f 72cd6c049caa8674907b3d518eccef010fb32574
+_bk;t=1729032359456Note: switching to '72cd6c049caa8674907b3d518eccef010fb32574'.
+_bk;t=1729032359456
+_bk;t=1729032359456You are in 'detached HEAD' state. You can look around, make experimental
+_bk;t=1729032359456changes and commit them, and you can discard any commits you make in this
+_bk;t=1729032359456state without impacting any branches by switching back to a branch.
+_bk;t=1729032359456
+_bk;t=1729032359456If you want to create a new branch to retain commits you create, you may
+_bk;t=1729032359456do so (now or later) by using -c with the switch command. Example:
+_bk;t=1729032359456
+_bk;t=1729032359456  git switch -c <new-branch-name>
+_bk;t=1729032359456
+_bk;t=1729032359456Or undo this operation with:
+_bk;t=1729032359456
+_bk;t=1729032359456  git switch -
+_bk;t=1729032359456
+_bk;t=1729032359456Turn off this advice by setting config variable advice.detachedHead to false
+_bk;t=1729032359456
+_bk;t=1729032359456HEAD is now at 72cd6c0 Merge pull request #315 from buildkite/dependabot/docker/docker/library/golang-a7f2fc9
+_bk;t=1729032359457[90m# Cleaning again to catch any post-checkout changes[0m
+_bk;t=1729032359457[90m$[0m git clean -ffxdq
+_bk;t=1729032359458[90m# Checking to see if git commit information needs to be sent to Buildkite...[0m
+_bk;t=1729032359459[90m$[0m buildkite-agent meta-data exists buildkite:git:commit
+_bk;t=1729032360279[90m# Git commit information has already been sent to Buildkite[0m
+_bk;t=1729032360280~~~ Running commands
+_bk;t=1729032360280[90m$[0m buildah build .
+_bk;t=1729032360325[33mWARN[0m[0000] Reading allowed ID mappings: reading subuid mappings for user "josh" and subgid mappings for group "josh": no subuid ranges found for user "josh" in /etc/subuid 
+_bk;t=1729032360325[33mWARN[0m[0000] Found no UID ranges set aside for user "josh" in /etc/subuid. 
+_bk;t=1729032360325[33mWARN[0m[0000] Found no GID ranges set aside for user "josh" in /etc/subgid. 
+_bk;t=1729032360340[1/2] STEP 1/4: FROM public.ecr.aws/docker/library/golang:1.23.2@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32 AS builder
+_bk;t=1729032360349Trying to pull public.ecr.aws/docker/library/golang@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32...
+_bk;t=1729032364883Getting image source signatures
+_bk;t=1729032365040Copying blob f14586a49dad [--------------------------------------] 0.0b / 124.0b
+_bk;t=1729032365040Copying blob 2b238499ec52 [--------------------------------------] 0.0b / 22.5MiB
+_bk;t=1729032365040Copying blob 6d11c181ebb3 [--------------------------------------] 0.0b / 47.3MiB
+_bk;t=1729032365040Copying blob a37a00ec5f00 [--------------------------------------] 0.0b / 67.4MiB
+_bk;t=1729032365040Copying blob 41b754d079e8 [--------------------------------------] 0.0b / 61.4MiB
+_bk;t=1729032365040Copying blob ecd06e024ec6 [--------------------------------------] 0.0b / 82.3MiB
+_bk;t=1729032365188[6A[JCopying blob f14586a49dad [--------------------------------------] 0.0b / 124.0b
+_bk;t=1729032365188Copying blob 2b238499ec52 [--------------------------------------] 0.0b / 22.5MiB
+_bk;t=1729032365188Copying blob 6d11c181ebb3 [--------------------------------------] 0.0b / 47.3MiB
+_bk;t=1729032365188Copying blob a37a00ec5f00 [--------------------------------------] 0.0b / 67.4MiB
+_bk;t=1729032365188Copying blob 41b754d079e8 [--------------------------------------] 0.0b / 61.4MiB
+_bk;t=1729032365188Copying blob ecd06e024ec6 [--------------------------------------] 0.0b / 82.3MiB
+_bk;t=1729032365340[6A[JCopying blob f14586a49dad [--------------------------------------] 0.0b / 124.0b
+_bk;t=1729032365340Copying blob 2b238499ec52 [--------------------------------------] 0.0b / 22.5MiB
+_bk;t=1729032365340Copying blob 6d11c181ebb3 [--------------------------------------] 0.0b / 47.3MiB
+_bk;t=1729032365340Copying blob a37a00ec5f00 [--------------------------------------] 0.0b / 67.4MiB
+_bk;t=1729032365340Copying blob 41b754d079e8 [--------------------------------------] 0.0b / 61.4MiB
+_bk;t=1729032365340Copying blob ecd06e024ec6 [--------------------------------------] 0.0b / 82.3MiB
+_bk;t=1729032365491[6A[JCopying blob f14586a49dad [--------------------------------------] 0.0b / 124.0b
+_bk;t=1729032365491Copying blob 2b238499ec52 [--------------------------------------] 0.0b / 22.5MiB
+_bk;t=1729032365491Copying blob 6d11c181ebb3 [--------------------------------------] 0.0b / 47.3MiB
+_bk;t=1729032365491Copying blob a37a00ec5f00 [--------------------------------------] 0.0b / 67.4MiB
+_bk;t=1729032365491Copying blob 41b754d079e8 [--------------------------------------] 0.0b / 61.4MiB
+_bk;t=1729032365491Copying blob ecd06e024ec6 [--------------------------------------] 0.0b / 82.3MiB
+_bk;t=1729032365639[6A[JCopying blob f14586a49dad [--------------------------------------] 0.0b / 124.0b
+_bk;t=1729032365639Copying blob 2b238499ec52 [--------------------------------------] 0.0b / 22.5MiB
+_bk;t=1729032365639Copying blob 6d11c181ebb3 [--------------------------------------] 0.0b / 47.3MiB
+_bk;t=1729032365639Copying blob a37a00ec5f00 [--------------------------------------] 0.0b / 67.4MiB
+_bk;t=1729032365639Copying blob 41b754d079e8 [--------------------------------------] 0.0b / 61.4MiB
+_bk;t=1729032365639Copying blob ecd06e024ec6 [--------------------------------------] 0.0b / 82.3MiB
+_bk;t=1729032365784[6A[JCopying blob f14586a49dad [======================================] 124.0b / 124.0b
+_bk;t=1729032365784Copying blob 2b238499ec52 [>-------------------------------------] 574.8KiB / 22.5MiB
+_bk;t=1729032365784Copying blob 6d11c181ebb3 [--------------------------------------] 630.0KiB / 47.3MiB
+_bk;t=1729032365784Copying blob a37a00ec5f00 [--------------------------------------] 563.2KiB / 67.4MiB
+_bk;t=1729032365784Copying blob 41b754d079e8 [--------------------------------------] 267.7KiB / 61.4MiB
+_bk;t=1729032365784Copying blob ecd06e024ec6 [--------------------------------------] 353.9KiB / 82.3MiB
+_bk;t=1729032365784Copying blob 4f4fb700ef54 [--------------------------------------] 0.0b / 32.0b
+_bk;t=1729032365934[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032365934Copying blob 2b238499ec52 [=====>--------------------------------] 3.5MiB / 22.5MiB
+_bk;t=1729032365934Copying blob 6d11c181ebb3 [=>------------------------------------] 2.1MiB / 47.3MiB
+_bk;t=1729032365934Copying blob a37a00ec5f00 [=>------------------------------------] 3.0MiB / 67.4MiB
+_bk;t=1729032365934Copying blob 41b754d079e8 [>-------------------------------------] 1.1MiB / 61.4MiB
+_bk;t=1729032365934Copying blob ecd06e024ec6 [>-------------------------------------] 1.5MiB / 82.3MiB
+_bk;t=1729032365934Copying blob 4f4fb700ef54 [--------------------------------------] 0.0b / 32.0b
+_bk;t=1729032366083[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366084Copying blob 2b238499ec52 [========>-----------------------------] 5.4MiB / 22.5MiB
+_bk;t=1729032366084Copying blob 6d11c181ebb3 [=>------------------------------------] 2.1MiB / 47.3MiB
+_bk;t=1729032366084Copying blob a37a00ec5f00 [=>------------------------------------] 3.6MiB / 67.4MiB
+_bk;t=1729032366084Copying blob 41b754d079e8 [>-------------------------------------] 2.0MiB / 61.4MiB
+_bk;t=1729032366084Copying blob ecd06e024ec6 [>-------------------------------------] 2.3MiB / 82.3MiB
+_bk;t=1729032366084Copying blob 4f4fb700ef54 [--------------------------------------] 0.0b / 32.0b
+_bk;t=1729032366234[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366234Copying blob 2b238499ec52 [=============>------------------------] 8.3MiB / 22.5MiB
+_bk;t=1729032366234Copying blob 6d11c181ebb3 [====>---------------------------------] 6.7MiB / 47.3MiB
+_bk;t=1729032366234Copying blob a37a00ec5f00 [===>----------------------------------] 7.4MiB / 67.4MiB
+_bk;t=1729032366234Copying blob 41b754d079e8 [=>------------------------------------] 3.4MiB / 61.4MiB
+_bk;t=1729032366234Copying blob ecd06e024ec6 [=>------------------------------------] 4.4MiB / 82.3MiB
+_bk;t=1729032366234Copying blob 4f4fb700ef54 [--------------------------------------] 0.0b / 32.0b
+_bk;t=1729032366385[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366385Copying blob 2b238499ec52 [=================>--------------------] 10.7MiB / 22.5MiB
+_bk;t=1729032366385Copying blob 6d11c181ebb3 [=====>--------------------------------] 7.7MiB / 47.3MiB
+_bk;t=1729032366385Copying blob a37a00ec5f00 [====>---------------------------------] 8.8MiB / 67.4MiB
+_bk;t=1729032366385Copying blob 41b754d079e8 [=>------------------------------------] 4.0MiB / 61.4MiB
+_bk;t=1729032366385Copying blob ecd06e024ec6 [=>------------------------------------] 5.3MiB / 82.3MiB
+_bk;t=1729032366385Copying blob 4f4fb700ef54 [--------------------------------------] 0.0b / 32.0b
+_bk;t=1729032366534[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366534Copying blob 2b238499ec52 [======================>---------------] 13.6MiB / 22.5MiB
+_bk;t=1729032366534Copying blob 6d11c181ebb3 [=======>------------------------------] 10.1MiB / 47.3MiB
+_bk;t=1729032366534Copying blob a37a00ec5f00 [=====>--------------------------------] 10.7MiB / 67.4MiB
+_bk;t=1729032366534Copying blob 41b754d079e8 [==>-----------------------------------] 4.6MiB / 61.4MiB
+_bk;t=1729032366534Copying blob ecd06e024ec6 [==>-----------------------------------] 6.8MiB / 82.3MiB
+_bk;t=1729032366534Copying blob 4f4fb700ef54 [--------------------------------------] 0.0b / 32.0b
+_bk;t=1729032366684[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366684Copying blob 2b238499ec52 [===========================>----------] 16.6MiB / 22.5MiB
+_bk;t=1729032366684Copying blob 6d11c181ebb3 [=========>----------------------------] 12.3MiB / 47.3MiB
+_bk;t=1729032366684Copying blob a37a00ec5f00 [======>-------------------------------] 13.3MiB / 67.4MiB
+_bk;t=1729032366684Copying blob 41b754d079e8 [===>----------------------------------] 6.1MiB / 61.4MiB
+_bk;t=1729032366684Copying blob ecd06e024ec6 [===>----------------------------------] 8.5MiB / 82.3MiB
+_bk;t=1729032366684Copying blob 4f4fb700ef54 [======================================] 32.0b / 32.0b
+_bk;t=1729032366834[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366834Copying blob 2b238499ec52 [===============================>------] 19.2MiB / 22.5MiB
+_bk;t=1729032366834Copying blob 6d11c181ebb3 [===========>--------------------------] 14.3MiB / 47.3MiB
+_bk;t=1729032366834Copying blob a37a00ec5f00 [========>-----------------------------] 15.8MiB / 67.4MiB
+_bk;t=1729032366835Copying blob 41b754d079e8 [===>----------------------------------] 7.0MiB / 61.4MiB
+_bk;t=1729032366835Copying blob ecd06e024ec6 [====>---------------------------------] 9.9MiB / 82.3MiB
+_bk;t=1729032366835Copying blob 4f4fb700ef54 done  
+_bk;t=1729032366985[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032366985Copying blob 2b238499ec52 [=====================================>] 22.4MiB / 22.5MiB
+_bk;t=1729032366985Copying blob 6d11c181ebb3 [============>-------------------------] 16.6MiB / 47.3MiB
+_bk;t=1729032366985Copying blob a37a00ec5f00 [=========>----------------------------] 18.0MiB / 67.4MiB
+_bk;t=1729032366985Copying blob 41b754d079e8 [====>---------------------------------] 8.2MiB / 61.4MiB
+_bk;t=1729032366985Copying blob ecd06e024ec6 [====>---------------------------------] 10.8MiB / 82.3MiB
+_bk;t=1729032366985Copying blob 4f4fb700ef54 done  
+_bk;t=1729032367134[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032367134Copying blob 2b238499ec52 [======================================] 22.5MiB / 22.5MiB
+_bk;t=1729032367134Copying blob 6d11c181ebb3 [===============>----------------------] 19.5MiB / 47.3MiB
+_bk;t=1729032367134Copying blob a37a00ec5f00 [===========>--------------------------] 20.9MiB / 67.4MiB
+_bk;t=1729032367134Copying blob 41b754d079e8 [=====>--------------------------------] 9.6MiB / 61.4MiB
+_bk;t=1729032367134Copying blob ecd06e024ec6 [=====>--------------------------------] 13.4MiB / 82.3MiB
+_bk;t=1729032367134Copying blob 4f4fb700ef54 done  
+_bk;t=1729032367284[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032367284Copying blob 2b238499ec52 done  
+_bk;t=1729032367284Copying blob 6d11c181ebb3 [=================>--------------------] 22.5MiB / 47.3MiB
+_bk;t=1729032367284Copying blob a37a00ec5f00 [=============>------------------------] 24.0MiB / 67.4MiB
+_bk;t=1729032367284Copying blob 41b754d079e8 [======>-------------------------------] 11.3MiB / 61.4MiB
+_bk;t=1729032367284Copying blob ecd06e024ec6 [======>-------------------------------] 15.5MiB / 82.3MiB
+_bk;t=1729032367284Copying blob 4f4fb700ef54 done  
+_bk;t=1729032367434[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032367434Copying blob 2b238499ec52 done  
+_bk;t=1729032367434Copying blob 6d11c181ebb3 [===================>------------------] 25.3MiB / 47.3MiB
+_bk;t=1729032367434Copying blob a37a00ec5f00 [==============>-----------------------] 26.8MiB / 67.4MiB
+_bk;t=1729032367434Copying blob 41b754d079e8 [=======>------------------------------] 13.0MiB / 61.4MiB
+_bk;t=1729032367434Copying blob ecd06e024ec6 [=======>------------------------------] 17.7MiB / 82.3MiB
+_bk;t=1729032367434Copying blob 4f4fb700ef54 done  
+_bk;t=1729032367584[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032367584Copying blob 2b238499ec52 done  
+_bk;t=1729032367584Copying blob 6d11c181ebb3 [=====================>----------------] 27.6MiB / 47.3MiB
+_bk;t=1729032367584Copying blob a37a00ec5f00 [===============>----------------------] 28.9MiB / 67.4MiB
+_bk;t=1729032367584Copying blob 41b754d079e8 [========>-----------------------------] 14.5MiB / 61.4MiB
+_bk;t=1729032367584Copying blob ecd06e024ec6 [========>-----------------------------] 19.9MiB / 82.3MiB
+_bk;t=1729032367584Copying blob 4f4fb700ef54 done  
+_bk;t=1729032367735[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032367735Copying blob 2b238499ec52 done  
+_bk;t=1729032367735Copying blob 6d11c181ebb3 [=======================>--------------] 30.4MiB / 47.3MiB
+_bk;t=1729032367735Copying blob a37a00ec5f00 [=================>--------------------] 32.7MiB / 67.4MiB
+_bk;t=1729032367735Copying blob 41b754d079e8 [=========>----------------------------] 16.3MiB / 61.4MiB
+_bk;t=1729032367735Copying blob ecd06e024ec6 [=========>----------------------------] 21.4MiB / 82.3MiB
+_bk;t=1729032367735Copying blob 4f4fb700ef54 done  
+_bk;t=1729032367884[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032367884Copying blob 2b238499ec52 done  
+_bk;t=1729032367884Copying blob 6d11c181ebb3 [==========================>-----------] 33.6MiB / 47.3MiB
+_bk;t=1729032367884Copying blob a37a00ec5f00 [===================>------------------] 34.8MiB / 67.4MiB
+_bk;t=1729032367884Copying blob 41b754d079e8 [==========>---------------------------] 18.0MiB / 61.4MiB
+_bk;t=1729032367884Copying blob ecd06e024ec6 [==========>---------------------------] 23.5MiB / 82.3MiB
+_bk;t=1729032367884Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368034[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368034Copying blob 2b238499ec52 done  
+_bk;t=1729032368034Copying blob 6d11c181ebb3 [============================>---------] 36.3MiB / 47.3MiB
+_bk;t=1729032368034Copying blob a37a00ec5f00 [=====================>----------------] 38.7MiB / 67.4MiB
+_bk;t=1729032368034Copying blob 41b754d079e8 [===========>--------------------------] 19.6MiB / 61.4MiB
+_bk;t=1729032368034Copying blob ecd06e024ec6 [===========>--------------------------] 26.0MiB / 82.3MiB
+_bk;t=1729032368034Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368184[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368184Copying blob 2b238499ec52 done  
+_bk;t=1729032368184Copying blob 6d11c181ebb3 [==============================>-------] 39.1MiB / 47.3MiB
+_bk;t=1729032368184Copying blob a37a00ec5f00 [======================>---------------] 41.6MiB / 67.4MiB
+_bk;t=1729032368184Copying blob 41b754d079e8 [============>-------------------------] 21.4MiB / 61.4MiB
+_bk;t=1729032368184Copying blob ecd06e024ec6 [============>-------------------------] 28.4MiB / 82.3MiB
+_bk;t=1729032368184Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368334[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368334Copying blob 2b238499ec52 done  
+_bk;t=1729032368334Copying blob 6d11c181ebb3 [=================================>----] 41.8MiB / 47.3MiB
+_bk;t=1729032368334Copying blob a37a00ec5f00 [========================>-------------] 44.6MiB / 67.4MiB
+_bk;t=1729032368334Copying blob 41b754d079e8 [=============>------------------------] 23.1MiB / 61.4MiB
+_bk;t=1729032368334Copying blob ecd06e024ec6 [=============>------------------------] 30.7MiB / 82.3MiB
+_bk;t=1729032368334Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368485[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368485Copying blob 2b238499ec52 done  
+_bk;t=1729032368485Copying blob 6d11c181ebb3 [===================================>--] 44.6MiB / 47.3MiB
+_bk;t=1729032368485Copying blob a37a00ec5f00 [==========================>-----------] 47.6MiB / 67.4MiB
+_bk;t=1729032368485Copying blob 41b754d079e8 [==============>-----------------------] 24.9MiB / 61.4MiB
+_bk;t=1729032368485Copying blob ecd06e024ec6 [==============>-----------------------] 32.8MiB / 82.3MiB
+_bk;t=1729032368485Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368633[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368633Copying blob 2b238499ec52 done  
+_bk;t=1729032368633Copying blob 6d11c181ebb3 [=====================================>] 47.2MiB / 47.3MiB
+_bk;t=1729032368633Copying blob a37a00ec5f00 [===========================>----------] 50.5MiB / 67.4MiB
+_bk;t=1729032368633Copying blob 41b754d079e8 [================>---------------------] 26.7MiB / 61.4MiB
+_bk;t=1729032368633Copying blob ecd06e024ec6 [===============>----------------------] 34.2MiB / 82.3MiB
+_bk;t=1729032368633Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368692[31mERRO[0m[0008] While applying layer: ApplyLayer stdout:  stderr: potentially insufficient UIDs or GIDs available in user namespace (requested 0:42 for /etc/gshadow): Check /etc/subuid and /etc/subgid if configured locally and run podman-system-migrate: lchown /etc/gshadow: invalid argument exit status 1 
+_bk;t=1729032368784[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368784Copying blob 2b238499ec52 done  
+_bk;t=1729032368784Copying blob 6d11c181ebb3 [======================================] 47.3MiB / 47.3MiB
+_bk;t=1729032368784Copying blob a37a00ec5f00 [=============================>--------] 54.1MiB / 67.4MiB
+_bk;t=1729032368784Copying blob 41b754d079e8 [=================>--------------------] 29.2MiB / 61.4MiB
+_bk;t=1729032368784Copying blob ecd06e024ec6 [================>---------------------] 37.5MiB / 82.3MiB
+_bk;t=1729032368784Copying blob 4f4fb700ef54 done  
+_bk;t=1729032368937[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032368938Copying blob 2b238499ec52 done  
+_bk;t=1729032368938Copying blob 6d11c181ebb3 done  
+_bk;t=1729032368938Copying blob a37a00ec5f00 [================================>-----] 58.9MiB / 67.4MiB
+_bk;t=1729032368938Copying blob 41b754d079e8 [===================>------------------] 31.6MiB / 61.4MiB
+_bk;t=1729032368938Copying blob ecd06e024ec6 [=================>--------------------] 39.9MiB / 82.3MiB
+_bk;t=1729032368938Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369084[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369084Copying blob 2b238499ec52 done  
+_bk;t=1729032369084Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369084Copying blob a37a00ec5f00 [===================================>--] 63.8MiB / 67.4MiB
+_bk;t=1729032369084Copying blob 41b754d079e8 [====================>-----------------] 33.8MiB / 61.4MiB
+_bk;t=1729032369084Copying blob ecd06e024ec6 [===================>------------------] 42.3MiB / 82.3MiB
+_bk;t=1729032369084Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369234[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369234Copying blob 2b238499ec52 done  
+_bk;t=1729032369234Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369234Copying blob a37a00ec5f00 [======================================] 67.4MiB / 67.4MiB
+_bk;t=1729032369234Copying blob 41b754d079e8 [======================>---------------] 36.7MiB / 61.4MiB
+_bk;t=1729032369234Copying blob ecd06e024ec6 [====================>-----------------] 45.0MiB / 82.3MiB
+_bk;t=1729032369234Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369384[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369384Copying blob 2b238499ec52 done  
+_bk;t=1729032369384Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369384Copying blob a37a00ec5f00 done  
+_bk;t=1729032369384Copying blob 41b754d079e8 [========================>-------------] 39.6MiB / 61.4MiB
+_bk;t=1729032369384Copying blob ecd06e024ec6 [======================>---------------] 48.8MiB / 82.3MiB
+_bk;t=1729032369384Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369534[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369534Copying blob 2b238499ec52 done  
+_bk;t=1729032369534Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369534Copying blob a37a00ec5f00 done  
+_bk;t=1729032369534Copying blob 41b754d079e8 [==========================>-----------] 43.5MiB / 61.4MiB
+_bk;t=1729032369534Copying blob ecd06e024ec6 [========================>-------------] 54.6MiB / 82.3MiB
+_bk;t=1729032369534Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369684[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369684Copying blob 2b238499ec52 done  
+_bk;t=1729032369684Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369684Copying blob a37a00ec5f00 done  
+_bk;t=1729032369684Copying blob 41b754d079e8 [============================>---------] 47.5MiB / 61.4MiB
+_bk;t=1729032369684Copying blob ecd06e024ec6 [===========================>----------] 60.4MiB / 82.3MiB
+_bk;t=1729032369684Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369836[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369836Copying blob 2b238499ec52 done  
+_bk;t=1729032369836Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369836Copying blob a37a00ec5f00 done  
+_bk;t=1729032369836Copying blob 41b754d079e8 [===============================>------] 51.4MiB / 61.4MiB
+_bk;t=1729032369836Copying blob ecd06e024ec6 [============================>---------] 63.8MiB / 82.3MiB
+_bk;t=1729032369836Copying blob 4f4fb700ef54 done  
+_bk;t=1729032369985[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032369985Copying blob 2b238499ec52 done  
+_bk;t=1729032369985Copying blob 6d11c181ebb3 done  
+_bk;t=1729032369985Copying blob a37a00ec5f00 done  
+_bk;t=1729032369985Copying blob 41b754d079e8 [================================>-----] 53.7MiB / 61.4MiB
+_bk;t=1729032369985Copying blob ecd06e024ec6 [================================>-----] 71.9MiB / 82.3MiB
+_bk;t=1729032369985Copying blob 4f4fb700ef54 done  
+_bk;t=1729032370134[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032370134Copying blob 2b238499ec52 done  
+_bk;t=1729032370134Copying blob 6d11c181ebb3 done  
+_bk;t=1729032370134Copying blob a37a00ec5f00 done  
+_bk;t=1729032370134Copying blob 41b754d079e8 [===================================>--] 58.3MiB / 61.4MiB
+_bk;t=1729032370134Copying blob ecd06e024ec6 [==================================>---] 75.8MiB / 82.3MiB
+_bk;t=1729032370134Copying blob 4f4fb700ef54 done  
+_bk;t=1729032370276[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032370276Copying blob 2b238499ec52 done  
+_bk;t=1729032370276Copying blob 6d11c181ebb3 done  
+_bk;t=1729032370276Copying blob a37a00ec5f00 done  
+_bk;t=1729032370276Copying blob 41b754d079e8 [======================================] 61.4MiB / 61.4MiB
+_bk;t=1729032370276Copying blob ecd06e024ec6 [======================================] 82.3MiB / 82.3MiB
+_bk;t=1729032370276Copying blob 4f4fb700ef54 done  
+_bk;t=1729032370276[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032370276Copying blob 2b238499ec52 done  
+_bk;t=1729032370276Copying blob 6d11c181ebb3 done  
+_bk;t=1729032370276Copying blob a37a00ec5f00 done  
+_bk;t=1729032370276Copying blob 41b754d079e8 done  
+_bk;t=1729032370276Copying blob ecd06e024ec6 done  
+_bk;t=1729032370276Copying blob 4f4fb700ef54 done  
+_bk;t=1729032370277[7A[JCopying blob f14586a49dad done  
+_bk;t=1729032370277Copying blob 2b238499ec52 done  
+_bk;t=1729032370277Copying blob 6d11c181ebb3 done  
+_bk;t=1729032370277Copying blob a37a00ec5f00 done  
+_bk;t=1729032370277Copying blob 41b754d079e8 done  
+_bk;t=1729032370277Copying blob ecd06e024ec6 done  
+_bk;t=1729032370277Copying blob 4f4fb700ef54 done  
+_bk;t=1729032370295Error: creating build container: copying system image from manifest list: writing blob: adding layer with blob "sha256:6d11c181ebb38ef30f2681a42f02030bc6fdcfbe9d5248270ee065eb7302b500": ApplyLayer stdout:  stderr: potentially insufficient UIDs or GIDs available in user namespace (requested 0:42 for /etc/gshadow): Check /etc/subuid and /etc/subgid if configured locally and run podman-system-migrate: lchown /etc/gshadow: invalid argument exit status 1
+_bk;t=1729032370297^^^ +++
+_bk;t=1729032370297[31m🚨 Error: The command exited with status 1[0m
+_bk;t=1729032370297^^^ +++
+_bk;t=1729032370297user command error: exit status 1
