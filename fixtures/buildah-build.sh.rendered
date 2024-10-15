@@ -1,0 +1,63 @@
+<time datetime="2024-10-15T22:45:57.206Z">2024-10-15T22:45:57.206Z</time>~~~ Preparing working directory
+<time datetime="2024-10-15T22:45:57.206Z">2024-10-15T22:45:57.206Z</time><span class="term-fgi90"># Creating &quot;&#47;home&#47;josh&#47;.buildkite-agent&#47;builds&#47;ubuntu-1&#47;stargoose&#47;metrics-docker&quot;</span>
+<time datetime="2024-10-15T22:45:57.206Z">2024-10-15T22:45:57.206Z</time><span class="term-fgi90">$</span> cd &#47;home&#47;josh&#47;.buildkite-agent&#47;builds&#47;ubuntu-1&#47;stargoose&#47;metrics-docker
+<time datetime="2024-10-15T22:45:57.206Z">2024-10-15T22:45:57.206Z</time><span class="term-fgi90">$</span> git clone -v -- https:&#47;&#47;github.com&#47;buildkite&#47;buildkite-agent-metrics .
+<time datetime="2024-10-15T22:45:57.215Z">2024-10-15T22:45:57.215Z</time>Cloning into &#39;.&#39;...
+<time datetime="2024-10-15T22:45:57.684Z">2024-10-15T22:45:57.684Z</time>POST git-upload-pack (175 bytes)
+<time datetime="2024-10-15T22:45:57.941Z">2024-10-15T22:45:57.941Z</time>POST git-upload-pack (gzip 3202 to 1623 bytes)
+<time datetime="2024-10-15T22:45:58.189Z">2024-10-15T22:45:58.189Z</time>remote: Enumerating objects: 5191, done.
+<time datetime="2024-10-15T22:45:58.203Z">2024-10-15T22:45:58.203Z</time>remote: Counting objects: 100% (1011&#47;1011), done.
+<time datetime="2024-10-15T22:45:58.262Z">2024-10-15T22:45:58.262Z</time>remote: Compressing objects: 100% (462&#47;462), done.
+<time datetime="2024-10-15T22:45:58.653Z">2024-10-15T22:45:58.653Z</time>remote: Total 5191 (delta 674), reused 673 (delta 531), pack-reused 4180 (from 1)
+<time datetime="2024-10-15T22:45:58.653Z">2024-10-15T22:45:58.653Z</time>Receiving objects: 100% (5191&#47;5191), 4.67 MiB | 12.27 MiB&#47;s, done.
+<time datetime="2024-10-15T22:45:58.654Z">2024-10-15T22:45:58.654Z</time>Resolving deltas: 100% (2035&#47;2035), done.
+<time datetime="2024-10-15T22:45:58.72Z">2024-10-15T22:45:58.72Z</time><span class="term-fgi90">$</span> git clean -ffxdq
+<time datetime="2024-10-15T22:45:58.721Z">2024-10-15T22:45:58.721Z</time><span class="term-fgi90">$</span> git fetch -v --prune -- origin 72cd6c049caa8674907b3d518eccef010fb32574
+<time datetime="2024-10-15T22:45:59.14Z">2024-10-15T22:45:59.14Z</time>POST git-upload-pack (102 bytes)
+<time datetime="2024-10-15T22:45:59.441Z">2024-10-15T22:45:59.441Z</time>From https:&#47;&#47;github.com&#47;buildkite&#47;buildkite-agent-metrics
+<time datetime="2024-10-15T22:45:59.441Z">2024-10-15T22:45:59.441Z</time> * branch            72cd6c049caa8674907b3d518eccef010fb32574 -&gt; FETCH_HEAD
+<time datetime="2024-10-15T22:45:59.448Z">2024-10-15T22:45:59.448Z</time><span class="term-fgi90">$</span> git checkout -f 72cd6c049caa8674907b3d518eccef010fb32574
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>Note: switching to &#39;72cd6c049caa8674907b3d518eccef010fb32574&#39;.
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>You are in &#39;detached HEAD&#39; state. You can look around, make experimental
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>changes and commit them, and you can discard any commits you make in this
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>state without impacting any branches by switching back to a branch.
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>If you want to create a new branch to retain commits you create, you may
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>do so (now or later) by using -c with the switch command. Example:
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>  git switch -c &lt;new-branch-name&gt;
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>Or undo this operation with:
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>  git switch -
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>Turn off this advice by setting config variable advice.detachedHead to false
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>
+<time datetime="2024-10-15T22:45:59.456Z">2024-10-15T22:45:59.456Z</time>HEAD is now at 72cd6c0 Merge pull request #315 from buildkite&#47;dependabot&#47;docker&#47;docker&#47;library&#47;golang-a7f2fc9
+<time datetime="2024-10-15T22:45:59.457Z">2024-10-15T22:45:59.457Z</time><span class="term-fgi90"># Cleaning again to catch any post-checkout changes</span>
+<time datetime="2024-10-15T22:45:59.457Z">2024-10-15T22:45:59.457Z</time><span class="term-fgi90">$</span> git clean -ffxdq
+<time datetime="2024-10-15T22:45:59.458Z">2024-10-15T22:45:59.458Z</time><span class="term-fgi90"># Checking to see if git commit information needs to be sent to Buildkite...</span>
+<time datetime="2024-10-15T22:45:59.459Z">2024-10-15T22:45:59.459Z</time><span class="term-fgi90">$</span> buildkite-agent meta-data exists buildkite:git:commit
+<time datetime="2024-10-15T22:46:00.279Z">2024-10-15T22:46:00.279Z</time><span class="term-fgi90"># Git commit information has already been sent to Buildkite</span>
+<time datetime="2024-10-15T22:46:00.28Z">2024-10-15T22:46:00.28Z</time>~~~ Running commands
+<time datetime="2024-10-15T22:46:00.28Z">2024-10-15T22:46:00.28Z</time><span class="term-fgi90">$</span> buildah build .
+<time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Reading allowed ID mappings: reading subuid mappings for user &quot;josh&quot; and subgid mappings for group &quot;josh&quot;: no subuid ranges found for user &quot;josh&quot; in &#47;etc&#47;subuid
+<time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Found no UID ranges set aside for user &quot;josh&quot; in &#47;etc&#47;subuid.
+<time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Found no GID ranges set aside for user &quot;josh&quot; in &#47;etc&#47;subgid.
+<time datetime="2024-10-15T22:46:00.34Z">2024-10-15T22:46:00.34Z</time>[1&#47;2] STEP 1&#47;4: FROM public.ecr.aws&#47;docker&#47;library&#47;golang:1.23.2@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32 AS builder
+<time datetime="2024-10-15T22:46:00.349Z">2024-10-15T22:46:00.349Z</time>Trying to pull public.ecr.aws&#47;docker&#47;library&#47;golang@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32...
+<time datetime="2024-10-15T22:46:04.883Z">2024-10-15T22:46:04.883Z</time>Getting image source signatures
+<time datetime="2024-10-15T22:46:05.04Z">2024-10-15T22:46:05.04Z</time>Copying blob f14586a49dad done
+<time datetime="2024-10-15T22:46:08.633Z">2024-10-15T22:46:08.633Z</time>Copying blob f14586a49dad done
+<time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 2b238499ec52 done
+<time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 6d11c181ebb3 done
+<time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob a37a00ec5f00 done
+<time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 41b754d079e8 done
+<time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob ecd06e024ec6 done
+<time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 4f4fb700ef54 done
+<time datetime="2024-10-15T22:46:10.295Z">2024-10-15T22:46:10.295Z</time>Error: creating build container: copying system image from manifest list: writing blob: adding layer with blob &quot;sha256:6d11c181ebb38ef30f2681a42f02030bc6fdcfbe9d5248270ee065eb7302b500&quot;: ApplyLayer stdout:  stderr: potentially insufficient UIDs or GIDs available in user namespace (requested 0:42 for &#47;etc&#47;gshadow): Check &#47;etc&#47;subuid and &#47;etc&#47;subgid if configured locally and run podman-system-migrate: lchown &#47;etc&#47;gshadow: invalid argument exit status 1
+<time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time>^^^ +++
+<time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time><span class="term-fg31">🚨 Error: The command exited with status 1</span>
+<time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time>^^^ +++
+<time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time>user command error: exit status 1

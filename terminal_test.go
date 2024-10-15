@@ -12,6 +12,7 @@ import (
 )
 
 var TestFiles = []string{
+	"buildah-build.sh",
 	"control.sh",
 	"curl.sh",
 	"cursor-save-restore.sh",
@@ -173,7 +174,7 @@ var rendererTestCases = []struct {
 	{
 		name:  "allows clearing lines below the current line",
 		input: "foo\nbar\x1b[A\x1b[Jbaz",
-		want:  "foobaz",
+		want:  "foobaz\n&nbsp;",
 	},
 	{
 		name:  "doesn't freak out about clearing lines below when there aren't any",
@@ -191,14 +192,14 @@ var rendererTestCases = []struct {
 		want:  "foobar",
 	},
 	{
-		name:  "allows clearing the entire scrollback buffer with ESC [2J",
+		name:  "allows clearing the entire window with ESC [2J",
 		input: "this is a big long bit of terminal output\nplease pay it no mind, we will clear it soon\nokay, get ready for a disappearing act...\nand...and...\n\n\x1b[2Jhey presto",
-		want:  "hey presto",
+		want:  "&nbsp;\n&nbsp;\n&nbsp;\n&nbsp;\n&nbsp;\nhey presto",
 	},
 	{
-		name:  "allows clearing the entire scrollback buffer with ESC [3J also",
+		name:  "allows clearing the entire scrollback buffer with ESC [3J",
 		input: "this is a big long bit of terminal output\nplease pay it no mind, we will clear it soon\nokay, get ready for a disappearing act...\nand...and...\n\n\x1b[2Jhey presto",
-		want:  "hey presto",
+		want:  "&nbsp;\n&nbsp;\n&nbsp;\n&nbsp;\n&nbsp;\nhey presto",
 	},
 	{
 		name:  "allows erasing the current line up to a point",
@@ -519,17 +520,18 @@ func TestScreenWriteToXY(t *testing.T) {
 	}
 }
 
-func BenchmarkRendererControl(b *testing.B)    { benchmarkRender("control.sh", b) }
-func BenchmarkRendererCurl(b *testing.B)       { benchmarkRender("curl.sh", b) }
-func BenchmarkRendererHomer(b *testing.B)      { benchmarkRender("homer.sh", b) }
-func BenchmarkRendererITermLinks(b *testing.B) { benchmarkRender("itermlinks.sh", b) }
-func BenchmarkRendererDockerPull(b *testing.B) { benchmarkRender("docker-pull.sh", b) }
-func BenchmarkRendererPikachu(b *testing.B)    { benchmarkRender("pikachu.sh", b) }
-func BenchmarkRendererPlaywright(b *testing.B) { benchmarkRender("playwright.sh", b) }
-func BenchmarkRendererPowershell(b *testing.B) { benchmarkRender("pwsh.sh", b) }
-func BenchmarkRendererRustFmt(b *testing.B)    { benchmarkRender("rustfmt.sh", b) }
-func BenchmarkRendererWeather(b *testing.B)    { benchmarkRender("weather.sh", b) }
-func BenchmarkRendererNpm(b *testing.B)        { benchmarkRender("npm.sh", b) }
+func BenchmarkRendererBuildahBuild(b *testing.B) { benchmarkRender("buildah-build.sh", b) }
+func BenchmarkRendererControl(b *testing.B)      { benchmarkRender("control.sh", b) }
+func BenchmarkRendererCurl(b *testing.B)         { benchmarkRender("curl.sh", b) }
+func BenchmarkRendererHomer(b *testing.B)        { benchmarkRender("homer.sh", b) }
+func BenchmarkRendererITermLinks(b *testing.B)   { benchmarkRender("itermlinks.sh", b) }
+func BenchmarkRendererDockerPull(b *testing.B)   { benchmarkRender("docker-pull.sh", b) }
+func BenchmarkRendererPikachu(b *testing.B)      { benchmarkRender("pikachu.sh", b) }
+func BenchmarkRendererPlaywright(b *testing.B)   { benchmarkRender("playwright.sh", b) }
+func BenchmarkRendererPowershell(b *testing.B)   { benchmarkRender("pwsh.sh", b) }
+func BenchmarkRendererRustFmt(b *testing.B)      { benchmarkRender("rustfmt.sh", b) }
+func BenchmarkRendererWeather(b *testing.B)      { benchmarkRender("weather.sh", b) }
+func BenchmarkRendererNpm(b *testing.B)          { benchmarkRender("npm.sh", b) }
 
 func BenchmarkRendererDockerComposePull(b *testing.B) {
 	benchmarkRender("docker-compose-pull.sh", b)
@@ -543,17 +545,18 @@ func benchmarkRender(filename string, b *testing.B) {
 	}
 }
 
-func BenchmarkStreamingControl(b *testing.B)    { benchmarkStreaming("control.sh", b) }
-func BenchmarkStreamingCurl(b *testing.B)       { benchmarkStreaming("curl.sh", b) }
-func BenchmarkStreamingHomer(b *testing.B)      { benchmarkStreaming("homer.sh", b) }
-func BenchmarkStreamingITermLinks(b *testing.B) { benchmarkStreaming("itermlinks.sh", b) }
-func BenchmarkStreamingDockerPull(b *testing.B) { benchmarkStreaming("docker-pull.sh", b) }
-func BenchmarkStreamingPikachu(b *testing.B)    { benchmarkStreaming("pikachu.sh", b) }
-func BenchmarkStreamingPlaywright(b *testing.B) { benchmarkStreaming("playwright.sh", b) }
-func BenchmarkStreamingPowershell(b *testing.B) { benchmarkStreaming("pwsh.sh", b) }
-func BenchmarkStreamingRustFmt(b *testing.B)    { benchmarkStreaming("rustfmt.sh", b) }
-func BenchmarkStreamingWeather(b *testing.B)    { benchmarkStreaming("weather.sh", b) }
-func BenchmarkStreamingNpm(b *testing.B)        { benchmarkStreaming("npm.sh", b) }
+func BenchmarkStreamingBuildahBuild(b *testing.B) { benchmarkStreaming("buildah-build.sh", b) }
+func BenchmarkStreamingControl(b *testing.B)      { benchmarkStreaming("control.sh", b) }
+func BenchmarkStreamingCurl(b *testing.B)         { benchmarkStreaming("curl.sh", b) }
+func BenchmarkStreamingHomer(b *testing.B)        { benchmarkStreaming("homer.sh", b) }
+func BenchmarkStreamingITermLinks(b *testing.B)   { benchmarkStreaming("itermlinks.sh", b) }
+func BenchmarkStreamingDockerPull(b *testing.B)   { benchmarkStreaming("docker-pull.sh", b) }
+func BenchmarkStreamingPikachu(b *testing.B)      { benchmarkStreaming("pikachu.sh", b) }
+func BenchmarkStreamingPlaywright(b *testing.B)   { benchmarkStreaming("playwright.sh", b) }
+func BenchmarkStreamingPowershell(b *testing.B)   { benchmarkStreaming("pwsh.sh", b) }
+func BenchmarkStreamingRustFmt(b *testing.B)      { benchmarkStreaming("rustfmt.sh", b) }
+func BenchmarkStreamingWeather(b *testing.B)      { benchmarkStreaming("weather.sh", b) }
+func BenchmarkStreamingNpm(b *testing.B)          { benchmarkStreaming("npm.sh", b) }
 
 func BenchmarkStreamingDockerComposePull(b *testing.B) {
 	benchmarkStreaming("docker-compose-pull.sh", b)
