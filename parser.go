@@ -23,7 +23,8 @@ type position struct {
 // Stateful ANSI parser
 type parser struct {
 	screen               *Screen
-	buffer               []byte
+	buffer               join
+	remainder            []byte
 	mode                 int
 	cursor               int
 	escapeStartedAt      int
@@ -82,14 +83,14 @@ type parser struct {
  */
 
 func (p *parser) parseToScreen(input []byte) {
-	if len(p.buffer) == 0 {
-		p.buffer = input
-	} else {
-		p.buffer = append(p.buffer, input...)
-	}
 
-	for p.cursor < len(p.buffer) {
-		char, charLen := utf8.DecodeRune(p.buffer[p.cursor:])
+	// This is like append(p.remainder, input), but without copying.
+	p.buffer = join{p.remainder, input}
+
+	for p.cursor < p.buffer.len() {
+		// UTF-8 runes are 1-4 bytes, so slice ahead +4.
+		charBytes := p.buffer.slice(p.cursor, min(p.cursor+4, p.buffer.len()))
+		char, charLen := utf8.DecodeRune(charBytes)
 
 		switch p.mode {
 		case parserModeEscape:
@@ -129,15 +130,19 @@ func (p *parser) parseToScreen(input []byte) {
 	}
 
 	// If we're in normal mode, everything up to the cursor has been procesed.
-	// If we're in the middle of an escape, everything up to p.escapeStartedAt
-	// has been processed.
-	done := p.escapeStartedAt
 	if p.mode == parserModeNormal {
-		done = p.cursor
+		p.cursor = 0
+		p.remainder = p.remainder[:0]
+		return
 	}
 
-	// Drop the completed portion of the buffer.
-	p.buffer = p.buffer[done:]
+	// We're in the middle of an escape, only everything up to p.escapeStartedAt
+	// has been processed. The remainder sits at the end of input, which we
+	// don't want to retain (see io.Writer docs), so copy it using append.
+	done := p.escapeStartedAt
+	p.remainder = append(p.remainder[:0], p.buffer.slice(done, p.buffer.len())...)
+
+	// Adjust the buffer indices accordingly.
 	p.cursor -= done
 	p.instructionStartedAt -= done
 	p.escapeStartedAt -= done
@@ -184,7 +189,7 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 // processOperatingSystemCommand processes the contents of the OSC that was just read.
 func (p *parser) processOperatingSystemCommand(end int) {
 	p.mode = parserModeNormal
-	element, err := parseElementSequence(string(p.buffer[p.instructionStartedAt:end]))
+	element, err := parseElementSequence(string(p.buffer.slice(p.instructionStartedAt, end)))
 	// Errors are rendered into the screen (see below).
 
 	if element == nil && err == nil {
@@ -275,7 +280,7 @@ func (p *parser) handleApplicationProgramCommand(char rune) {
 // processApplicationProgramCommand process the contents of the APC that was just read.
 func (p *parser) processApplicationProgramCommand(end int) {
 	p.mode = parserModeNormal
-	sequence := string(p.buffer[p.instructionStartedAt:end])
+	sequence := string(p.buffer.slice(p.instructionStartedAt, end))
 
 	// this might be a Buildkite Application Program Command sequence...
 	data, err := p.parseBuildkiteAPC(sequence)
@@ -389,8 +394,27 @@ func (p *parser) handleEscape(char rune) {
 // addInstruction appends an instruction to p.instructions, if the current
 // instruction is nonempty.
 func (p *parser) addInstruction() {
-	instruction := string(p.buffer[p.instructionStartedAt:p.cursor])
+	instruction := string(p.buffer.slice(p.instructionStartedAt, p.cursor))
 	if instruction != "" {
 		p.instructions = append(p.instructions, instruction)
 	}
 }
+
+// join provides a way to slice across consecutive []bytes. Copying happens at
+// slice time, not at construction.
+type join struct {
+	head, tail []byte
+}
+
+func (j join) slice(from, to int) []byte {
+	m := len(j.head)
+	if to <= m {
+		return j.head[from:to]
+	}
+	if from >= m {
+		return j.tail[from-m : to-m]
+	}
+	return append(j.head[from:], j.tail[:to-m]...)
+}
+
+func (j join) len() int { return len(j.head) + len(j.tail) }
