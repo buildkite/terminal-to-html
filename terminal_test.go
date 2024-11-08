@@ -102,9 +102,10 @@ var rendererTestCases = []struct {
 		want:  "this is poop and stuff",
 	},
 	{
+		// where "large" means "beyond the range of an int8"
 		name:  "allows large cursor movements backwards",
-		input: strings.Repeat("w", 300) + "\x1b[300Dhahaha",
-		want:  "hahaha" + strings.Repeat("w", 294),
+		input: strings.Repeat("w", 150) + "\x1b[300Dhahaha",
+		want:  "hahaha" + strings.Repeat("w", 144),
 	},
 	{
 		name:  "allows you to control the cursor upwards",

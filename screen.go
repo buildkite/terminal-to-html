@@ -40,10 +40,8 @@ type Screen struct {
 	maxColumns int
 
 	// Current window size. This is required to properly bound cursor movement
-	// commands. It defaults to 160 columns * 100 lines.
-	// Note that window size does not bound content - maxLines controls the
-	// number of screen lines held in the buffer, and each line can be
-	// arbitrarily long (when written with plain text).
+	// commands and implement line wrapping.
+	// It defaults to 160 columns * 100 lines.
 	cols, lines int
 
 	// Optional callback. If not nil, as each line is scrolled out of the top of
@@ -137,12 +135,6 @@ func (s *Screen) up(i string) {
 		s.CursorUpOOB++
 		s.y = 0
 	}
-	// If the cursor was on a line longer than the screen width, then pretend
-	// the line wrapped at that width.
-	// This is consistent with iTerm2 - try printing a long line of text,
-	// then ESC [1B, then some more text... then resize the window and see what
-	// happens.
-	s.x = s.x % s.cols
 }
 
 // Move the cursor down, if we can
@@ -152,7 +144,6 @@ func (s *Screen) down(i string) {
 		s.CursorDownOOB++
 		s.y = s.lines - 1
 	}
-	s.x = s.x % s.cols // see coment in the up method.
 }
 
 // Move the cursor forward (right) on the line, if we can
@@ -235,6 +226,15 @@ func (s *Screen) currentLineForWriting() *screenLine {
 
 // Write a character to the screen's current X&Y, along with the current screen style
 func (s *Screen) write(data rune) {
+	// Handle line wrapping
+	// Doing this at write time allows the cursor to be positioned past the end,
+	// as would happen if the entire line (including the last column) was
+	// written to, but doesn't allow writing past the last column.
+	if s.x >= s.cols {
+		s.x = 0
+		s.y++
+	}
+
 	line := s.currentLineForWriting()
 	line.writeNode(s.x, node{blob: data, style: s.style})
 
@@ -245,12 +245,13 @@ func (s *Screen) write(data rune) {
 		}
 		line.hyperlinks[s.x] = s.urlBrush
 	}
+
+	s.x++
 }
 
 // Append a character to the screen
 func (s *Screen) append(data rune) {
 	s.write(data)
-	s.x++
 }
 
 // Append multiple characters to the screen
@@ -261,6 +262,12 @@ func (s *Screen) appendMany(data []rune) {
 }
 
 func (s *Screen) appendElement(i *element) {
+	// Handle wrapping. See comment in [write].
+	if s.x >= s.cols {
+		s.x = 0
+		s.y++
+	}
+
 	line := s.currentLineForWriting()
 	idx := len(line.elements)
 	line.elements = append(line.elements, i)
