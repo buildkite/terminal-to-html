@@ -42,13 +42,15 @@
 <time datetime="2024-10-15T22:46:00.279Z">2024-10-15T22:46:00.279Z</time><span class="term-fgi90"># Git commit information has already been sent to Buildkite</span>
 <time datetime="2024-10-15T22:46:00.28Z">2024-10-15T22:46:00.28Z</time>~~~ Running commands
 <time datetime="2024-10-15T22:46:00.28Z">2024-10-15T22:46:00.28Z</time><span class="term-fgi90">$</span> buildah build .
-<time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Reading allowed ID mappings: reading subuid mappings for user &quot;josh&quot; and subgid mappings for group &quot;josh&quot;: no subuid ranges found for user &quot;josh&quot; in &#47;etc&#47;subuid
+<time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Reading allowed ID mappings: reading subuid mappings for user &quot;josh&quot; and subgid mappings for group &quot;josh&quot;: no subuid ranges found for user &quot;josh&quot; in
+&#47;etc&#47;subuid
 <time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Found no UID ranges set aside for user &quot;josh&quot; in &#47;etc&#47;subuid.
 <time datetime="2024-10-15T22:46:00.325Z">2024-10-15T22:46:00.325Z</time><span class="term-fg33">WARN</span>[0000] Found no GID ranges set aside for user &quot;josh&quot; in &#47;etc&#47;subgid.
 <time datetime="2024-10-15T22:46:00.34Z">2024-10-15T22:46:00.34Z</time>[1&#47;2] STEP 1&#47;4: FROM public.ecr.aws&#47;docker&#47;library&#47;golang:1.23.2@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32 AS builder
 <time datetime="2024-10-15T22:46:00.349Z">2024-10-15T22:46:00.349Z</time>Trying to pull public.ecr.aws&#47;docker&#47;library&#47;golang@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32...
 <time datetime="2024-10-15T22:46:04.883Z">2024-10-15T22:46:04.883Z</time>Getting image source signatures
 <time datetime="2024-10-15T22:46:05.04Z">2024-10-15T22:46:05.04Z</time>Copying blob f14586a49dad done
+<time datetime="2024-10-15T22:46:08.633Z">2024-10-15T22:46:08.633Z</time>Copying blob 2b238499ec52 done
 <time datetime="2024-10-15T22:46:08.633Z">2024-10-15T22:46:08.633Z</time>Copying blob f14586a49dad done
 <time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 2b238499ec52 done
 <time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 6d11c181ebb3 done
@@ -56,7 +58,9 @@
 <time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 41b754d079e8 done
 <time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob ecd06e024ec6 done
 <time datetime="2024-10-15T22:46:10.277Z">2024-10-15T22:46:10.277Z</time>Copying blob 4f4fb700ef54 done
-<time datetime="2024-10-15T22:46:10.295Z">2024-10-15T22:46:10.295Z</time>Error: creating build container: copying system image from manifest list: writing blob: adding layer with blob &quot;sha256:6d11c181ebb38ef30f2681a42f02030bc6fdcfbe9d5248270ee065eb7302b500&quot;: ApplyLayer stdout:  stderr: potentially insufficient UIDs or GIDs available in user namespace (requested 0:42 for &#47;etc&#47;gshadow): Check &#47;etc&#47;subuid and &#47;etc&#47;subgid if configured locally and run podman-system-migrate: lchown &#47;etc&#47;gshadow: invalid argument exit status 1
+<time datetime="2024-10-15T22:46:10.295Z">2024-10-15T22:46:10.295Z</time>Error: creating build container: copying system image from manifest list: writing blob: adding layer with blob &quot;sha256:6d11c181ebb38ef30f2681a42f02030bc6fdcfbe9
+d5248270ee065eb7302b500&quot;: ApplyLayer stdout:  stderr: potentially insufficient UIDs or GIDs available in user namespace (requested 0:42 for &#47;etc&#47;gshadow): Check
+ &#47;etc&#47;subuid and &#47;etc&#47;subgid if configured locally and run podman-system-migrate: lchown &#47;etc&#47;gshadow: invalid argument exit status 1
 <time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time>^^^ +++
 <time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time><span class="term-fg31">🚨 Error: The command exited with status 1</span>
 <time datetime="2024-10-15T22:46:10.297Z">2024-10-15T22:46:10.297Z</time>^^^ +++
