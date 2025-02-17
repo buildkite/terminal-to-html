@@ -30,8 +30,7 @@
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">attempt</span> registry request try #1 at 13:05:54
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">fetch</span> GET https:&#47;&#47;registry.npmjs.org&#47;webgl-workshop&#47;-&#47;webgl-workshop-1.0.5.tgz
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">fetch</span> 200 https:&#47;&#47;registry.npmjs.org&#47;webgl-workshop&#47;-&#47;webgl-workshop-1.0.5.tgz
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addTmpTarball</span> &#47;var&#47;folders&#47;q0&#47;mqfk4sjd5b1g5n62dd43p5x40000gn&#47;T&#47;npm-5354-43f5bcfd&#47;registry.npmjs.org&#47;webgl-workshop&#47;-&#47;webgl-workshop-1.0.5.tgz not in fl
-ight; adding
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addTmpTarball</span> &#47;var&#47;folders&#47;q0&#47;mqfk4sjd5b1g5n62dd43p5x40000gn&#47;T&#47;npm-5354-43f5bcfd&#47;registry.npmjs.org&#47;webgl-workshop&#47;-&#47;webgl-workshop-1.0.5.tgz not in flight; adding
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addTmpTarball</span> already have metadata; skipping unpack for webgl-workshop@1.0.5
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;webgl-workshop&#47;1.0.5&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;webgl-workshop&#47;1.0.5&#47;package&#47;package.json written
@@ -1193,8 +1192,7 @@ ight; adding
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;chalk&#47;0.5.1&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;chalk&#47;0.5.1&#47;package&#47;package.json written
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">fetch</span> 200 https:&#47;&#47;registry.npmjs.org&#47;fs-readdir-recursive&#47;-&#47;fs-readdir-recursive-0.0.2.tgz
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addTmpTarball</span> &#47;var&#47;folders&#47;q0&#47;mqfk4sjd5b1g5n62dd43p5x40000gn&#47;T&#47;npm-5354-43f5bcfd&#47;registry.npmjs.org&#47;fs-readdir-recursive&#47;-&#47;fs-readdir-recursive-0.0.2.t
-gz not in flight; adding
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addTmpTarball</span> &#47;var&#47;folders&#47;q0&#47;mqfk4sjd5b1g5n62dd43p5x40000gn&#47;T&#47;npm-5354-43f5bcfd&#47;registry.npmjs.org&#47;fs-readdir-recursive&#47;-&#47;fs-readdir-recursive-0.0.2.tgz not in flight; adding
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addTmpTarball</span> already have metadata; skipping unpack for fs-readdir-recursive@0.0.2
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;fs-readdir-recursive&#47;0.0.2&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;fs-readdir-recursive&#47;0.0.2&#47;package&#47;package.json written
@@ -2209,8 +2207,7 @@ gz not in flight; adding
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkMans</span> quotemeta@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> quotemeta@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> domify@1.3.1
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;fs-readdir-recursive-085e95b089ce5487.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fs-readdir-re
-cursive
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;fs-readdir-recursive-085e95b089ce5487.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fs-readdir-recursive
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> gl-clear@0.0.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> quotemeta@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">304</span> https:&#47;&#47;registry.npmjs.org&#47;escape-string-regexp
@@ -2708,14 +2705,11 @@ cursive
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">attempt</span> registry request try #1 at 13:07:09
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">etag</span> &quot;1AU4YUK9I5DF77HA6EEQT4CIP&quot;
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">request</span> GET https:&#47;&#47;registry.npmjs.org&#47;ast-parents
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;ansi-styles-250ba003f43322cb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;ansi-style
-s
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;escape-string-regexp-0950e1a968702cf8.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;e
-scape-string-regexp
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;ansi-styles-250ba003f43322cb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;ansi-styles
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;escape-string-regexp-0950e1a968702cf8.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;escape-string-regexp
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;strip-ansi-de6bd5761580abf5.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;strip-ansi
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;has-ansi-6bbdf848c01c7b1d.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;has-ansi
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;supports-color-2d77ab0ba6349a4b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;support
-s-color
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;supports-color-2d77ab0ba6349a4b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;supports-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">request</span> on initialization, where is &#47;static-eval
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">request</span> after pass 1, where is &#47;static-eval
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">request</span> url raw &#47;static-eval
@@ -2761,8 +2755,7 @@ s-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">attempt</span> registry request try #1 at 13:07:09
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">etag</span> &quot;5J5ZGJI53R08QVKRVRUDJYZES&quot;
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">request</span> GET https:&#47;&#47;registry.npmjs.org&#47;parse-headers
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-context-102a03f64a85f73b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-conte
-xt
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-context-102a03f64a85f73b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">request</span> on initialization, where is &#47;esprima
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">request</span> after pass 1, where is &#47;esprima
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">request</span> url raw &#47;esprima
@@ -2812,8 +2805,7 @@ xt
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">tar</span> unpack &#47;Users&#47;mp&#47;.npm&#47;gl-context&#47;0.0.0&#47;package.tgz
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">tar</span> unpacking to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">gentlyRm</span> vacuuming &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;convert-source-map-c1f8fe4b013865eb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework&#47;node_modules&#47;co
-nvert-source-map
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;convert-source-map-c1f8fe4b013865eb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework&#47;node_modules&#47;convert-source-map
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;css-55200013e0e751cd.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework&#47;node_modules&#47;css
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;resolve&#47;0.6.3&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> bit-twiddle@&gt;=1.0.0 &lt;2.0.0
@@ -3228,8 +3220,7 @@ nvert-source-map
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> has-ansi@0.1.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> supports-color@0.2.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> ansi-styles@1.1.0
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;escape-string-regexp-0950e1a968702cf8.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_mo
-dules&#47;escape-string-regexp
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;escape-string-regexp-0950e1a968702cf8.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;escape-string-regexp
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;supports-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;supports-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -3237,8 +3228,7 @@ dules&#47;escape-string-regexp
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span>   false,
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span>   &#39;&#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#39; ]
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">linkStuff</span> supports-color@0.2.0
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;ansi-styles-250ba003f43322cb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;ans
-i-styles
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;ansi-styles-250ba003f43322cb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;ansi-styles
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">cache add</span> spec ansi-regex@^0.2.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> ansi-regex@&gt;=0.2.1 &lt;0.3.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> name ansi-regex
@@ -3270,8 +3260,7 @@ i-styles
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> supports-color@0.2.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> linklocal@2.0.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">cache add</span> spec raf-component@^1.1.2
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;supports-color-2d77ab0ba6349a4b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;
-supports-color
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;supports-color-2d77ab0ba6349a4b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;chalk&#47;node_modules&#47;supports-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> raf-component@&gt;=1.1.2 &lt;2.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> name raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> uri https:&#47;&#47;registry.npmjs.org&#47;raf-component
@@ -3520,16 +3509,11 @@ supports-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> name cli-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> uri https:&#47;&#47;registry.npmjs.org&#47;cli-color
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNameRange</span> registry:https:&#47;&#47;registry.npmjs.org&#47;cli-color not in flight; fetching
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;scroll-speed-f49f7501abe1147b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_mod
-ules&#47;scroll-speed
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-pressed-64c6c531334a4723.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_mo
-dules&#47;mouse-pressed
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;key-pressed-87c1f7f392f79a27.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modu
-les&#47;key-pressed
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-position-359c014a9ddbcf08.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_m
-odules&#47;mouse-position
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;orbit-camera-b3d52245d3d1e8f3.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_mod
-ules&#47;orbit-camera
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;scroll-speed-f49f7501abe1147b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;scroll-speed
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-pressed-64c6c531334a4723.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;mouse-pressed
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;key-pressed-87c1f7f392f79a27.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-position-359c014a9ddbcf08.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;mouse-position
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;orbit-camera-b3d52245d3d1e8f3.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;scroll-speed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;mouse-pressed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed
@@ -3620,8 +3604,7 @@ ules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> convert-source-map@0.3.5
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;chalk&#47;0.4.0&#47;package&#47;package.json written
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> convert-source-map@0.3.5
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;convert-source-map-c1f8fe4b013865eb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework&#47;node_mod
-ules&#47;convert-source-map
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;convert-source-map-c1f8fe4b013865eb.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework&#47;node_modules&#47;convert-source-map
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">cache add</span> spec fd@~0.0.2
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> fd@&gt;=0.0.2 &lt;0.1.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> name fd
@@ -3722,10 +3705,8 @@ ules&#47;convert-source-map
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkMans</span> gl-api@1.0.2
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> gl-api@1.0.2
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">200</span> https:&#47;&#47;registry.npmjs.org&#47;split
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-8fb2ce92be6b766a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context&#47;node_modules&#47;raf
--component
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-7d9e0c8bad30a973.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-co
-ntext&#47;node_modules&#47;raf-component
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-8fb2ce92be6b766a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context&#47;node_modules&#47;raf-component
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-7d9e0c8bad30a973.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context&#47;node_modules&#47;raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> gl-api@1.0.2
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">304</span> https:&#47;&#47;registry.npmjs.org&#47;is-require
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">etag</span> https:&#47;&#47;registry.npmjs.org&#47;is-require from cache
@@ -3788,10 +3769,8 @@ ntext&#47;node_modules&#47;raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">linkStuff</span> mouse-pressed@0.0.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> orbit-camera@0.0.3
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;shallow-copy&#47;0.0.1&#47;package&#47;package.json not in flight; writing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mime-7c39d2a38832a107.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework-plugin-inline&#47;node_modules&#47;mi
-me
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;rework-plugin-function-a7196d1891c7b7a6.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework-plugin-inli
-ne&#47;node_modules&#47;rework-plugin-function
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mime-7c39d2a38832a107.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework-plugin-inline&#47;node_modules&#47;mime
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;rework-plugin-function-a7196d1891c7b7a6.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework-plugin-inline&#47;node_modules&#47;rework-plugin-function
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> wheel@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> name wheel
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> uri https:&#47;&#47;registry.npmjs.org&#47;wheel
@@ -3842,10 +3821,8 @@ ne&#47;node_modules&#47;rework-plugin-function
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> name gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">mapToRegistry</span> uri https:&#47;&#47;registry.npmjs.org&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNameRange</span> registry:https:&#47;&#47;registry.npmjs.org&#47;gl-matrix not in flight; fetching
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-position-359c014a9ddbcf08.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera
-&#47;node_modules&#47;mouse-position
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-pressed-64c6c531334a4723.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;
-node_modules&#47;mouse-pressed
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-position-359c014a9ddbcf08.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;mouse-position
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mouse-pressed-64c6c531334a4723.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;mouse-pressed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> through2@0.6.3
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">addNamed</span> through2@0.5.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">registry.get</span> https:&#47;&#47;registry.npmjs.org&#47;gl-matrix not expired, no request
@@ -3859,8 +3836,7 @@ node_modules&#47;mouse-pressed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> gl-matrix@2.2.1 into &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">installOne</span> gl-matrix@2.2.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of gl-matrix to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera not in flight; installing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-matrix-ce9a999d92a8a6bc.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_module
-s&#47;orbit-camera&#47;node_modules&#47;gl-matrix
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-matrix-ce9a999d92a8a6bc.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera&#47;node_modules&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera&#47;node_modules&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">gentlyRm</span> vacuuming &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera&#47;node_modules&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">tar</span> unpack &#47;Users&#47;mp&#47;.npm&#47;gl-matrix&#47;2.2.1&#47;package.tgz
@@ -3952,8 +3928,7 @@ s&#47;orbit-camera&#47;node_modules&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> minimist@0.0.8
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;escodegen&#47;1.4.1&#47;package&#47;package.json written
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> minimist@0.0.8
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-8fb2ce92be6b766a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context&#47;node_modu
-les&#47;raf-component
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-8fb2ce92be6b766a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context&#47;node_modules&#47;raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -3961,8 +3936,7 @@ les&#47;raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span>   false,
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span>   &#39;&#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#39; ]
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">linkStuff</span> gl-context@0.1.1
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-7d9e0c8bad30a973.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_module
-s&#47;gl-context&#47;node_modules&#47;raf-component
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;raf-component-7d9e0c8bad30a973.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context&#47;node_modules&#47;raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -3985,8 +3959,7 @@ s&#47;gl-context&#47;node_modules&#47;raf-component
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> [ &#39;raf-component&#39; ]
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> gl-context@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">200</span> https:&#47;&#47;registry.npmjs.org&#47;commander
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;minimist-f31fa617e65e38de.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;mkdirp&#47;node_modules&#47;minim
-ist
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;minimist-f31fa617e65e38de.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;mkdirp&#47;node_modules&#47;minimist
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;mkdirp
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;mkdirp
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -4013,8 +3986,7 @@ ist
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> [ &#39;minimist&#39; ]
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-context-b20e1808ab1f2a91.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">gentlyRm</span> vacuuming &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;.bin&#47;mkdirp
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-context-102a03f64a85f73b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;g
-l-context
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-context-102a03f64a85f73b.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear&#47;node_modules&#47;gl-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;gl-clear
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -4080,8 +4052,7 @@ l-context
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> mime@1.2.11
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> mime@1.2.11
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> mime@1.2.11
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mime-7c39d2a38832a107.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework-plugin-inline&#47;node_mod
-ules&#47;mime
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;mime-7c39d2a38832a107.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;rework-plugin-inline&#47;node_modules&#47;mime
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> resolve@1.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;resolve
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;resolve
@@ -4166,8 +4137,7 @@ ules&#47;mime
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> element-size@1.1.1 into &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">installOne</span> element-size@1.1.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of element-size to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit not in flight; installing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;element-size-96a2c7b477eaf2bf.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit&#47;node_modules&#47;elem
-ent-size
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;element-size-96a2c7b477eaf2bf.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit&#47;node_modules&#47;element-size
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit&#47;node_modules&#47;element-size
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">gentlyRm</span> vacuuming &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit&#47;node_modules&#47;element-size
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">tar</span> unpack &#47;Users&#47;mp&#47;.npm&#47;element-size&#47;1.1.1&#47;package.tgz
@@ -4191,8 +4161,7 @@ ent-size
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> element-size@1.1.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> element-size@1.1.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> element-size@1.1.1
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;element-size-96a2c7b477eaf2bf.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit&#47;node_modul
-es&#47;element-size
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;element-size-96a2c7b477eaf2bf.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit&#47;node_modules&#47;element-size
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-fit
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -4252,14 +4221,10 @@ es&#47;element-size
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of sleuth to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require not in flight; installing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;sleuth&#47;0.0.0&#47;package&#47;package.json written
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">200</span> https:&#47;&#47;registry.npmjs.org&#47;gl-buffer
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;is-require-652b49aac58d13b9.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;is-
-require
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;shallow-copy-e7e1bfaf895d9b1c.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;s
-hallow-copy
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through2-cf2488b3979471f6.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;throu
-gh2
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;escodegen-a29af576a100ccee.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;esco
-degen
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;is-require-652b49aac58d13b9.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;is-require
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;shallow-copy-e7e1bfaf895d9b1c.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;shallow-copy
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through2-cf2488b3979471f6.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;through2
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;escodegen-a29af576a100ccee.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;escodegen
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;acorn-ed81553a0113d45a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;acorn
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;astw-82cc392714cbe3c3.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;astw
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;sleuth-a697fb8ef79731de.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;sleuth
@@ -4318,8 +4283,7 @@ degen
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> is-require@0.0.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> is-require@0.0.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> is-require@0.0.1
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;is-require-652b49aac58d13b9.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modu
-les&#47;is-require
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;is-require-652b49aac58d13b9.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;is-require
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> sleuth@0.1.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> through2@0.6.3
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">cache add</span> spec static-eval@~0.1.0
@@ -4363,8 +4327,7 @@ les&#47;is-require
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;xtend&#47;2.1.2&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;xtend&#47;2.2.0&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;xtend&#47;4.0.0&#47;package&#47;package.json not in flight; writing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;shallow-copy-e7e1bfaf895d9b1c.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_mo
-dules&#47;shallow-copy
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;shallow-copy-e7e1bfaf895d9b1c.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;shallow-copy
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">200</span> https:&#47;&#47;registry.npmjs.org&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;xtend&#47;4.0.0&#47;package&#47;package.json written
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;xtend&#47;2.2.0&#47;package&#47;package.json written
@@ -4383,8 +4346,7 @@ dules&#47;shallow-copy
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> through@2.3.6 into &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">installOne</span> through@2.3.6
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of through to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split not in flight; installing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-f646f64c94eb46b5.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node
-_modules&#47;through
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-f646f64c94eb46b5.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">gentlyRm</span> vacuuming &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">tar</span> unpack &#47;Users&#47;mp&#47;.npm&#47;through&#47;2.3.6&#47;package.tgz
@@ -4403,8 +4365,7 @@ _modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> gl-matrix@2.2.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> gl-matrix@2.2.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> gl-matrix@2.2.1
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-matrix-ce9a999d92a8a6bc.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node
-_modules&#47;orbit-camera&#47;node_modules&#47;gl-matrix
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;gl-matrix-ce9a999d92a8a6bc.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera&#47;node_modules&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -4418,8 +4379,7 @@ _modules&#47;orbit-camera&#47;node_modules&#47;gl-matrix
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> [ &#39;gl-matrix&#39; ]
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> orbit-camera@0.0.3
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> orbit-camera@0.0.3
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;orbit-camera-b3d52245d3d1e8f3.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;n
-ode_modules&#47;orbit-camera
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;orbit-camera-b3d52245d3d1e8f3.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">preinstall</span> through@2.3.6
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node_modules&#47;through
@@ -4433,8 +4393,7 @@ ode_modules&#47;orbit-camera
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> through@2.3.6
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> through@2.3.6
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> through@2.3.6
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-f646f64c94eb46b5.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;spl
-it&#47;node_modules&#47;through
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-f646f64c94eb46b5.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;parse-obj&#47;node_modules&#47;split
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,
@@ -4796,14 +4755,12 @@ it&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of jstransform to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify not in flight; installing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;isndarray&#47;0.1.0&#47;package&#47;package.json written
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;gl-vao&#47;1.2.0&#47;package&#47;package.json not in flight; writing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;esprima-fb-1eef1ef701da733f.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;ast
-w&#47;node_modules&#47;esprima-fb
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;esprima-fb-1eef1ef701da733f.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;astw&#47;node_modules&#47;esprima-fb
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;xtend-850a623179f0ebf1.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;xtend
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-301149bbeb974fd1.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;esprima-fb-ef7106bb701941fa.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;esprima-fb
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;fresh-require&#47;node_modules&#47;astw&#47;node_modules&#47;esprima-fb
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;jstransform-93e0df9feecd5cff.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;jstransfo
-rm
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;jstransform-93e0df9feecd5cff.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;jstransform
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;xtend
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;esprima-fb
@@ -4867,8 +4824,7 @@ rm
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> through@2.3.6
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">postinstall</span> through@2.3.6
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;terminal-menu&#47;0.2.0&#47;package&#47;package.json written
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-301149bbeb974fd1.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;throug
-h
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;through-301149bbeb974fd1.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;envify&#47;node_modules&#47;through
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">304</span> https:&#47;&#47;registry.npmjs.org&#47;vkey
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">etag</span> https:&#47;&#47;registry.npmjs.org&#47;vkey from cache
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32 term-bg40">http</span> <span class="term-fg35">304</span> https:&#47;&#47;registry.npmjs.org&#47;insert-css
@@ -4881,8 +4837,7 @@ h
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">install</span> vkey@0.0.3 into &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">installOne</span> vkey@0.0.3
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of vkey to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed not in flight; installing
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;vkey-1eee51ea1601944a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key
--pressed&#47;node_modules&#47;vkey
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;vkey-1eee51ea1601944a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed&#47;node_modules&#47;vkey
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;insert-css&#47;0.1.1&#47;package&#47;package.json not in flight; writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">afterAdd</span> &#47;Users&#47;mp&#47;.npm&#47;insert-css&#47;0.1.1&#47;package&#47;package.json already in flight; not writing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed&#47;node_modules&#47;vkey
@@ -4907,13 +4862,10 @@ h
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">installOne</span> insert-css@0.1.1
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">installOne</span> of insert-css to &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu not in flight; installing
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;xtend-b95f567ac44f2f64.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;xtend
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;remove-element-1a000dc1f00c4d51.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;
-remove-element
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;terminal-menu-978bd933fb325903.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;t
-erminal-menu
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;remove-element-1a000dc1f00c4d51.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;remove-element
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;terminal-menu-978bd933fb325903.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;terminal-menu
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;vkey-01fbcf01078b6dbd.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;vkey
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;insert-css-a8a45193b9207ab1.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;inse
-rt-css
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">lock</span> using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;insert-css-a8a45193b9207ab1.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;insert-css
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;xtend
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;remove-element
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unbuild</span> node_modules&#47;webgl-workshop&#47;node_modules&#47;browser-menu&#47;node_modules&#47;terminal-menu
@@ -5003,8 +4955,7 @@ rt-css
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkBins</span> remove-element@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkMans</span> remove-element@0.0.0
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">rebuildBundles</span> remove-element@0.0.0
-<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;vkey-1eee51ea1601944a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modu
-les&#47;key-pressed&#47;node_modules&#47;vkey
+<span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">unlock</span> done using &#47;Users&#47;mp&#47;.npm&#47;_locks&#47;vkey-1eee51ea1601944a.lock for &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed&#47;node_modules&#47;vkey
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">about to build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg32">info</span> <span class="term-fg35">build</span> &#47;Users&#47;mp&#47;node_modules&#47;webgl-workshop&#47;node_modules&#47;canvas-orbit-camera&#47;node_modules&#47;key-pressed
 <span class="term-fg37 term-bg40">npm</span> <span class="term-fg34 term-bg40">verb</span> <span class="term-fg35">linkStuff</span> [ false,

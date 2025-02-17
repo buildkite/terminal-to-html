@@ -178,6 +178,10 @@ func (wc *writeCounter) Write(b []byte) (int, error) {
 	return n, err
 }
 
+func (wc *writeCounter) WriteString(s string) {
+	wc.out.Write([]byte(s))
+}
+
 // process streams the src through a terminal renderer to the dst. If preview is
 // true, the preview wrapper is added.
 func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen) (in, out int, err error) {
@@ -191,7 +195,7 @@ func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen
 	}
 
 	// Attach the scrollout callback before streaming input.
-	screen.ScrollOutFunc = func(line string) { fmt.Fprintln(wc, line) }
+	screen.ScrollOutFunc = wc.WriteString
 
 	inBytes, err := io.Copy(screen, src)
 	if err != nil {
@@ -200,7 +204,7 @@ func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen
 
 	// Write what remains in the screen buffer (everything that didn't scroll
 	// out of the top).
-	fmt.Fprint(wc, screen.AsHTML())
+	wc.WriteString(screen.AsHTML())
 
 	if preview {
 		if err := writePreviewEnd(wc); err != nil {
