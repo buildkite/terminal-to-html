@@ -77,10 +77,10 @@ func (b *outputBuffer) appendChar(char rune) {
 }
 
 // asHTML returns the line with HTML formatting.
-func (l *screenLine) asHTML() string {
+func (l *screenLine) asHTML(allowMetadata bool) string {
 	var lineBuf outputBuffer
 
-	if data, ok := l.metadata[bkNamespace]; ok {
+	if data, ok := l.metadata[bkNamespace]; ok && allowMetadata {
 		lineBuf.appendMeta(bkNamespace, data)
 	}
 
@@ -167,9 +167,15 @@ func (l *screenLine) asHTML() string {
 	// Close any that are open, in reverse order that they were opened.
 	closeFrom(0)
 
-	line := strings.TrimRight(lineBuf.buf.String(), " \t")
+	line := lineBuf.buf.String()
+	if l.newline {
+		line = strings.TrimRight(line, " \t")
+	}
 	if line == "" {
-		return "&nbsp;"
+		line = "&nbsp;"
+	}
+	if l.newline {
+		line += "\n"
 	}
 	return line
 }
@@ -184,5 +190,9 @@ func (l *screenLine) asPlain() string {
 		}
 	}
 
-	return strings.TrimRight(buf.String(), " \t")
+	line := buf.String()
+	if l.newline {
+		line = strings.TrimRight(line, " \t") + "\n"
+	}
+	return line
 }

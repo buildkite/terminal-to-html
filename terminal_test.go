@@ -465,7 +465,7 @@ func streamingRender(t testing.TB, raw []byte) string {
 	if err != nil {
 		t.Fatalf("NewScreen error: %v", err)
 	}
-	s.ScrollOutFunc = func(line string) { fmt.Fprintln(&buf, line) }
+	s.ScrollOutFunc = func(line string) { buf.WriteString(line) }
 	s.Write(raw)
 	buf.WriteString(s.AsHTML())
 	return buf.String()

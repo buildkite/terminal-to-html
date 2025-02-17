@@ -18,12 +18,12 @@ func TestScreenLineAsHTML_Interleaving(t *testing.T) {
 		{
 			name:  "a span /a /span",
 			input: "five \x1b]8;;http://example.com\x1b\\six \x1b[35mseven \x1b]8;;\x1b\\eight\x1b[0m",
-			want:  `five <a href="http://example.com">six <span class="term-fg35">seven </span></a><span class="term-fg35">eight</span>`,
+			want:  `five <a href="http://example.com">six <span class="term-fg35">seven </span></a><span class="term-fg35">eight</span>` + "\n",
 		},
 		{
 			name:  "span a /span /a",
 			input: "five \x1b[35msix \x1b]8;;http://example.com\x1b\\seven \x1b[0meight\x1b]8;;\x1b\\",
-			want:  `five <span class="term-fg35">six <a href="http://example.com">seven </a></span><a href="http://example.com">eight</a>`,
+			want:  `five <span class="term-fg35">six <a href="http://example.com">seven </a></span><a href="http://example.com">eight</a>` + "\n",
 		},
 	}
 
@@ -38,7 +38,7 @@ func TestScreenLineAsHTML_Interleaving(t *testing.T) {
 				t.Fatalf("len(s.screen) = %d, want 1", len(s.screen))
 			}
 
-			got := s.screen[0].asHTML()
+			got := s.screen[0].asHTML(true)
 			if diff := cmp.Diff(got, test.want); diff != "" {
 				t.Errorf("s.screen[0].asHTML diff (-got +want):\n%s", diff)
 			}

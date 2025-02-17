@@ -44,8 +44,14 @@ type Screen struct {
 	// It defaults to 160 columns * 100 lines.
 	cols, lines int
 
+	// prevNewline is used during rendering, and is true if the previous line
+	// that was rendered had a newline at the end. It starts set to true.
+	prevNewline bool
+
 	// Optional callback. If not nil, as each line is scrolled out of the top of
 	// the buffer, this func is called with the HTML.
+	// The line will often have a `\n` suffix, so there is no need to add
+	// '\n's specially.
 	ScrollOutFunc func(lineHTML string)
 
 	// Processing statistics
@@ -90,6 +96,7 @@ func NewScreen(opts ...ScreenOption) (*Screen, error) {
 		parser: parser{
 			mode: parserModeNormal,
 		},
+		prevNewline: true,
 	}
 	s.parser.screen = s
 	for _, o := range opts {
@@ -191,7 +198,10 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		// If maxLines is not in use, or adding a new line would not make it
 		// larger than maxLines, then just allocate a new line.
 		if s.maxLines <= 0 || len(s.screen)+1 <= s.maxLines {
-			newLine := screenLine{nodes: make([]node, 0, s.cols)}
+			newLine := screenLine{
+				nodes:   make([]node, 0, s.cols),
+				newline: true,
+			}
 			s.screen = append(s.screen, newLine)
 			if s.y >= s.lines {
 				// Because the "window" is always the last s.lines of s.screen
@@ -207,13 +217,17 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		// larger than maxLines.
 		// Pass the line being scrolled out to scrollOutFunc, if not nil.
 		if s.ScrollOutFunc != nil {
-			s.ScrollOutFunc(s.screen[0].asHTML())
+			s.ScrollOutFunc(s.screen[0].asHTML(s.prevNewline))
+			s.prevNewline = s.screen[0].newline
 		}
 		s.LinesScrolledOut++
 
 		// Trim the first line off the top of the screen.
 		// Recycle its nodes slice to make a new line on the bottom.
-		newLine := screenLine{nodes: s.screen[0].nodes[:0]}
+		newLine := screenLine{
+			nodes:   s.screen[0].nodes[:0],
+			newline: true,
+		}
 		s.screen = append(s.screen[1:], newLine)
 
 		// Since the buffer scrolled down, leaving len(s.screen) unchanged,
@@ -231,6 +245,10 @@ func (s *Screen) write(data rune) {
 	// as would happen if the entire line (including the last column) was
 	// written to, but doesn't allow writing past the last column.
 	if s.x >= s.cols {
+		// Don't actually wrap the line when outputting to plain text or HTML.
+		if line := s.currentLine(); line != nil {
+			line.newline = false
+		}
 		s.x = 0
 		s.y++
 	}
@@ -264,6 +282,9 @@ func (s *Screen) appendMany(data []rune) {
 func (s *Screen) appendElement(i *element) {
 	// Handle wrapping. See comment in [write].
 	if s.x >= s.cols {
+		if line := s.currentLine(); line != nil {
+			line.newline = false
+		}
 		s.x = 0
 		s.y++
 	}
@@ -461,27 +482,36 @@ func (s *Screen) Write(input []byte) (int, error) {
 
 // AsHTML returns the contents of the current screen buffer as HTML.
 func (s *Screen) AsHTML() string {
-	lines := make([]string, 0, len(s.screen))
-
+	var sb strings.Builder
 	for _, line := range s.screen {
-		lines = append(lines, line.asHTML())
+		// If the line we're about to write continues the previous line, then
+		// don't prefix it with metadata (the timestamp).
+		sb.WriteString(line.asHTML(s.prevNewline))
+		s.prevNewline = line.newline
 	}
-
-	return strings.Join(lines, "\n")
+	// Screen is not really intended to be re-rendered once it's done, so reset
+	// prevNewline to true so that the first line's metadata is always
+	// displayed.
+	s.prevNewline = true
+	return strings.TrimRight(sb.String(), "\n")
 }
 
 // AsPlainText renders the screen without any ANSI style etc.
 func (s *Screen) AsPlainText() string {
-	lines := make([]string, 0, len(s.screen))
-
+	var sb strings.Builder
 	for _, line := range s.screen {
-		lines = append(lines, line.asPlain())
+		sb.WriteString(line.asPlain())
 	}
-
-	return strings.Join(lines, "\n")
+	return strings.TrimRight(sb.String(), "\n")
 }
 
 func (s *Screen) newLine() {
+	// Ensure the previous line, if it already exists, gets a \n in the render.
+	// This could happen if we got CSI A (cursor up), and then \n onto a line
+	// that had previously been wrapped from the previous line.
+	if line := s.currentLine(); line != nil {
+		line.newline = true
+	}
 	s.x = 0
 	s.y++
 }
@@ -505,6 +535,10 @@ func (s *Screen) backspace() {
 type screenLine struct {
 	nodes []node
 
+	// newline is true for most lines, and means this line ends with \n.
+	// If newline is false, this line continues onto the next line.
+	newline bool
+
 	// metadata is { namespace => { key => value, ... }, ... }
 	// e.g. { "bk" => { "t" => "1234" } }
 	metadata map[string]map[string]string
@@ -526,6 +560,7 @@ func (l *screenLine) clearAll() {
 		return
 	}
 	l.nodes = l.nodes[:0]
+	l.newline = true
 }
 
 // clear clears part (or all) of a line. The range to clear is inclusive
