@@ -178,9 +178,7 @@ func (wc *writeCounter) Write(b []byte) (int, error) {
 	return n, err
 }
 
-func (wc *writeCounter) WriteString(s string) {
-	wc.out.Write([]byte(s))
-}
+func (wc *writeCounter) WriteString(s string) { wc.Write([]byte(s)) }
 
 // process streams the src through a terminal renderer to the dst. If preview is
 // true, the preview wrapper is added.

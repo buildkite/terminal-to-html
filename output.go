@@ -3,6 +3,7 @@ package terminal
 import (
 	"html"
 	"html/template"
+	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -20,25 +21,25 @@ var (
 )
 
 type outputBuffer struct {
-	buf strings.Builder
+	strings.Builder
 }
 
 func (b *outputBuffer) appendNodeStyle(n node) {
-	openSpanTagTmpl.Execute(&b.buf, strings.Join(n.style.asClasses(), " "))
+	openSpanTagTmpl.Execute(b, strings.Join(n.style.asClasses(), " "))
 }
 
 func (b *outputBuffer) closeStyle() {
-	b.buf.WriteString("</span>")
+	b.WriteString("</span>")
 }
 
 func (b *outputBuffer) appendAnchor(url string) {
-	b.buf.WriteString(`<a href="`)
-	b.buf.WriteString(html.EscapeString(sanitizeURL(url)))
-	b.buf.WriteString(`">`)
+	b.WriteString(`<a href="`)
+	b.WriteString(html.EscapeString(sanitizeURL(url)))
+	b.WriteString(`">`)
 }
 
 func (b *outputBuffer) closeAnchor() {
-	b.buf.WriteString("</a>")
+	b.WriteString("</a>")
 }
 
 func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
@@ -53,35 +54,42 @@ func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
 	time := time.Unix(millis/1000, (millis%1000)*1_000_000).UTC()
 	// One of the formats accepted by the <time> tag:
 	datetime := time.Format("2006-01-02T15:04:05.999Z")
-	timeTagImpl.Execute(&b.buf, datetime)
+	timeTagImpl.Execute(b, datetime)
 }
 
 // Append a character to our outputbuffer, escaping HTML bits as necessary.
 func (b *outputBuffer) appendChar(char rune) {
 	switch char {
 	case '&':
-		b.buf.WriteString("&amp;")
+		b.WriteString("&amp;")
 	case '\'':
-		b.buf.WriteString("&#39;")
+		b.WriteString("&#39;")
 	case '<':
-		b.buf.WriteString("&lt;")
+		b.WriteString("&lt;")
 	case '>':
-		b.buf.WriteString("&gt;")
+		b.WriteString("&gt;")
 	case '"':
-		b.buf.WriteString("&quot;")
+		b.WriteString("&quot;")
 	case '/':
-		b.buf.WriteString("&#47;")
+		b.WriteString("&#47;")
 	default:
-		b.buf.WriteRune(char)
+		b.WriteRune(char)
 	}
 }
 
-// asHTML returns the line with HTML formatting.
-func (l *screenLine) asHTML(allowMetadata bool) string {
-	var lineBuf outputBuffer
+// lineToHTML joins parts of a line together and renders them in HTML. It
+// ignores the newline field (i.e. assumes all parts are !newline except the
+// last part). The output string will have a terminating \n.
+func lineToHTML(parts []screenLine) string {
+	var buf outputBuffer
 
-	if data, ok := l.metadata[bkNamespace]; ok && allowMetadata {
-		lineBuf.appendMeta(bkNamespace, data)
+	// Combine metadata - last metadata wins.
+	bkmd := make(map[string]string)
+	for _, l := range parts {
+		maps.Copy(bkmd, l.metadata[bkNamespace])
+	}
+	if len(bkmd) > 0 {
+		buf.appendMeta(bkNamespace, bkmd)
 	}
 
 	// tagStack is used as a stack of open tags, so they can be closed in the
@@ -99,85 +107,79 @@ func (l *screenLine) asHTML(allowMetadata bool) string {
 		for i := len(tagStack) - 1; i >= idx; i-- {
 			switch tagStack[i] {
 			case tagAnchor:
-				lineBuf.closeAnchor()
+				buf.closeAnchor()
 			case tagSpan:
-				lineBuf.closeStyle()
+				buf.closeStyle()
 			}
 		}
 		tagStack = tagStack[:idx]
 	}
 
-	for x, current := range l.nodes {
-		// The zero value for node has a plain style and no hyperlink.
-		var previous node
-		// If we're past the first node in the line, there is a previous node
-		// to the left.
-		if x > 0 {
-			previous = l.nodes[x-1]
-		}
+	// The zero value for node has a plain style and no hyperlink.
+	var previous node
 
-		// A set of flags for which tags need changing.
-		tagChanged := []bool{
-			// The anchor tag needs changing if the link "style" has changed,
-			// or if they are both links the link URLs are different.
-			// (Note that the x-1 index into the hyperlinks map returns "".)
-			tagAnchor: current.style.hyperlink() != previous.style.hyperlink() ||
-				(current.style.hyperlink() && l.hyperlinks[x-1] != l.hyperlinks[x]),
+	for _, l := range parts {
+		for x, current := range l.nodes {
+			// A set of flags for which tags need changing.
+			tagChanged := []bool{
+				// The anchor tag needs changing if the link "style" has changed,
+				// or if they are both links the link URLs are different.
+				// (Note that the x-1 index into the hyperlinks map returns "".)
+				tagAnchor: current.style.hyperlink() != previous.style.hyperlink() ||
+					(current.style.hyperlink() && l.hyperlinks[x-1] != l.hyperlinks[x]),
 
-			// The span tag needs changing if the style has changed.
-			tagSpan: !current.hasSameStyle(previous),
-		}
-
-		// Go forward through the stack of open tags, looking for the first
-		// tag we need to close (because it changed).
-		// If none are found, closeFromIdx will be past the end of the stack.
-		closeFromIdx := len(tagStack)
-		for i, ot := range tagStack {
-			if tagChanged[ot] {
-				closeFromIdx = i
-				break
+				// The span tag needs changing if the style has changed.
+				tagSpan: !current.hasSameStyle(previous),
 			}
-		}
 
-		// Close everything from that stack index onwards.
-		closeFrom(closeFromIdx)
+			// Go forward through the stack of open tags, looking for the first
+			// tag we need to close (because it changed).
+			// If none are found, closeFromIdx will be past the end of the stack.
+			closeFromIdx := len(tagStack)
+			for i, ot := range tagStack {
+				if tagChanged[ot] {
+					closeFromIdx = i
+					break
+				}
+			}
 
-		// Now open new tags as needed.
-		// Open a new anchor tag, if one is not already open and this node is
-		// hyperlinked.
-		if !slices.Contains(tagStack, tagAnchor) && current.style.hyperlink() {
-			lineBuf.appendAnchor(l.hyperlinks[x])
-			tagStack = append(tagStack, tagAnchor)
-		}
-		// Open a new span tag, if one is not already open and this node has
-		// style.
-		if !slices.Contains(tagStack, tagSpan) && !current.style.isPlain() {
-			lineBuf.appendNodeStyle(current)
-			tagStack = append(tagStack, tagSpan)
-		}
+			// Close everything from that stack index onwards.
+			closeFrom(closeFromIdx)
 
-		// Write a standalone element or a rune.
-		if current.style.element() {
-			lineBuf.buf.WriteString(l.elements[current.blob].asHTML())
-		} else {
-			lineBuf.appendChar(current.blob)
+			// Now open new tags as needed.
+			// Open a new anchor tag, if one is not already open and this node is
+			// hyperlinked.
+			if !slices.Contains(tagStack, tagAnchor) && current.style.hyperlink() {
+				buf.appendAnchor(l.hyperlinks[x])
+				tagStack = append(tagStack, tagAnchor)
+			}
+			// Open a new span tag, if one is not already open and this node has
+			// style.
+			if !slices.Contains(tagStack, tagSpan) && !current.style.isPlain() {
+				buf.appendNodeStyle(current)
+				tagStack = append(tagStack, tagSpan)
+			}
+
+			// Write a standalone element or a rune.
+			if current.style.element() {
+				buf.WriteString(l.elements[current.blob].asHTML())
+			} else {
+				buf.appendChar(current.blob)
+			}
+
+			previous = current
 		}
 	}
 
 	// Close any that are open, in reverse order that they were opened.
 	closeFrom(0)
 
-	line := lineBuf.buf.String()
-	if l.newline {
-		line = strings.TrimRight(line, " \t")
+	out := strings.TrimRight(buf.String(), " \t")
+	if out == "" {
+		return "&nbsp;\n"
 	}
-	if line == "" {
-		line = "&nbsp;"
-	}
-	if l.newline {
-		line += "\n"
-	}
-	return line
+	out += "\n"
+	return out
 }
 
 // asPlain returns the line contents without any added HTML.

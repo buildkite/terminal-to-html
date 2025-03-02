@@ -44,14 +44,13 @@ type Screen struct {
 	// It defaults to 160 columns * 100 lines.
 	cols, lines int
 
-	// prevNewline is used during rendering, and is true if the previous line
-	// that was rendered had a newline at the end. It starts set to true.
-	prevNewline bool
+	// When multiple screen lines are scrolled out at once, their storage can be
+	// recycled later on.
+	nodeRecycling [][]node
 
 	// Optional callback. If not nil, as each line is scrolled out of the top of
 	// the buffer, this func is called with the HTML.
-	// The line will often have a `\n` suffix, so there is no need to add
-	// '\n's specially.
+	// The line will always have a `\n` suffix.
 	ScrollOutFunc func(lineHTML string)
 
 	// Processing statistics
@@ -96,7 +95,6 @@ func NewScreen(opts ...ScreenOption) (*Screen, error) {
 		parser: parser{
 			mode: parserModeNormal,
 		},
-		prevNewline: true,
 	}
 	s.parser.screen = s
 	for _, o := range opts {
@@ -104,6 +102,7 @@ func NewScreen(opts ...ScreenOption) (*Screen, error) {
 			return nil, err
 		}
 	}
+
 	return s, nil
 }
 
@@ -198,8 +197,19 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		// If maxLines is not in use, or adding a new line would not make it
 		// larger than maxLines, then just allocate a new line.
 		if s.maxLines <= 0 || len(s.screen)+1 <= s.maxLines {
+			var nodes []node
+			if len(s.nodeRecycling) > 0 {
+				// Pop one off the end of nodeRecycling
+				r1 := len(s.nodeRecycling) - 1
+				nodes = s.nodeRecycling[r1]
+				s.nodeRecycling = s.nodeRecycling[:r1]
+			}
+			if nodes == nil {
+				// No slices available for recycling, make a new one.
+				nodes = make([]node, 0, s.cols)
+			}
 			newLine := screenLine{
-				nodes:   make([]node, 0, s.cols),
+				nodes:   nodes,
 				newline: true,
 			}
 			s.screen = append(s.screen, newLine)
@@ -215,23 +225,42 @@ func (s *Screen) currentLineForWriting() *screenLine {
 
 		// maxLines is in effect, and adding a new line would make the screen
 		// larger than maxLines.
-		// Pass the line being scrolled out to scrollOutFunc, if not nil.
+		// Pass the whole line being scrolled out to ScrollOutFunc if available,
+		// otherwise just scroll out 1 line to nowhere.
+		scrollOutTo := 1
 		if s.ScrollOutFunc != nil {
-			s.ScrollOutFunc(s.screen[0].asHTML(s.prevNewline))
-			s.prevNewline = s.screen[0].newline
+			// Whole lines need to be passed to the callback. Find the end of
+			// the line (the screen line with newline = true).
+			// The majority of the time this will just be the first screen line.
+			// If it's all one enormous line, stop at the top of the screen.
+			// (so, allow scrollout to eat all of the "scrollback" but none of
+			// the "visible screen". We're talking a line that's 160*200
+			// chars long for the top of the screen to be reached that way.)
+			scrollOutTo = s.top()
+			for i, l := range s.screen {
+				if l.newline {
+					scrollOutTo = i + 1
+					break
+				}
+			}
+			s.ScrollOutFunc(lineToHTML(s.screen[:scrollOutTo]))
 		}
-		s.LinesScrolledOut++
+		for i := range scrollOutTo {
+			s.nodeRecycling = append(s.nodeRecycling, s.screen[i].nodes[:0])
+		}
+		s.LinesScrolledOut += scrollOutTo
 
-		// Trim the first line off the top of the screen.
-		// Recycle its nodes slice to make a new line on the bottom.
+		// Make a new line on the bottom using a recycled node slice. There's
+		// at least one we just added.
+		r1 := len(s.nodeRecycling) - 1
 		newLine := screenLine{
-			nodes:   s.screen[0].nodes[:0],
+			nodes:   s.nodeRecycling[r1],
 			newline: true,
 		}
-		s.screen = append(s.screen[1:], newLine)
+		s.nodeRecycling = s.nodeRecycling[:r1]
+		s.screen = append(s.screen[scrollOutTo:], newLine)
 
-		// Since the buffer scrolled down, leaving len(s.screen) unchanged,
-		// s.y moves upwards.
+		// Since the buffer added 1 line, s.y moves upwards.
 		s.y--
 	}
 
@@ -483,17 +512,23 @@ func (s *Screen) Write(input []byte) (int, error) {
 // AsHTML returns the contents of the current screen buffer as HTML.
 func (s *Screen) AsHTML() string {
 	var sb strings.Builder
-	for _, line := range s.screen {
-		// If the line we're about to write continues the previous line, then
-		// don't prefix it with metadata (the timestamp).
-		sb.WriteString(line.asHTML(s.prevNewline))
-		s.prevNewline = line.newline
+
+	screen := s.screen
+	for len(screen) > 0 {
+		// Find lineEnd of a line, or failing that, go to the end of the screen.
+		lineEnd := len(screen)
+		for i, l := range screen {
+			if l.newline {
+				lineEnd = i + 1
+				break
+			}
+		}
+		sb.WriteString(lineToHTML(screen[:lineEnd]))
+		screen = screen[lineEnd:]
 	}
-	// Screen is not really intended to be re-rendered once it's done, so reset
-	// prevNewline to true so that the first line's metadata is always
-	// displayed.
-	s.prevNewline = true
-	return strings.TrimRight(sb.String(), "\n")
+
+	// For backwards compatibility the final newline is trimmed.
+	return strings.TrimSuffix(sb.String(), "\n")
 }
 
 // AsPlainText renders the screen without any ANSI style etc.
@@ -502,7 +537,9 @@ func (s *Screen) AsPlainText() string {
 	for _, line := range s.screen {
 		sb.WriteString(line.asPlain())
 	}
-	return strings.TrimRight(sb.String(), "\n")
+
+	// For backwards compatibility the final newline is trimmed.
+	return strings.TrimSuffix(sb.String(), "\n")
 }
 
 func (s *Screen) newLine() {
