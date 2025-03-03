@@ -237,7 +237,7 @@ func (s *Screen) currentLineForWriting() *screenLine {
 			// the "visible screen". We're talking a line that's 160*200
 			// chars long for the top of the screen to be reached that way.)
 			scrollOutTo = s.top()
-			for i, l := range s.screen {
+			for i, l := range s.screen[:scrollOutTo] {
 				if l.newline {
 					scrollOutTo = i + 1
 					break

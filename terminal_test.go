@@ -485,7 +485,9 @@ func TestStreamingRendererAgainstCases(t *testing.T) {
 }
 
 func TestStreamingRendererAgainstFixtures(t *testing.T) {
-	for _, base := range TestFiles {
+	// Streaming vs non-streaming differs in adding a \n on extraordinarily
+	// huge lines, but huge-line is an important test for streaming mode.
+	for _, base := range append(TestFiles, "huge-line.sh") {
 		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
 			raw := loadFixture(t, base, "raw")
 			want := string(loadFixture(t, base, "rendered"))
