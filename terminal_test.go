@@ -258,6 +258,11 @@ var rendererTestCases = []struct {
 		want:  "<span class=\"term-fgx169 term-bgx50\">hello</span> <span class=\"term-fgx179\">goodbye</span>",
 	},
 	{
+		name:  "doesn't trip over 24-bit colors",
+		input: "\x1b[48;5;50;38;2;48;7;1mhello\x1b[0m \x1b[38;5;179;48;2;38;5;200mgoodbye",
+		want:  "<span class=\"term-bgx50\">hello</span> <span class=\"term-fgx179\">goodbye</span>",
+	},
+	{
 		name:  "handles non-xterm codes on the same line as xterm colors",
 		input: "\x1b[38;5;228;5;1mblinking and bold\x1b",
 		want:  `<span class="term-fgx228 term-fg1 term-fg5">blinking and bold</span>`,
