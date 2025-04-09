@@ -237,6 +237,11 @@ func (s *Screen) currentLineForWriting() *screenLine {
 			// the "visible screen". We're talking a line that's 160*200
 			// chars long for the top of the screen to be reached that way.)
 			scrollOutTo = s.top()
+			if s.top() == 0 {
+				// We still need to scroll out a line, even if there are no lines above
+				// the top of the window. Get the next line.
+				scrollOutTo = len(s.screen)
+			}
 			for i, l := range s.screen[:scrollOutTo] {
 				if l.newline {
 					scrollOutTo = i + 1
@@ -250,14 +255,21 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		}
 		s.LinesScrolledOut += scrollOutTo
 
-		// Make a new line on the bottom using a recycled node slice. There's
-		// at least one we just added.
-		r1 := len(s.nodeRecycling) - 1
+		var nodes []node
+		if r1 := len(s.nodeRecycling) - 1; r1 >= 0 {
+			// Make a new line on the bottom using a recycled node slice. There's
+			// usually at least one we just added.
+			nodes = s.nodeRecycling[r1]
+			s.nodeRecycling = s.nodeRecycling[:r1]
+		} else {
+			// No nodes to recycle, make a new node slice. This happens when we scroll
+			// out a line that consisted of no screenlines.
+			nodes = make([]node, 0, s.cols)
+		}
 		newLine := screenLine{
-			nodes:   s.nodeRecycling[r1],
+			nodes:   nodes,
 			newline: true,
 		}
-		s.nodeRecycling = s.nodeRecycling[:r1]
 		s.screen = append(s.screen[scrollOutTo:], newLine)
 
 		// Since the buffer added 1 line, s.y moves upwards.
