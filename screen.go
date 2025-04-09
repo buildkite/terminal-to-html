@@ -264,7 +264,7 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		} else {
 			// No nodes to recycle, make a new node slice. This happens when we scroll
 			// out a line that consisted of no screenlines.
-			nodes = make([]node, 0)
+			nodes = make([]node, 0, s.cols)
 		}
 		newLine := screenLine{
 			nodes:   nodes,
