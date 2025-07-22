@@ -52,6 +52,11 @@ var rendererTestCases = []struct {
 		want:  "hello",
 	},
 	{
+		name:  "handles trailing double newline",
+		input: "hello\n\n",
+		want:  "hello\n",
+	},
+	{
 		name:  "closes colors that get opened",
 		input: "he\033[32mllo",
 		want:  "he<span class=\"term-fg32\">llo</span>",
@@ -175,7 +180,7 @@ var rendererTestCases = []struct {
 	{
 		name:  "allows clearing lines below the current line",
 		input: "foo\nbar\x1b[A\x1b[Jbaz",
-		want:  "foobaz\n&nbsp;",
+		want:  "foobaz",
 	},
 	{
 		name:  "doesn't freak out about clearing lines below when there aren't any",
@@ -490,8 +495,7 @@ func TestStreamingRendererAgainstCases(t *testing.T) {
 }
 
 func TestStreamingRendererAgainstFixtures(t *testing.T) {
-	// Streaming vs non-streaming differs in adding a \n on extraordinarily
-	// huge lines, but huge-line is an important test for streaming mode.
+	// huge-line is an important test for streaming mode.
 	for _, base := range append(TestFiles, "huge-line.sh") {
 		t.Run(fmt.Sprintf("for fixture %q", base), func(t *testing.T) {
 			raw := loadFixture(t, base, "raw")
