@@ -30,6 +30,15 @@ var currentLineForWritingTestCases = []struct {
 		want: []string{"a\n", "b\n"},
 		maxlines: 2,
 	},
+	{
+		name: "Test cursor past the end then line change",
+		input: "\nabcdefghijklmnopqrstuvwxyz1234567890_-=.abcdefghijklmnopqrstuvwxyz1234567890_-=.abcdefghijklmnopqrstuvwxyz1234567890_-=.abcdefghijklmnopqrstuvwxyz1234567890_-=.\x1b[Aa\n\n\n",
+		want: []string{
+			"                                                                                                                                                               a\n",
+			"abcdefghijklmnopqrstuvwxyz1234567890_-=.abcdefghijklmnopqrstuvwxyz1234567890_-=.abcdefghijklmnopqrstuvwxyz1234567890_-=.abcdefghijklmnopqrstuvwxyz1234567890_-=.\n",
+		},
+		maxlines: 2,
+	},
 }
 
 func TestCurrentLineForWriting(t *testing.T) {
