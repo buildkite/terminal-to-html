@@ -202,10 +202,17 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		// have written all the way to the end of a line, so we can safely assume
 		// the current line exists.
 
+		// Carriage return.
+		s.x = 0
+
+		if s.currentLine() == nil {
+			// This should _never_ happen, but never say never.
+			s.currentLineForWriting()
+		}
+
 		// This, and the final line, are the only instances in which newline should
 		// be false.
 		s.currentLine().newline = false
-		s.x = 0
 		s.y++
 	}
 	// Ensure there are enough lines on screen to start writing here.
