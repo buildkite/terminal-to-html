@@ -141,6 +141,9 @@ func (s *Screen) up(i string) {
 		s.CursorUpOOB++
 		s.y = 0
 	}
+	// If the cursor was past the end and we change its y position, it moves to
+	// the final column instead.
+	s.x = min(s.x, s.cols-1)
 }
 
 // Move the cursor down, if we can
@@ -150,6 +153,9 @@ func (s *Screen) down(i string) {
 		s.CursorDownOOB++
 		s.y = s.lines - 1
 	}
+	// If the cursor was past the end and we change its y position, it moves to
+	// the final column instead.
+	s.x = min(s.x, s.cols-1)
 }
 
 // Move the cursor forward (right) on the line, if we can
