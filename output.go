@@ -77,10 +77,12 @@ func (b *outputBuffer) appendChar(char rune) {
 	}
 }
 
-// lineToHTML joins parts of a line together and renders them in HTML. It
-// ignores the newline field (i.e. assumes all parts are !newline except the
-// last part). The output string will have a terminating \n.
+// lineToHTML joins parts of a line together and renders them in HTML.
 func lineToHTML(parts []screenLine) string {
+	if len(parts) == 0 {
+		return ""
+	}
+
 	var buf outputBuffer
 
 	// Combine metadata - last metadata wins.
@@ -175,10 +177,12 @@ func lineToHTML(parts []screenLine) string {
 	closeFrom(0)
 
 	out := strings.TrimRight(buf.String(), " \t")
-	if out == "" {
-		return "&nbsp;\n"
+	if parts[len(parts)-1].newline {
+		if out == "" {
+			return "&nbsp;\n"
+		}
+		out += "\n"
 	}
-	out += "\n"
 	return out
 }
 
