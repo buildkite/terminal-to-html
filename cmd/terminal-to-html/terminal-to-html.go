@@ -90,7 +90,7 @@ func webservice(listen string, preview bool, screen *terminal.Screen) {
 		// > Request.Body.
 		// However, it lets us provide Content-Length in all cases.
 		b := bytes.NewBuffer(nil)
-		if _, _, err := process(b, r.Body, preview, &screen); err != nil {
+		if _, _, err := process(b, r.Body, preview, "html", false, &screen); err != nil {
 			log.Printf("error starting preview: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error creating preview.")
@@ -180,9 +180,8 @@ func (wc *writeCounter) Write(b []byte) (int, error) {
 
 func (wc *writeCounter) WriteString(s string) { wc.Write([]byte(s)) }
 
-// process streams the src through a terminal renderer to the dst. If preview is
-// true, the preview wrapper is added.
-func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen) (in, out int, err error) {
+// process streams the src through a terminal renderer to the dst.
+func process(dst io.Writer, src io.Reader, preview bool, format string, timestamps bool, screen *terminal.Screen) (in, out int, err error) {
 	// Wrap dst in writeCounter to count bytes written
 	wc := &writeCounter{out: dst}
 
@@ -193,7 +192,11 @@ func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen
 	}
 
 	// Attach the scrollout callback before streaming input.
-	screen.ScrollOutFunc = wc.WriteString
+	// Note: ScrollOutFunc always outputs HTML. For plain text format,
+	// streaming is not supported - use buffer-max-lines=0 to disable streaming.
+	if format == "html" {
+		screen.ScrollOutFunc = wc.WriteString
+	}
 
 	inBytes, err := io.Copy(screen, src)
 	if err != nil {
@@ -202,7 +205,11 @@ func process(dst io.Writer, src io.Reader, preview bool, screen *terminal.Screen
 
 	// Write what remains in the screen buffer (everything that didn't scroll
 	// out of the top).
-	wc.WriteString(screen.AsHTML())
+	if format == "plain" {
+		wc.WriteString(screen.AsPlainTextWithTimestamps(timestamps))
+	} else {
+		wc.WriteString(screen.AsHTML())
+	}
 
 	if preview {
 		if err := writePreviewEnd(wc); err != nil {
@@ -230,6 +237,15 @@ func main() {
 			Name:  "preview",
 			Usage: "wrap output in HTML & CSS so it can be easily viewed directly in a browser",
 		},
+		&cli.StringFlag{
+			Name:  "format",
+			Value: "html",
+			Usage: "output format: 'html' (default) or 'plain' for plain text",
+		},
+		&cli.BoolFlag{
+			Name:  "timestamps",
+			Usage: "include UTC timestamps in plain text output (only applies when --format=plain)",
+		},
 		&cli.BoolFlag{
 			Name:  "log-stats-to-stderr",
 			Usage: "Logs a JSON object to stderr containing resource and processing statistics after successfully processing",
@@ -256,6 +272,12 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) error {
+		// Validate format flag
+		format := c.String("format")
+		if format != "html" && format != "plain" {
+			return fmt.Errorf("invalid format %q: must be 'html' or 'plain'", format)
+		}
+
 		screen, err := terminal.NewScreen(
 			terminal.WithMaxSize(c.Int("window-max-cols"), c.Int("buffer-max-lines")),
 			terminal.WithSize(c.Int("window-cols"), c.Int("window-lines")),
@@ -283,7 +305,7 @@ func main() {
 			input = f
 		}
 
-		in, out, err := process(os.Stdout, input, c.Bool("preview"), screen)
+		in, out, err := process(os.Stdout, input, c.Bool("preview"), format, c.Bool("timestamps"), screen)
 		if err != nil {
 			return err
 		}

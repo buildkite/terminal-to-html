@@ -561,6 +561,26 @@ func (s *Screen) AsPlainText() string {
 	return strings.TrimSuffix(sb.String(), "\n")
 }
 
+// AsPlainTextWithTimestamps renders the screen as plain text, optionally
+// with UTC timestamp prefixes.
+func (s *Screen) AsPlainTextWithTimestamps(timestamps bool) string {
+	if !timestamps {
+		return s.AsPlainText()
+	}
+
+	var sb strings.Builder
+	for i := 0; i < len(s.screen); {
+		// Find the end of this logical line.
+		lineEnd := i + 1
+		for lineEnd < len(s.screen) && !s.screen[lineEnd-1].newline {
+			lineEnd++
+		}
+		sb.WriteString(lineToPlain(s.screen[i:lineEnd], true))
+		i = lineEnd
+	}
+	return strings.TrimSuffix(sb.String(), "\n")
+}
+
 func (s *Screen) newLine() {
 	// Do the carriage return first to ensure that currentLineForWriting can't
 	// give us the next line if the cursor was placed past the end of the line.
