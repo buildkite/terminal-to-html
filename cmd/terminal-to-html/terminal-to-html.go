@@ -192,11 +192,11 @@ func process(dst io.Writer, src io.Reader, preview bool, format string, timestam
 	}
 
 	// Attach the scrollout callback before streaming input.
-	// Note: ScrollOutFunc always outputs HTML. For plain text format,
-	// streaming is not supported - use buffer-max-lines=0 to disable streaming.
+	screen.Timestamps = timestamps
 	if format == "html" {
-		screen.Timestamps = timestamps
 		screen.ScrollOutFunc = wc.WriteString
+	} else {
+		screen.ScrollOutPlainFunc = wc.WriteString
 	}
 
 	inBytes, err := io.Copy(screen, src)

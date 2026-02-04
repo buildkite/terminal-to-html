@@ -53,6 +53,12 @@ type Screen struct {
 	// The line will always have a `\n` suffix.
 	ScrollOutFunc func(lineHTML string)
 
+	// Optional callback for plain text output. If not nil, as each line is
+	// scrolled out of the top of the buffer, this func is called with plain text.
+	// The line will always have a `\n` suffix.
+	// If both ScrollOutFunc and ScrollOutPlainFunc are set, only ScrollOutPlainFunc is used.
+	ScrollOutPlainFunc func(linePlain string)
+
 	// Timestamps controls whether timestamps are included in output.
 	// Defaults to true (timestamps included).
 	Timestamps bool
@@ -262,7 +268,7 @@ func (s *Screen) currentLineForWriting() *screenLine {
 		// Pass the whole line being scrolled out to ScrollOutFunc if available,
 		// otherwise just scroll out 1 line to nowhere.
 		scrollOutTo := 1
-		if s.ScrollOutFunc != nil {
+		if s.ScrollOutPlainFunc != nil || s.ScrollOutFunc != nil {
 			// Whole lines need to be passed to the callback. Find the end of
 			// the line (the screen line with newline = true).
 			// The majority of the time this will just be the first screen line.
@@ -282,7 +288,11 @@ func (s *Screen) currentLineForWriting() *screenLine {
 					break
 				}
 			}
-			s.ScrollOutFunc(lineToHTML(s.screen[:scrollOutTo], s.Timestamps))
+			if s.ScrollOutPlainFunc != nil {
+				s.ScrollOutPlainFunc(lineToPlain(s.screen[:scrollOutTo], s.Timestamps))
+			} else {
+				s.ScrollOutFunc(lineToHTML(s.screen[:scrollOutTo], s.Timestamps))
+			}
 		}
 		for i := range scrollOutTo {
 			s.nodeRecycling = append(s.nodeRecycling, s.screen[i].nodes[:0])
