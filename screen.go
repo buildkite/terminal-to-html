@@ -53,6 +53,10 @@ type Screen struct {
 	// The line will always have a `\n` suffix.
 	ScrollOutFunc func(lineHTML string)
 
+	// Timestamps controls whether timestamps are included in output.
+	// Defaults to true (timestamps included).
+	Timestamps bool
+
 	// Processing statistics
 	LinesScrolledOut int // count of lines that scrolled off the top
 	CursorUpOOB      int // count of times ESC [A or ESC [F tried to move y < 0
@@ -95,6 +99,7 @@ func NewScreen(opts ...ScreenOption) (*Screen, error) {
 		parser: parser{
 			mode: parserModeNormal,
 		},
+		Timestamps: true,
 	}
 	s.parser.screen = s
 	for _, o := range opts {
@@ -277,7 +282,7 @@ func (s *Screen) currentLineForWriting() *screenLine {
 					break
 				}
 			}
-			s.ScrollOutFunc(lineToHTML(s.screen[:scrollOutTo]))
+			s.ScrollOutFunc(lineToHTML(s.screen[:scrollOutTo], s.Timestamps))
 		}
 		for i := range scrollOutTo {
 			s.nodeRecycling = append(s.nodeRecycling, s.screen[i].nodes[:0])
@@ -528,8 +533,13 @@ func (s *Screen) Write(input []byte) (int, error) {
 	return len(input), nil
 }
 
-// AsHTML returns the contents of the current screen buffer as HTML.
+// AsHTML returns the contents of the current screen buffer as HTML with timestamps.
 func (s *Screen) AsHTML() string {
+	return s.AsHTMLWithTimestamps(true)
+}
+
+// AsHTMLWithTimestamps returns the contents of the current screen buffer as HTML.
+func (s *Screen) AsHTMLWithTimestamps(timestamps bool) string {
 	var sb strings.Builder
 
 	screen := s.screen
@@ -542,7 +552,7 @@ func (s *Screen) AsHTML() string {
 				break
 			}
 		}
-		sb.WriteString(lineToHTML(screen[:lineEnd]))
+		sb.WriteString(lineToHTML(screen[:lineEnd], timestamps))
 		screen = screen[lineEnd:]
 	}
 

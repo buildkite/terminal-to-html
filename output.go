@@ -80,7 +80,7 @@ func (b *outputBuffer) appendChar(char rune) {
 // lineToHTML joins parts of a line together and renders them in HTML. It
 // ignores the newline field (i.e. assumes all parts are !newline except the
 // last part). The output string will have a terminating \n.
-func lineToHTML(parts []screenLine) string {
+func lineToHTML(parts []screenLine, timestamps bool) string {
 	var buf outputBuffer
 
 	// Combine metadata - last metadata wins.
@@ -88,7 +88,7 @@ func lineToHTML(parts []screenLine) string {
 	for _, l := range parts {
 		maps.Copy(bkmd, l.metadata[bkNamespace])
 	}
-	if len(bkmd) > 0 {
+	if timestamps && len(bkmd) > 0 {
 		buf.appendMeta(bkNamespace, bkmd)
 	}
 

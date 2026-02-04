@@ -195,6 +195,7 @@ func process(dst io.Writer, src io.Reader, preview bool, format string, timestam
 	// Note: ScrollOutFunc always outputs HTML. For plain text format,
 	// streaming is not supported - use buffer-max-lines=0 to disable streaming.
 	if format == "html" {
+		screen.Timestamps = timestamps
 		screen.ScrollOutFunc = wc.WriteString
 	}
 
@@ -208,7 +209,7 @@ func process(dst io.Writer, src io.Reader, preview bool, format string, timestam
 	if format == "plain" {
 		wc.WriteString(screen.AsPlainTextWithTimestamps(timestamps))
 	} else {
-		wc.WriteString(screen.AsHTML())
+		wc.WriteString(screen.AsHTMLWithTimestamps(timestamps))
 	}
 
 	if preview {
@@ -240,11 +241,11 @@ func main() {
 		&cli.StringFlag{
 			Name:  "format",
 			Value: "html",
-			Usage: "output format: 'html' (default) or 'plain' for plain text",
+			Usage: "output format: 'html' or 'plain' for plain text",
 		},
 		&cli.BoolFlag{
-			Name:  "timestamps",
-			Usage: "include UTC timestamps in plain text output (only applies when --format=plain)",
+			Name:  "no-timestamps",
+			Usage: "disable timestamps in output",
 		},
 		&cli.BoolFlag{
 			Name:  "log-stats-to-stderr",
@@ -285,6 +286,7 @@ func main() {
 		if err != nil {
 			return fmt.Errorf("creating screen: %w", err)
 		}
+		screen.Timestamps = !c.Bool("no-timestamps")
 
 		// Run a web server?
 		if addr := c.String("http"); addr != "" {
@@ -305,7 +307,7 @@ func main() {
 			input = f
 		}
 
-		in, out, err := process(os.Stdout, input, c.Bool("preview"), format, c.Bool("timestamps"), screen)
+		in, out, err := process(os.Stdout, input, c.Bool("preview"), format, !c.Bool("no-timestamps"), screen)
 		if err != nil {
 			return err
 		}
