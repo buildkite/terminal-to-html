@@ -80,7 +80,7 @@ func (b *outputBuffer) appendChar(char rune) {
 // lineToHTML joins parts of a line together and renders them in HTML. It
 // ignores the newline field (i.e. assumes all parts are !newline except the
 // last part). The output string will have a terminating \n.
-func lineToHTML(parts []screenLine) string {
+func lineToHTML(parts []screenLine, timestamps bool) string {
 	var buf outputBuffer
 
 	// Combine metadata - last metadata wins.
@@ -88,7 +88,7 @@ func lineToHTML(parts []screenLine) string {
 	for _, l := range parts {
 		maps.Copy(bkmd, l.metadata[bkNamespace])
 	}
-	if len(bkmd) > 0 {
+	if timestamps && len(bkmd) > 0 {
 		buf.appendMeta(bkNamespace, bkmd)
 	}
 
@@ -197,4 +197,42 @@ func (l *screenLine) asPlain() string {
 		line = strings.TrimRight(line, " \t") + "\n"
 	}
 	return line
+}
+
+// lineToPlain joins parts of a line together and renders them as plain text,
+// optionally with a UTC timestamp prefix. The output string will have a
+// terminating \n.
+func lineToPlain(parts []screenLine, timestamps bool) string {
+	var buf strings.Builder
+
+	if timestamps {
+		// Combine metadata - last metadata wins.
+		bkmd := make(map[string]string)
+		for _, l := range parts {
+			maps.Copy(bkmd, l.metadata[bkNamespace])
+		}
+		if t, ok := bkmd["t"]; ok {
+			if millis, err := strconv.ParseInt(t, 10, 64); err == nil {
+				ts := time.Unix(millis/1000, (millis%1000)*1_000_000).UTC()
+				buf.WriteString(ts.Format("2006-01-02T15:04:05Z"))
+				buf.WriteString(" ")
+			}
+		}
+	}
+
+	// Render the text content.
+	for _, l := range parts {
+		for _, node := range l.nodes {
+			if !node.style.element() {
+				buf.WriteRune(node.blob)
+			}
+		}
+	}
+
+	line := buf.String()
+	line = strings.TrimRight(line, " \t")
+	if line == "" && !timestamps {
+		return "\n"
+	}
+	return line + "\n"
 }

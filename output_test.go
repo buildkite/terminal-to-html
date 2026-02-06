@@ -38,9 +38,9 @@ func TestScreenLineAsHTML_Interleaving(t *testing.T) {
 				t.Fatalf("len(s.screen) = %d, want 1", len(s.screen))
 			}
 
-			got := lineToHTML(s.screen[:1])
+			got := lineToHTML(s.screen[:1], true)
 			if diff := cmp.Diff(got, test.want); diff != "" {
-				t.Errorf("lineToHTML(s.screen[:1]) diff (-got +want):\n%s", diff)
+				t.Errorf("lineToHTML(s.screen[:1], true) diff (-got +want):\n%s", diff)
 			}
 		})
 	}
