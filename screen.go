@@ -290,7 +290,8 @@ func (s *Screen) currentLineForWriting() *screenLine {
 			}
 			if s.ScrollOutPlainFunc != nil {
 				s.ScrollOutPlainFunc(lineToPlain(s.screen[:scrollOutTo], s.Timestamps))
-			} else {
+			}
+			if s.ScrollOutFunc != nil {
 				s.ScrollOutFunc(lineToHTML(s.screen[:scrollOutTo], s.Timestamps))
 			}
 		}
