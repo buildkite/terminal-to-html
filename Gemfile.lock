@@ -2,14 +2,12 @@ PATH
   remote: .
   specs:
     terminal (2.0.0)
-      escape_utils (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     benchmark-ips (2.1.1)
     diff-lcs (1.2.5)
-    escape_utils (1.0.1)
     hirb (0.7.3)
     memory_profiler (0.0.4)
     method_profiler (2.0.1)

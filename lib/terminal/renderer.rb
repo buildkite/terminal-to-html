@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require 'escape_utils'
+require 'cgi'
 require 'strscan'
 
 module Terminal
@@ -93,7 +93,7 @@ module Terminal
     end
 
     def escape_html(string)
-      EscapeUtils.escape_html(string)
+      CGI.escapeHTML(string)
     end
 
     def convert_screen_to_string
