@@ -382,9 +382,7 @@ func (s *Screen) setLineMetadata(namespace string, data map[string]string) {
 	}
 
 	// copy new data over old data
-	for k, v := range data {
-		ns[k] = v
-	}
+	maps.Copy(ns, data)
 }
 
 // Apply color instruction codes to the screen's current style

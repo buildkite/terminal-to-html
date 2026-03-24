@@ -40,7 +40,6 @@ func TestParseBuildkiteAPC(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.sequence, func(t *testing.T) {
 			t.Parallel()
 
