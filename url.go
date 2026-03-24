@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"net/url"
+	"slices"
 )
 
 const unsafeURLSubstitution = "#"
@@ -21,10 +22,8 @@ func sanitizeURL(s string) string {
 	// An allow-list would be preferable, but we don't know what URL schemes are being legitimately
 	// used in the wild, so that would be a breaking change, and likely require configurability.
 	disallowedSchemes := []string{"javascript"}
-	for _, ds := range disallowedSchemes {
-		if url.Scheme == ds {
-			return unsafeURLSubstitution
-		}
+	if slices.Contains(disallowedSchemes, url.Scheme) {
+		return unsafeURLSubstitution
 	}
 
 	// default allow
