@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/golang:1.26.1@sha256:595c7847cff97c9a9e76f015083c481d26078f961c9c8dca3923132f51fe12f1
+FROM public.ecr.aws/docker/library/golang:1.26.2@sha256:fcdb3e42c5544e9682a635771eac76a698b66de79b1b50ec5b9ce5c5f14ad775
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
