@@ -195,7 +195,7 @@ func (s style) color(colors []string) style {
 			continue
 		case COLOR_GOT_38_2:
 			rgb[rgb_index] = uint8(cc)
-			if rgb_index == 3 {
+			if rgb_index == 2 {
 				s.setFGColor24Bit(rgb)
 				colorMode = COLOR_NORMAL
 				continue
@@ -204,7 +204,7 @@ func (s style) color(colors []string) style {
 			continue
 		case COLOR_GOT_48_2:
 			rgb[rgb_index] = uint8(cc)
-			if rgb_index == 3 {
+			if rgb_index == 2 {
 				s.setBGColor24Bit(rgb)
 				colorMode = COLOR_NORMAL
 				continue
