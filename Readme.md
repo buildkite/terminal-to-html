@@ -70,6 +70,8 @@ To get a bash prompt with all the go cross-compilation tools set up for you alre
 $ docker build -t terminal . && docker run -it --rm -v $(pwd):/go/src/github.com/buildkite/terminal-to-html terminal bash
 ```
 
+For publishing a release and its binary assets, see [RELEASE.md](RELEASE.md).
+
 ## Benchmarking
 
 Run `go test -bench .` to see raw Go performance. The `npm` test is the focus: this best represents the kind of use cases the original code was developed against.
