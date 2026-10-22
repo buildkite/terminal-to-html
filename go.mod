@@ -5,6 +5,7 @@ go 1.26.10
 require (
 	github.com/google/go-cmp v0.7.0
 	github.com/urfave/cli/v2 v2.27.7
+	github.com/wolfeidau/osc7501 v0.2.1
 )
 
 require (

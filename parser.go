@@ -1,8 +1,11 @@
 package terminal
 
 import (
+	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/wolfeidau/osc7501"
 )
 
 const (
@@ -14,6 +17,8 @@ const (
 	parserModeCharset
 	parserModeAPC
 	parserModeAPCEsc // within APC and just read an escape
+	parserModeOSCDiscard
+	parserModeOSCDiscardEsc
 )
 
 type position struct {
@@ -92,6 +97,16 @@ func (p *parser) parseToScreen(input []byte) {
 		charBytes := p.buffer.slice(p.cursor, min(p.cursor+4, p.buffer.len()))
 		char, charLen := utf8.DecodeRune(charBytes)
 
+		// Bound OSC 7501 buffering, including reports split across writes.
+		if (p.mode == parserModeOSC || p.mode == parserModeOSCEsc) && p.cursor+charLen-p.escapeStartedAt > 4096 &&
+			string(p.buffer.slice(p.instructionStartedAt, p.instructionStartedAt+5)) == "7501;" {
+			if p.mode == parserModeOSCEsc {
+				p.mode = parserModeOSCDiscardEsc
+			} else {
+				p.mode = parserModeOSCDiscard
+			}
+		}
+
 		switch p.mode {
 		case parserModeEscape:
 			// We've received an escape character but aren't inside an escape sequence yet
@@ -108,6 +123,16 @@ func (p *parser) parseToScreen(input []byte) {
 		case parserModeOSCEsc:
 			// We're inside an operating system command, and just hit an ESC (might be ST)
 			p.handleOSCEscape(char)
+
+		case parserModeOSCDiscard, parserModeOSCDiscardEsc:
+			switch {
+			case char == '\x07', char == '\\' && p.mode == parserModeOSCDiscardEsc:
+				p.mode = parserModeNormal
+			case char == '\x1b':
+				p.mode = parserModeOSCDiscardEsc
+			default:
+				p.mode = parserModeOSCDiscard
+			}
 
 		case parserModeCharset:
 			// We're inside a charset sequence, capture the next character.
@@ -129,8 +154,8 @@ func (p *parser) parseToScreen(input []byte) {
 		p.cursor += charLen
 	}
 
-	// If we're in normal mode, everything up to the cursor has been procesed.
-	if p.mode == parserModeNormal {
+	// Discarded OSCs need no retained bytes while waiting for their terminator.
+	if p.mode == parserModeNormal || p.mode == parserModeOSCDiscard || p.mode == parserModeOSCDiscardEsc {
 		p.cursor = 0
 		p.remainder = p.remainder[:0]
 		return
@@ -189,7 +214,20 @@ func (p *parser) handleOperatingSystemCommand(char rune) {
 // processOperatingSystemCommand processes the contents of the OSC that was just read.
 func (p *parser) processOperatingSystemCommand(end int) {
 	p.mode = parserModeNormal
-	element, err := parseElementSequence(string(p.buffer.slice(p.instructionStartedAt, end)))
+	sequence := string(p.buffer.slice(p.instructionStartedAt, end))
+	if body, ok := strings.CutPrefix(sequence, "7501;"); ok {
+		if status, err := osc7501.Parse([]byte(body)); err == nil {
+			// Reports annotate the current line without occupying a screen cell,
+			// inheriting text styles, or triggering a pending line wrap.
+			line := p.screen.currentLine()
+			if line == nil {
+				line = p.screen.currentLineForWriting()
+			}
+			line.programStatuses = append(line.programStatuses, status)
+		}
+		return
+	}
+	element, err := parseElementSequence(sequence)
 	// Errors are rendered into the screen (see below).
 
 	if element == nil && err == nil {

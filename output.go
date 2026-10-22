@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/wolfeidau/osc7501"
 )
 
 type outputBuffer struct {
@@ -33,6 +35,30 @@ func (b *outputBuffer) appendAnchor(url string) {
 
 func (b *outputBuffer) closeAnchor() {
 	b.WriteString("</a>")
+}
+
+func (b *outputBuffer) appendProgramStatus(status osc7501.Report) {
+	progress := ""
+	if status.Progress >= 0 {
+		progress = strconv.Itoa(status.Progress)
+	}
+	b.WriteString("<program-status")
+	for _, field := range []struct{ key, value string }{
+		{"state", status.State},
+		{"id", status.ID},
+		{"kind", status.Kind},
+		{"progress", progress},
+		{"app", status.App},
+		{"title", status.Title},
+		{"msg", status.Msg},
+	} {
+		if field.value != "" {
+			b.WriteString(` data-` + field.key + `="`)
+			b.WriteString(html.EscapeString(field.value))
+			b.WriteByte('"')
+		}
+	}
+	b.WriteString("></program-status>")
 }
 
 func (b *outputBuffer) appendMeta(namespace string, data map[string]string) {
@@ -117,6 +143,12 @@ func lineToHTML(parts []screenLine, timestamps bool) string {
 	var previous node
 
 	for _, l := range parts {
+		if len(l.programStatuses) > 0 {
+			closeFrom(0)
+			for _, status := range l.programStatuses {
+				buf.appendProgramStatus(status)
+			}
+		}
 		for x, current := range l.nodes {
 			// A set of flags for which tags need changing.
 			tagChanged := []bool{
