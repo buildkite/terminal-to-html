@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Match the build toolchain in Dockerfile.
 go_version=1.26.10
-if [[ ! -x /usr/local/go/bin/go ]] || [[ "$(/usr/local/go/bin/go version)" != "go version go${go_version} linux/amd64" ]]; then
+if [[ ! -x /usr/local/go/bin/go ]] || [[ "$(GOTOOLCHAIN=local /usr/local/go/bin/go version)" != "go version go${go_version} linux/amd64" ]]; then
   archive=$(mktemp)
   trap 'rm -f "$archive"' EXIT
   curl -fsSL "https://go.dev/dl/go${go_version}.linux-amd64.tar.gz" -o "$archive"
