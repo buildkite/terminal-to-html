@@ -52,7 +52,48 @@ Links which contain semicolons can be surrounded by either single or double quot
 
 `1339;url='https://example.com/link-with;semicolon?argument=something';content=Example`
 
+### Program status (OSC 7501)
+
+Terminal converts [OSC 7501 program status reports](https://www.superlogical.com/rex/docs/build/program-status)
+(revision 0.4) into empty custom elements for a frontend to interpret:
+
+```sh
+printf '\033]7501;state=blocked:kind=permission:id=deploy/eu-west:app=terraform:msg=QXBwcm92ZT8\033\\'
+```
+
+```html
+<program-status data-state="blocked" data-id="deploy/eu-west" data-kind="permission" data-app="terraform" data-msg="Approve?"></program-status>
+```
+
+The attributes mirror the protocol's keys: `data-state`, `data-id`, `data-kind`,
+`data-progress`, `data-app`, `data-title`, and `data-msg`. Text in `title` and `msg`
+is decoded from base64 and HTML-escaped. Absent optional keys and empty text values are omitted;
+absent progress means indeterminate, not zero. The protocol id uses `data-id`,
+not the DOM `id` attribute. Unknown keys are ignored.
+
+Reports appear at the start of their screen line, after any timestamp and outside
+text styles and links. They consume no terminal columns and add no text to plain
+text output. Multiple reports on a line retain their order and survive cursor
+redraws of that line. Wrapped screen lines retain their own reports when joined
+into one output line. Reports scroll out with their line.
+
+This is report conversion, not a terminal status store. Each accepted report emits
+a marker, including `state=clear`; earlier markers are not replaced or deleted.
+The frontend owns record replacement, subtree clearing, app inheritance, and
+presentation. Status updates do not define explicit log ranges. Feature detection
+queries and replies are ignored; the converter never replies to the program.
+
+Reports are parsed and validated by [osc7501](https://github.com/buildkite/osc7501).
+Rejected reports are silently discarded. Both BEL and ESC-backslash terminators
+are supported, including sequences split across writes. Terminal enforces a
+4096-byte limit including framing; field validation follows the parser's behavior.
+
+HTML sanitizers must allow `program-status` and the attributes above.
+Frontends must treat decoded messages and titles as text, never HTML.
+
 ## Installation
+
+Building from source requires Go 1.26 or later.
 
 If you have Go installed you can simply run the following command to install the `terminal-to-html` command into `$GOPATH/bin`:
 

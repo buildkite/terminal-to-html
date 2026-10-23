@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	"github.com/buildkite/osc7501"
 )
 
 const (
@@ -640,6 +642,10 @@ type screenLine struct {
 	// metadata is { namespace => { key => value, ... }, ... }
 	// e.g. { "bk" => { "t" => "1234" } }
 	metadata map[string]map[string]string
+
+	// OSC 7501 reports remain attached to the line across cursor redraws,
+	// like timestamps. Multiple reports on one line retain their order.
+	programStatuses []osc7501.Report
 
 	// element nodes refer to elements in this slice by index
 	// (if node.style.element(), then elements[node.blob] is the element)
