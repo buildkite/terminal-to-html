@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Match the build toolchain in Dockerfile.
+go_version=1.26.10
+if [[ ! -x /usr/local/go/bin/go ]] || [[ "$(GOTOOLCHAIN=local /usr/local/go/bin/go version)" != "go version go${go_version} linux/amd64" ]]; then
+  archive=$(mktemp)
+  trap 'rm -f "$archive"' EXIT
+  curl -fsSL "https://go.dev/dl/go${go_version}.linux-amd64.tar.gz" -o "$archive"
+  rm -rf /usr/local/go
+  tar -C /usr/local -xzf "$archive"
+fi
+ln -sf /usr/local/go/bin/go /usr/local/bin/go
+ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+go mod download
