@@ -83,7 +83,7 @@ The frontend owns record replacement, subtree clearing, app inheritance, and
 presentation. Status updates do not define explicit log ranges. Feature detection
 queries and replies are ignored; the converter never replies to the program.
 
-Reports are parsed and validated by [osc7501](https://github.com/wolfeidau/osc7501).
+Reports are parsed and validated by [osc7501](https://github.com/buildkite/osc7501).
 Rejected reports are silently discarded. Both BEL and ESC-backslash terminators
 are supported, including sequences split across writes. Terminal enforces a
 4096-byte limit including framing; field validation follows the parser's behavior.

@@ -5,7 +5,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/wolfeidau/osc7501"
+	"github.com/buildkite/osc7501"
 )
 
 const (

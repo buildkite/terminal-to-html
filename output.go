@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wolfeidau/osc7501"
+	"github.com/buildkite/osc7501"
 )
 
 type outputBuffer struct {
