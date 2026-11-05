@@ -57,6 +57,16 @@ var rendererTestCases = []struct {
 		want:  "he<span class=\"term-fg32\">llo</span>",
 	},
 	{
+		name:  "keeps a multi-byte rune that follows an escape that goes nowhere",
+		input: "ok \x1b\u00e9 end",
+		want:  "ok \u00e9 end",
+	},
+	{
+		name:  "keeps a multi-byte rune that ends an unrecognised control sequence",
+		input: "\x1b[\u65e5\u672c",
+		want:  "[\u65e5\u672c",
+	},
+	{
 		name:  "treats multi-byte unicode characters as individual runes",
 		input: "€€€€€€\b\b\baaa",
 		want:  "€€€aaa",
