@@ -5,6 +5,9 @@ import (
 	"unicode/utf8"
 )
 
+// escapeRune is the character that starts every sequence this parser handles.
+const escapeRune = '\x1b'
+
 const (
 	parserModeNormal = iota
 	parserModeEscape
@@ -31,6 +34,10 @@ type parser struct {
 	instructions         []string
 	instructionStartedAt int
 	savePosition         position
+
+	// Set when a sequence turned out not to be an escape after all, so the
+	// bytes after the ESC are reprocessed as ordinary text.
+	abortedEscape bool
 
 	// Buildkite-specific state
 	lastTimestamp int64
@@ -124,6 +131,16 @@ func (p *parser) parseToScreen(input []byte) {
 		case parserModeNormal:
 			// Outside of an escape sequence entirely, normal input
 			p.handleNormal(char)
+		}
+
+		if p.abortedEscape {
+			// The escape was a false alarm. Resume at the byte after the ESC
+			// rather than past the current rune: the rune that ended the
+			// sequence can be more than one byte wide, and skipping it would
+			// land the cursor inside it.
+			p.abortedEscape = false
+			p.cursor = p.escapeStartedAt + utf8.RuneLen(escapeRune)
+			continue
 		}
 
 		p.cursor += charLen
@@ -322,8 +339,7 @@ func (p *parser) handleControlSequence(char rune) {
 
 	default:
 		// unrecognized character, abort the escapeCode
-		p.cursor = p.escapeStartedAt
-		p.mode = parserModeNormal
+		p.abortEscape()
 	}
 }
 
@@ -386,9 +402,15 @@ func (p *parser) handleEscape(char rune) {
 
 	default:
 		// Not an escape code, false alarm
-		p.cursor = p.escapeStartedAt
-		p.mode = parserModeNormal
+		p.abortEscape()
 	}
+}
+
+// abortEscape gives up on the sequence that started at p.escapeStartedAt. The
+// bytes after the ESC are reprocessed as ordinary text.
+func (p *parser) abortEscape() {
+	p.mode = parserModeNormal
+	p.abortedEscape = true
 }
 
 // addInstruction appends an instruction to p.instructions, if the current
