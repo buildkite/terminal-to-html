@@ -132,3 +132,29 @@ func assertTextXY(s *Screen, expected string, x, y int) error {
 	}
 	return nil
 }
+
+func TestParseSplitUTF8(t *testing.T) {
+	for _, input := range []string{"café", "日本語", "hello 🌍", "\x1b[31mcafé🌍\x1b[0m", "\x1b]8;;https://example.com/日本\a日本語\x1b]8;;\a", "a\xffb"} {
+		for chunkSize := 1; chunkSize <= 4; chunkSize++ {
+			t.Run(fmt.Sprintf("%q/chunk=%d", input, chunkSize), func(t *testing.T) {
+				s, err := NewScreen()
+				if err != nil {
+					t.Fatal(err)
+				}
+				for start := 0; start < len(input); start += chunkSize {
+					chunk := []byte(input[start:min(start+chunkSize, len(input))])
+					if n, err := s.Write(chunk); err != nil || n != len(chunk) {
+						t.Fatalf("Write = %d, %v", n, err)
+					}
+					// Writers must not retain the caller's buffer.
+					for i := range chunk {
+						chunk[i] = 'x'
+					}
+				}
+				if got, want := s.AsHTML(), Render([]byte(input)); got != want {
+					t.Errorf("chunked = %q, single write = %q", got, want)
+				}
+			})
+		}
+	}
+}
