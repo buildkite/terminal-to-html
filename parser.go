@@ -90,6 +90,9 @@ func (p *parser) parseToScreen(input []byte) {
 	for p.cursor < p.buffer.len() {
 		// UTF-8 runes are 1-4 bytes, so slice ahead +4.
 		charBytes := p.buffer.slice(p.cursor, min(p.cursor+4, p.buffer.len()))
+		if !utf8.FullRune(charBytes) {
+			break
+		}
 		char, charLen := utf8.DecodeRune(charBytes)
 
 		switch p.mode {
@@ -129,17 +132,13 @@ func (p *parser) parseToScreen(input []byte) {
 		p.cursor += charLen
 	}
 
-	// If we're in normal mode, everything up to the cursor has been procesed.
-	if p.mode == parserModeNormal {
-		p.cursor = 0
-		p.remainder = p.remainder[:0]
-		return
+	// In normal mode, retain any incomplete UTF-8 rune at the cursor.
+	// Inside an escape, retain the whole sequence starting at escapeStartedAt.
+	done := p.cursor
+	if p.mode != parserModeNormal {
+		done = p.escapeStartedAt
 	}
-
-	// We're in the middle of an escape, only everything up to p.escapeStartedAt
-	// has been processed. The remainder sits at the end of input, which we
-	// don't want to retain (see io.Writer docs), so copy it using append.
-	done := p.escapeStartedAt
+	// The remainder may refer to input, which io.Writer must not retain.
 	p.remainder = append(p.remainder[:0], p.buffer.slice(done, p.buffer.len())...)
 
 	// Adjust the buffer indices accordingly.
