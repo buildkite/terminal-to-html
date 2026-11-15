@@ -358,6 +358,16 @@ var rendererTestCases = []struct {
 		want:  `a link to <a href="http://google.com">google</a>.`,
 	},
 	{
+		name:  "renders OSC 8 links with semicolons in the URL path",
+		input: "\x1b]8;;https://example.com/path;version=2\x1b\\label\x1b]8;;\x1b\\ after",
+		want:  `<a href="https://example.com/path;version=2">label</a> after`,
+	},
+	{
+		name:  "renders OSC 8 links with semicolons in the URL query and nonempty params",
+		input: "\x1b]8;id=example;https://example.com/?a=1;b=2\alabel\x1b]8;;\a after",
+		want:  `<a href="https://example.com/?a=1;b=2">label</a> after`,
+	},
+	{
 		name:  "uses URL as link content if missing",
 		input: "\x1b]1339;url=http://google.com\a",
 		want:  `<a href="http://google.com">http://google.com</a>`,
