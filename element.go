@@ -98,7 +98,7 @@ func parseElementSequence(sequence string) (*element, error) {
 		// The link "content" comes after the element and is stored
 		// as regular text in the screen line, because they are designed to gracefully
 		// degrade to plain text if the sequence isn't supported.
-		tokens := strings.Split(args, ";")
+		tokens := strings.SplitN(args, ";", 2)
 		if len(tokens) != 2 {
 			// Probably malformed
 			return nil, nil
