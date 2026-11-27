@@ -575,6 +575,131 @@ func BenchmarkStreamingDockerComposePull(b *testing.B) {
 	benchmarkStreaming("docker-compose-pull.sh", b)
 }
 
+func TestProgramStatusReports(t *testing.T) {
+	cases := []struct {
+		name, body, attributes string
+	}{
+		{"root", "state=idle", `data-state="idle"`},
+		{"working", "state=working:progress=007:app=cargo", `data-state="working" data-progress="7" data-app="cargo"`},
+		{"blocked", "state=blocked:id=deploy/eu-west:kind=permission:progress=0:app=terraform:title=RVUgV2VzdA==:msg=QXBwcm92ZT8", `data-state="blocked" data-id="deploy/eu-west" data-kind="permission" data-progress="0" data-app="terraform" data-title="EU West" data-msg="Approve?"`},
+		{"clear", "state=clear:id=build/test", `data-state="clear" data-id="build/test"`},
+		{"error", "state=error", `data-state="error"`},
+		{"irrelevant fields", "state=done:kind=auth:progress=50:app=bad/name", `data-state="done"`},
+		{"unknown optional values", "state=blocked:kind=new:progress=101", `data-state="blocked"`},
+		{"negative progress", "state=working:progress=-1", `data-state="working"`},
+		{"signed progress", "state=working:progress=+1", `data-state="working"`},
+		{"complete progress", "state=working:progress=100", `data-state="working" data-progress="100"`},
+		{"pairs", " state = working :badpair:=bad:STATE=error:unknown=value:msg=!!!:state=done", `data-state="done"`},
+		{"repeated fields", "state=done:id=build/compile:id=build/test:msg=Rmlyc3Q=:msg=TGFzdA==", `data-state="done" data-id="build/test" data-msg="Last"`},
+		{"empty text", "state=done:title=:msg=", `data-state="done"`},
+		{"text limits", "state=done:title=" + base64Encode(strings.Repeat("t", 192)) + ":msg=" + base64Encode(strings.Repeat("m", 2048)), `data-state="done" data-title="` + strings.Repeat("t", 192) + `" data-msg="` + strings.Repeat("m", 2048) + `"`},
+		{"escaped text", "state=done:title=" + base64Encode("Déploy 🚀") + ":msg=" + base64Encode(`"><img src=x onerror='alert(1)'>&`), `data-state="done" data-title="Déploy 🚀" data-msg="&#34;&gt;&lt;img src=x onerror=&#39;alert(1)&#39;&gt;&amp;"`},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			for _, terminator := range []string{"\a", "\x1b\\"} {
+				got := Render([]byte("before\x1b]7501;" + c.body + terminator + "after"))
+				want := "<program-status " + c.attributes + "></program-status>beforeafter"
+				if diff := cmp.Diff(want, got); diff != "" {
+					t.Errorf("terminator %q (-want +got):\n%s", terminator, diff)
+				}
+			}
+		})
+	}
+}
+
+func TestProgramStatusRejectedReports(t *testing.T) {
+	bodies := []string{
+		"?", "?:states=idle,working", "app=cargo", "state=future",
+		"state=done:id=", "state=done:id=a//b",
+		"state=done:id=" + strings.Repeat("a", 33),
+		"state=done:id=" + strings.Repeat("a/", 8) + "a",
+		"state=done:id=" + strings.Repeat(strings.Repeat("a", 32)+"/", 3) + strings.Repeat("b", 30),
+		"state=done:msg=a===", "state=done:msg=/w==",
+		"state=done:msg=" + base64Encode("a\nb"),
+		"state=done:title=" + base64Encode("a\u0085b"),
+		"state=done:msg=" + base64Encode(strings.Repeat("a", 2049)),
+		"state=done:title=" + base64Encode(strings.Repeat("a", 193)),
+		"state=done:id=a//b:id=build/test",
+		"state=done:msg=" + base64Encode(strings.Repeat("a", 2049)) + ":msg=",
+		"state=done:title=" + strings.Repeat("A", 257) + ":title=",
+		"state=done:app=" + strings.Repeat("a", 33),
+		"state=done:" + strings.Repeat("k", 17) + "=value",
+	}
+	for _, body := range bodies {
+		t.Run(body[:min(len(body), 65)], func(t *testing.T) {
+			if got := Render([]byte("before\x1b]7501;" + body + "\aafter")); got != "beforeafter" {
+				t.Errorf("rejected report rendered as %q", got)
+			}
+		})
+	}
+}
+
+func TestProgramStatusStreaming(t *testing.T) {
+	input := "\x1b_bk;t=0\a\x1b[32mab\x1b]7501;state=working:id=build\x1b\\cd\x1b]7501;state=clear:id=build\a\r\x1b[2Kgh\nnext\nlast"
+	want := `<time datetime="1970-01-01T00:00:00Z">1970-01-01T00:00:00Z</time>` +
+		`<program-status data-state="working" data-id="build"></program-status>` +
+		`<program-status data-state="clear" data-id="build"></program-status>` +
+		"<span class=\"term-fg32\">gh</span>\n<span class=\"term-fg32\">next</span>\n<span class=\"term-fg32\">last</span>"
+	for split := 0; split <= len(input); split++ {
+		s, err := NewScreen(WithSize(4, 2), WithMaxSize(4, 2))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var scrolled strings.Builder
+		s.ScrollOutFunc = func(line string) { scrolled.WriteString(line) }
+		s.Write([]byte(input[:split]))
+		s.Write([]byte(input[split:]))
+		got := scrolled.String() + s.AsHTML()
+		if diff := cmp.Diff(want, got); diff != "" {
+			t.Fatalf("split %d (-want +got):\n%s", split, diff)
+		}
+		if got := s.AsPlainText(); got != "next\nlast" {
+			t.Fatalf("split %d: plain text = %q", split, got)
+		}
+	}
+}
+
+func TestProgramStatusWrappedLines(t *testing.T) {
+	s, err := NewScreen(WithSize(4, 2))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.Write([]byte("abcd\x1b]7501;state=working\ae\x1b]7501;state=done\afg"))
+	want := `<program-status data-state="working"></program-status>abcd<program-status data-state="done"></program-status>efg`
+	if diff := cmp.Diff(want, s.AsHTML()); diff != "" {
+		t.Errorf("(-want +got):\n%s", diff)
+	}
+	if got := s.AsPlainText(); got != "abcdefg" {
+		t.Errorf("plain text = %q", got)
+	}
+}
+
+func TestProgramStatusSequenceLimits(t *testing.T) {
+	for _, terminator := range []string{"\a", "\x1b\\"} {
+		for _, length := range []int{4096, 4097, 16384} {
+			prefix := "\x1b]7501;state=done:unknown="
+			input := prefix + strings.Repeat("a", length-len(prefix)-len(terminator)) + terminator + "ok"
+			for _, chunkSize := range []int{1, 4096, len(input)} {
+				s, err := NewScreen()
+				if err != nil {
+					t.Fatal(err)
+				}
+				for offset := 0; offset < len(input); offset += chunkSize {
+					s.Write([]byte(input[offset:min(offset+chunkSize, len(input))]))
+				}
+				want := "ok"
+				if length == 4096 {
+					want = `<program-status data-state="done"></program-status>ok`
+				}
+				if got := s.AsHTML(); got != want {
+					t.Errorf("length %d, terminator %q, chunk %d: got %q, want %q", length, terminator, chunkSize, got, want)
+				}
+			}
+		}
+	}
+}
+
 func benchmarkStreaming(filename string, b *testing.B) {
 	raw := loadFixture(b, filename, "raw")
 	b.ResetTimer()
